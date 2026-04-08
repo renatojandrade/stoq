@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Stoq.ApiService/Stoq.ApiService.csproj" />
+  <Project Path="Stoq.AppHost/Stoq.AppHost.csproj" />
+  <Project Path="Stoq.ServiceDefaults/Stoq.ServiceDefaults.csproj" />
+  <Project Path="Stoq.Web/Stoq.Web.csproj" />
+</Solution>

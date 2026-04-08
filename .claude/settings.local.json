@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('\\\\n'.join\\(sorted\\(d.get\\('libraries',{}\\).keys\\(\\)\\)\\)\\)\")",
+      "Bash(python3 -c \" import json with open\\('/c/Users/renat/source/repos/stoq/server/Stoq.AppHost/obj/project.assets.json'\\) as f: d = json.load\\(f\\) libs = sorted\\(d.get\\('libraries', {}\\).keys\\(\\)\\) for l in libs: print\\(l\\) \")",
+      "Bash(python3 -c ':*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet package:*)"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- TargetFramework, Nullable, ImplicitUsings inherited from Directory.Build.props -->
+    <UserSecretsId>d249a603-2792-46b9-949f-cbbd9ace4200</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Aspire hosting extensions for infrastructure resources -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stoq.ApiService\Stoq.ApiService.csproj" />
+    <ProjectReference Include="..\Stoq.Web\Stoq.Web.csproj" />
+  </ItemGroup>
+
+</Project>

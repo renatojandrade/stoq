@@ -1,0 +1,112 @@
+; Root EditorConfig — applies to every file in server/
+; Roslyn reads this at build time (EnforceCodeStyleInBuild=true in Directory.Build.props).
+root = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# All files
+# ─────────────────────────────────────────────────────────────────────────────
+[*]
+indent_style              = space
+end_of_line               = lf
+insert_final_newline      = true
+trim_trailing_whitespace  = true
+charset                   = utf-8
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C# files
+# ─────────────────────────────────────────────────────────────────────────────
+[*.cs]
+indent_size  = 4
+tab_width    = 4
+# utf-8-bom is required for C# XML doc comments to render correctly in VS
+charset      = utf-8-bom
+
+# ── Using directives ──────────────────────────────────────────────────────────
+dotnet_sort_system_directives_first                                    = true
+dotnet_separate_import_directive_groups                                = false
+csharp_using_directive_placement                                       = outside_namespace:warning
+
+# ── Naming conventions ────────────────────────────────────────────────────────
+# Types, methods, properties, constants → PascalCase
+dotnet_naming_rule.types_should_be_pascal_case.severity               = warning
+dotnet_naming_rule.types_should_be_pascal_case.symbols                = types
+dotnet_naming_rule.types_should_be_pascal_case.style                  = pascal_case_style
+
+dotnet_naming_symbols.types.applicable_kinds                          = class, struct, interface, enum, delegate
+dotnet_naming_symbols.types.applicable_accessibilities                = *
+
+# Private instance fields → _camelCase
+dotnet_naming_rule.private_fields_should_be_camel_case.severity       = warning
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols        = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style          = camel_case_underscore_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds                 = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities       = private, private_protected
+
+dotnet_naming_style.camel_case_underscore_style.required_prefix       = _
+dotnet_naming_style.camel_case_underscore_style.capitalization        = camel_case
+
+# Parameters and local variables → camelCase
+dotnet_naming_rule.locals_should_be_camel_case.severity               = warning
+dotnet_naming_rule.locals_should_be_camel_case.symbols                = locals
+dotnet_naming_rule.locals_should_be_camel_case.style                  = camel_case_style
+
+dotnet_naming_symbols.locals.applicable_kinds                         = parameter, local
+dotnet_naming_symbols.locals.applicable_accessibilities               = *
+
+dotnet_naming_style.pascal_case_style.capitalization                  = pascal_case
+dotnet_naming_style.camel_case_style.capitalization                   = camel_case
+
+# ── Null-checking modernisation ───────────────────────────────────────────────
+dotnet_style_null_propagation                                          = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method      = true:warning
+csharp_style_throw_expression                                          = true:suggestion
+csharp_style_conditional_delegate_call                                 = true:suggestion
+
+# ── Modern C# language features ──────────────────────────────────────────────
+csharp_style_expression_bodied_methods                                 = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties                              = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors                            = false:suggestion
+csharp_prefer_simple_using_statement                                   = true:suggestion
+csharp_prefer_braces                                                   = true:warning
+csharp_style_pattern_matching_over_is_with_cast_check                 = true:warning
+csharp_style_pattern_matching_over_as_with_null_check                 = true:warning
+csharp_style_prefer_switch_expression                                  = true:suggestion
+csharp_style_prefer_pattern_matching                                   = true:suggestion
+csharp_style_var_for_built_in_types                                    = false:suggestion
+csharp_style_var_when_type_is_apparent                                 = true:suggestion
+csharp_style_var_elsewhere                                             = false:suggestion
+
+# ── Unnecessary code ──────────────────────────────────────────────────────────
+dotnet_style_prefer_simplified_boolean_expressions                     = true:suggestion
+dotnet_code_quality_unused_parameters                                  = all:suggestion
+
+# ── Analyser severities ───────────────────────────────────────────────────────
+# CA2007: Always call ConfigureAwait on awaited tasks.
+dotnet_diagnostic.CA2007.severity                                      = error
+# CA1031: Do not catch general exception types — catch specific exceptions.
+dotnet_diagnostic.CA1031.severity                                      = warning
+# SA1600: Public members must be documented.
+dotnet_diagnostic.SA1600.severity                                      = suggestion
+# SA1633: File header — copyright block is a convention, not a build-breaking rule.
+dotnet_diagnostic.SA1633.severity                                      = suggestion
+# RCS1018: Add accessibility modifiers.
+dotnet_diagnostic.RCS1018.severity                                     = error
+# S3776: Cognitive complexity — keep methods simple.
+dotnet_diagnostic.S3776.severity                                       = warning
+# S2068: Hard-coded credentials are a security hotspot.
+dotnet_diagnostic.S2068.severity                                       = error
+# S1481: Remove unused local variables.
+dotnet_diagnostic.S1481.severity                                       = warning
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JSON / YAML / XML
+# ─────────────────────────────────────────────────────────────────────────────
+[*.{json,yaml,yml,xml,csproj,props,targets}]
+indent_size = 2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Markdown
+# ─────────────────────────────────────────────────────────────────────────────
+[*.md]
+trim_trailing_whitespace = false

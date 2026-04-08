@@ -1,0 +1,95 @@
+# ─── Operating System ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── .NET / C# ───────────────────────────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+.vs/
+*.ncrunch*
+_ReSharper*/
+*.DotSettings.user
+
+# EF Core migrations snapshot (keep source, ignore designer output)
+*.Designer.cs
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish output
+publish/
+PublishProfiles/
+
+# Test results & coverage
+TestResults/
+coverage/
+*.trx
+*.coveragexml
+lcov.info
+
+# Secret / user config (never commit)
+appsettings.*.local.json
+secrets.json
+
+# ─── Node / JavaScript / TypeScript ─────────────────────────────────────────
+node_modules/
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.pnp.*
+
+# Build output
+dist/
+.next/
+.expo/
+out/
+
+# Expo / React Native
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.mobileprovision
+*.orig.*
+web-build/
+
+# ─── Environment & Secrets ───────────────────────────────────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+google-services.json
+GoogleService-Info.plist
+
+# ─── Editors & IDEs ──────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# ─── Docker ──────────────────────────────────────────────────────────────────
+*.env.docker
+
+# ─── Azure ───────────────────────────────────────────────────────────────────
+.azure/
+local.settings.json
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+logs/

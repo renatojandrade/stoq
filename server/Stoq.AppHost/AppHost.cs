@@ -1,25 +1,27 @@
-var builder = DistributedApplication.CreateBuilder(args);
+﻿IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
 // ─── Infrastructure ───────────────────────────────────────────────────────────
 // PostgreSQL — one server, five named databases (one per module schema).
 // Each module's Infrastructure project receives its connection string via Aspire
 // service discovery — no hard-coded connection strings anywhere in the solution.
-var postgres = builder.AddPostgres("postgres")
+IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres")
+    .WithDataVolume("stoq-postgres-data")
     .WithPgAdmin();
 
-var dbIdentity  = postgres.AddDatabase("stoq-identity");
-var dbCatalog   = postgres.AddDatabase("stoq-catalog");
-var dbInventory = postgres.AddDatabase("stoq-inventory");
-var dbShopping  = postgres.AddDatabase("stoq-shopping");
-var dbRetailer  = postgres.AddDatabase("stoq-retailer");
+IResourceBuilder<PostgresDatabaseResource> dbIdentity = postgres.AddDatabase("stoq-identity");
+IResourceBuilder<PostgresDatabaseResource> dbCatalog = postgres.AddDatabase("stoq-catalog");
+IResourceBuilder<PostgresDatabaseResource> dbInventory = postgres.AddDatabase("stoq-inventory");
+IResourceBuilder<PostgresDatabaseResource> dbShopping = postgres.AddDatabase("stoq-shopping");
+IResourceBuilder<PostgresDatabaseResource> dbRetailer = postgres.AddDatabase("stoq-retailer");
 
 // RabbitMQ — used by MassTransit 8.x for all async inter-module integration events.
 // The management UI is available in the Aspire dashboard sidebar when running locally.
-var rabbitmq = builder.AddRabbitMQ("rabbitmq")
+IResourceBuilder<RabbitMQServerResource> rabbitmq = builder.AddRabbitMQ("rabbitmq")
+    .WithDataVolume("stoq-rabbitmq-data")
     .WithManagementPlugin();
 
 // ─── Application services ─────────────────────────────────────────────────────
-var apiService = builder.AddProject<Projects.Stoq_ApiService>("apiservice")
+IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.Stoq_ApiService>("apiservice")
     .WithHttpHealthCheck("/health")
     .WithReference(dbIdentity)
     .WithReference(dbCatalog)
@@ -36,4 +38,4 @@ builder.AddProject<Projects.Stoq_Web>("webfrontend")
     .WithReference(apiService)
     .WaitFor(apiService);
 
-builder.Build().Run();
+await builder.Build().RunAsync();

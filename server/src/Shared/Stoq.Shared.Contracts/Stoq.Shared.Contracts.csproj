@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Integration event contracts only — no domain logic -->
+  </PropertyGroup>
+</Project>

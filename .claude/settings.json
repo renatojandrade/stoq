@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet ef:*)",
+      "Bash(npm --version)",
+      "Bash(npx create-expo-app@latest . --template blank-typescript)",
+      "Bash(npm install:*)",
+      "Bash(npx expo:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep -i \"AspNetRole\\\\|AspNetUserRole\\\\|AspNetRoleClaim\\\\|AspNetUserClaim\" c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/Migrations/*_InitialCreate.cs)",
+      "Bash(grep -E \"Role|Check\" /c/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/Migrations/*_InitialCreate.cs)",
+      "Bash(dotnet --version)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\renat\\\\source\\\\repos\\\\stoq\\\\server\\\\strip-comments.ps1\")",
+      "Bash(grep -v \"obj\\\\\\\\\")",
+      "Bash(grep -E \"Role|UpdatedAt|UpdatedBy|CheckConstraint\" /c/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/Migrations/*_InitialCreate.cs)",
+      "Bash(grep \"Role\\\\|defaultValue\" /c/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/Migrations/*_InitialCreate.cs)",
+      "Bash(ls /c/Users/renat/source/repos/stoq/mobile/.env*)",
+      "Bash(where keytool:*)",
+      "Bash(git rm:*)",
+      "Bash(grep -n \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Services/IdentityServiceImpl.cs\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Services/SocialAuthServiceImpl.cs\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/IdentityModuleDbContext.cs\")",
+      "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Catalog\" --include=\"*.cs\")",
+      "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Application\" --include=\"*.cs\")",
+      "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/Stoq.ApiService\" --include=\"*.cs\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\renat\\.claude\\projects\\c--Users-renat-source-repos-stoq\\memory"
+    ]
+  }
+}

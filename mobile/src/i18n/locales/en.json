@@ -1,0 +1,175 @@
+{
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
+      "google": "Google",
+      "facebook": "Facebook",
+      "apple": "Apple"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Join Stoq and manage your household",
+      "displayName": "Display name",
+      "email": "Email",
+      "password": "Password",
+      "preferredLanguage": "Language",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we'll send you a reset code",
+      "email": "Email",
+      "submit": "Send reset code",
+      "backToLogin": "Back to sign in",
+      "successTitle": "Check your email",
+      "successSubtitle": "We sent a 6-digit code to {{email}} if that address is registered."
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter the 6-digit code from your email",
+      "otpCode": "6-digit code",
+      "newPassword": "New password",
+      "submit": "Reset password",
+      "success": "Password reset! Please sign in."
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "emailTaken": "This email is already registered.",
+      "invalidOtp": "Invalid or expired code.",
+      "networkError": "Network error. Please try again.",
+      "unknown": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMinLength": "Password must be at least 8 characters.",
+      "passwordUppercase": "Password must contain an uppercase letter.",
+      "passwordDigit": "Password must contain a digit.",
+      "displayNameRequired": "Display name is required.",
+      "otpRequired": "Enter the 6-digit code.",
+      "otpLength": "Code must be exactly 6 digits."
+    }
+  },
+  "household": {
+    "setup": {
+      "title": "Set up your household",
+      "subtitle": "Create a new household or join an existing one with an invite code."
+    },
+    "create": {
+      "title": "Create household",
+      "name": "Household name",
+      "submit": "Create household",
+      "namePlaceholder": "e.g. Smith Family",
+      "nameRequired": "Household name is required.",
+      "successTitle": "Household created!",
+      "successSubtitle": "Share this invite code with your household members.",
+      "inviteCodeLabel": "Invite code",
+      "inviteCodeExpiry": "Valid for 48 hours",
+      "shareCode": "Share code",
+      "shareMessage": "Join my household \"{{name}}\" on Stoq! Use invite code: {{code}}",
+      "continue": "Continue"
+    },
+    "join": {
+      "title": "Join household",
+      "inviteCode": "Invite code",
+      "submit": "Join household",
+      "codePlaceholder": "6-character code",
+      "codeRequired": "Enter the invite code.",
+      "codeLength": "Invite code must be 6 characters."
+    },
+    "settings": {
+      "inviteCodeSection": "Invite code",
+      "codeExpires": "Expires {{date}}",
+      "codeExpired": "Code expired — regenerate to create a new one",
+      "regenerate": "Regenerate",
+      "regenerateTitle": "Regenerate invite code?",
+      "regenerateConfirm": "The current code will be invalidated. Anyone who hasn't joined yet will need the new code.",
+      "regenerateSuccess": "New invite code generated.",
+      "manageMembers": "Manage members",
+      "manageMembersDesc": "{{count}} member(s)"
+    },
+    "members": {
+      "you": "you",
+      "removeTitle": "Remove member?",
+      "removeConfirm": "Remove {{name}} from the household?",
+      "remove": "Remove",
+      "removeSuccess": "{{name}} removed from the household.",
+      "changeRoleTitle": "Change role",
+      "roleChangeSuccess": "Role updated.",
+      "roles": {
+        "HouseholdAdmin": "Admin",
+        "HouseholdMember": "Member",
+        "HouseholdViewer": "Viewer"
+      }
+    }
+  },
+  "profile": {
+    "householdSettings": "Household settings",
+    "householdSettingsDesc": "Invite code, members, and address",
+    "logout": "Sign out",
+    "logoutTitle": "Sign out?",
+    "logoutConfirm": "You'll need to sign in again to access your household."
+  },
+  "catalog": {
+    "list": {
+      "title": "Product catalog",
+      "searchPlaceholder": "Search products…",
+      "empty": "No products yet. Tap + to add one.",
+      "addProduct": "Add product",
+      "edit": "Edit product",
+      "delete": "Delete product"
+    },
+    "detail": {
+      "title": "Product",
+      "edit": "Edit",
+      "delete": "Delete",
+      "notFound": "Product not found."
+    },
+    "form": {
+      "createTitle": "New product",
+      "editTitle": "Edit product",
+      "name": "Product name",
+      "brand": "Brand",
+      "brandPlaceholder": "Optional",
+      "category": "Category",
+      "unit": "Unit",
+      "minQuantity": "Min. quantity",
+      "barcode": "Barcode",
+      "barcodePlaceholder": "8–14 digits (optional)",
+      "imageUrl": "Image URL",
+      "create": "Create",
+      "update": "Save"
+    },
+    "units": {
+      "Units": "Units",
+      "Grams": "Grams",
+      "Kilograms": "Kilograms",
+      "Millilitres": "Millilitres",
+      "Litres": "Litres"
+    },
+    "validation": {
+      "nameRequired": "Product name is required.",
+      "categoryRequired": "Category is required.",
+      "minQuantityInvalid": "Min. quantity must be a non-negative number."
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "error": "Something went wrong. Please try again."
+  }
+}

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Stoq.Catalog.Application\Stoq.Catalog.Application.csproj" />
+    <ProjectReference Include="..\Stoq.Catalog.Domain\Stoq.Catalog.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Stoq.Shared.Contracts\Stoq.Shared.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- EF Core + PostgreSQL -->
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+    <!-- MediatR (publish domain events) -->
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+</Project>

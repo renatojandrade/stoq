@@ -41,6 +41,7 @@ lcov.info
 
 # Secret / user config (never commit)
 appsettings.*.local.json
+appsettings.Development.json
 secrets.json
 
 # ─── Node / JavaScript / TypeScript ─────────────────────────────────────────
@@ -93,3 +94,4 @@ local.settings.json
 # ─── Logs ────────────────────────────────────────────────────────────────────
 *.log
 logs/
+/server/Stoq.ApiService/appsettings.Development.json

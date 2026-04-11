@@ -1,17 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <!-- TargetFramework, Nullable, ImplicitUsings inherited from Directory.Build.props -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Stoq.ServiceDefaults\Stoq.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\src\Modules\Identity\Stoq.Identity.Application\Stoq.Identity.Application.csproj" />
+    <ProjectReference Include="..\src\Modules\Identity\Stoq.Identity.Infrastructure\Stoq.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\Modules\Catalog\Stoq.Catalog.Application\Stoq.Catalog.Application.csproj" />
+    <ProjectReference Include="..\src\Modules\Catalog\Stoq.Catalog.Infrastructure\Stoq.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\Shared\Stoq.Shared.Kernel\Stoq.Shared.Kernel.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <!-- Version managed centrally in Directory.Packages.props -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
-
 </Project>

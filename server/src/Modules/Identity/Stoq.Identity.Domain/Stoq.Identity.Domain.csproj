@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Pure domain layer — no framework dependencies -->
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Stoq.Shared.Contracts\Stoq.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Stoq.Shared.Kernel\Stoq.Shared.Kernel.csproj" />
+  </ItemGroup>
+</Project>

@@ -3,7 +3,6 @@
   "settings": {
     "documentationRules": {
       "companyName": "Stoq",
-      "copyrightText": "Copyright (c) Stoq. All rights reserved.",
       "documentInternalElements": false,
       "documentPrivateElements": false,
       "documentPrivateFields": false

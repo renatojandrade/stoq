@@ -1,0 +1,175 @@
+{
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de volta",
+      "subtitle": "Entre na sua conta",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu a senha?",
+      "submit": "Entrar",
+      "noAccount": "Não tem uma conta?",
+      "register": "Cadastre-se",
+      "orContinueWith": "Ou continue com",
+      "continueWithGoogle": "Continuar com Google",
+      "google": "Google",
+      "facebook": "Facebook",
+      "apple": "Apple"
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Junte-se ao Stoq e gerencie sua residência",
+      "displayName": "Nome de exibição",
+      "email": "E-mail",
+      "password": "Senha",
+      "preferredLanguage": "Idioma",
+      "submit": "Criar conta",
+      "haveAccount": "Já tem uma conta?",
+      "login": "Entrar"
+    },
+    "forgotPassword": {
+      "title": "Esqueci a senha",
+      "subtitle": "Digite seu e-mail e enviaremos um código de redefinição",
+      "email": "E-mail",
+      "submit": "Enviar código",
+      "backToLogin": "Voltar ao login",
+      "successTitle": "Verifique seu e-mail",
+      "successSubtitle": "Enviamos um código de 6 dígitos para {{email}} se esse endereço estiver cadastrado."
+    },
+    "resetPassword": {
+      "title": "Redefinir senha",
+      "subtitle": "Digite o código de 6 dígitos do seu e-mail",
+      "otpCode": "Código de 6 dígitos",
+      "newPassword": "Nova senha",
+      "submit": "Redefinir senha",
+      "success": "Senha redefinida! Por favor, entre novamente."
+    },
+    "errors": {
+      "invalidCredentials": "E-mail ou senha inválidos.",
+      "emailTaken": "Este e-mail já está cadastrado.",
+      "invalidOtp": "Código inválido ou expirado.",
+      "networkError": "Erro de rede. Tente novamente.",
+      "unknown": "Algo deu errado. Tente novamente."
+    },
+    "validation": {
+      "emailRequired": "E-mail é obrigatório.",
+      "emailInvalid": "Digite um endereço de e-mail válido.",
+      "passwordRequired": "Senha é obrigatória.",
+      "passwordMinLength": "A senha deve ter pelo menos 8 caracteres.",
+      "passwordUppercase": "A senha deve conter uma letra maiúscula.",
+      "passwordDigit": "A senha deve conter um dígito.",
+      "displayNameRequired": "Nome de exibição é obrigatório.",
+      "otpRequired": "Digite o código de 6 dígitos.",
+      "otpLength": "O código deve ter exatamente 6 dígitos."
+    }
+  },
+  "household": {
+    "setup": {
+      "title": "Configure sua residência",
+      "subtitle": "Crie uma nova residência ou entre em uma existente com um código de convite."
+    },
+    "create": {
+      "title": "Criar residência",
+      "name": "Nome da residência",
+      "submit": "Criar residência",
+      "namePlaceholder": "ex: Família Silva",
+      "nameRequired": "Nome da residência é obrigatório.",
+      "successTitle": "Residência criada!",
+      "successSubtitle": "Compartilhe este código de convite com os membros da sua residência.",
+      "inviteCodeLabel": "Código de convite",
+      "inviteCodeExpiry": "Válido por 48 horas",
+      "shareCode": "Compartilhar código",
+      "shareMessage": "Entre na minha residência \"{{name}}\" no Stoq! Use o código de convite: {{code}}",
+      "continue": "Continuar"
+    },
+    "join": {
+      "title": "Entrar em uma residência",
+      "inviteCode": "Código de convite",
+      "submit": "Entrar na residência",
+      "codePlaceholder": "Código de 6 caracteres",
+      "codeRequired": "Digite o código de convite.",
+      "codeLength": "O código deve ter 6 caracteres."
+    },
+    "settings": {
+      "inviteCodeSection": "Código de convite",
+      "codeExpires": "Expira em {{date}}",
+      "codeExpired": "Código expirado — regenere para criar um novo",
+      "regenerate": "Regenerar",
+      "regenerateTitle": "Regenerar código de convite?",
+      "regenerateConfirm": "O código atual será invalidado. Quem ainda não entrou precisará do novo código.",
+      "regenerateSuccess": "Novo código de convite gerado.",
+      "manageMembers": "Gerenciar membros",
+      "manageMembersDesc": "{{count}} membro(s)"
+    },
+    "members": {
+      "you": "você",
+      "removeTitle": "Remover membro?",
+      "removeConfirm": "Remover {{name}} da residência?",
+      "remove": "Remover",
+      "removeSuccess": "{{name}} removido(a) da residência.",
+      "changeRoleTitle": "Alterar função",
+      "roleChangeSuccess": "Função atualizada.",
+      "roles": {
+        "HouseholdAdmin": "Administrador",
+        "HouseholdMember": "Membro",
+        "HouseholdViewer": "Visualizador"
+      }
+    }
+  },
+  "profile": {
+    "householdSettings": "Configurações da residência",
+    "householdSettingsDesc": "Código de convite, membros e endereço",
+    "logout": "Sair",
+    "logoutTitle": "Sair?",
+    "logoutConfirm": "Você precisará entrar novamente para acessar sua residência."
+  },
+  "catalog": {
+    "list": {
+      "title": "Catálogo de produtos",
+      "searchPlaceholder": "Buscar produtos…",
+      "empty": "Nenhum produto ainda. Toque em + para adicionar.",
+      "addProduct": "Adicionar produto",
+      "edit": "Editar produto",
+      "delete": "Excluir produto"
+    },
+    "detail": {
+      "title": "Produto",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "notFound": "Produto não encontrado."
+    },
+    "form": {
+      "createTitle": "Novo produto",
+      "editTitle": "Editar produto",
+      "name": "Nome do produto",
+      "brand": "Marca",
+      "brandPlaceholder": "Opcional",
+      "category": "Categoria",
+      "unit": "Unidade",
+      "minQuantity": "Qtd. mínima",
+      "barcode": "Código de barras",
+      "barcodePlaceholder": "8–14 dígitos (opcional)",
+      "imageUrl": "URL da imagem",
+      "create": "Criar",
+      "update": "Salvar"
+    },
+    "units": {
+      "Units": "Unidades",
+      "Grams": "Gramas",
+      "Kilograms": "Quilogramas",
+      "Millilitres": "Mililitros",
+      "Litres": "Litros"
+    },
+    "validation": {
+      "nameRequired": "O nome do produto é obrigatório.",
+      "categoryRequired": "A categoria é obrigatória.",
+      "minQuantityInvalid": "A qtd. mínima deve ser um número não negativo."
+    }
+  },
+  "common": {
+    "loading": "Carregando…",
+    "retry": "Tentar novamente",
+    "cancel": "Cancelar",
+    "ok": "OK",
+    "error": "Algo deu errado. Tente novamente."
+  }
+}

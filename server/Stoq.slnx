@@ -1,6 +1,28 @@
 <Solution>
-  <Project Path="Stoq.ApiService/Stoq.ApiService.csproj" />
-  <Project Path="Stoq.AppHost/Stoq.AppHost.csproj" />
-  <Project Path="Stoq.ServiceDefaults/Stoq.ServiceDefaults.csproj" />
-  <Project Path="Stoq.Web/Stoq.Web.csproj" />
+  <Folder Name="/Orchestration/">
+    <Project Path="Stoq.AppHost/Stoq.AppHost.csproj" />
+    <Project Path="Stoq.ServiceDefaults/Stoq.ServiceDefaults.csproj" />
+    <Project Path="Stoq.Web/Stoq.Web.csproj" />
+  </Folder>
+
+  <Folder Name="/Api/">
+    <Project Path="Stoq.ApiService/Stoq.ApiService.csproj" />
+  </Folder>
+
+  <Folder Name="/Shared/">
+    <Project Path="src/Shared/Stoq.Shared.Kernel/Stoq.Shared.Kernel.csproj" />
+    <Project Path="src/Shared/Stoq.Shared.Contracts/Stoq.Shared.Contracts.csproj" />
+  </Folder>
+
+  <Folder Name="/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Stoq.Identity.Domain/Stoq.Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Stoq.Identity.Application/Stoq.Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Stoq.Identity.Infrastructure/Stoq.Identity.Infrastructure.csproj" />
+  </Folder>
+
+  <Folder Name="/Modules/Catalog/">
+    <Project Path="src/Modules/Catalog/Stoq.Catalog.Domain/Stoq.Catalog.Domain.csproj" />
+    <Project Path="src/Modules/Catalog/Stoq.Catalog.Application/Stoq.Catalog.Application.csproj" />
+    <Project Path="src/Modules/Catalog/Stoq.Catalog.Infrastructure/Stoq.Catalog.Infrastructure.csproj" />
+  </Folder>
 </Solution>

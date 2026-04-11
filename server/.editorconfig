@@ -73,9 +73,14 @@ csharp_style_pattern_matching_over_is_with_cast_check                 = true:war
 csharp_style_pattern_matching_over_as_with_null_check                 = true:warning
 csharp_style_prefer_switch_expression                                  = true:suggestion
 csharp_style_prefer_pattern_matching                                   = true:suggestion
-csharp_style_var_for_built_in_types                                    = false:suggestion
-csharp_style_var_when_type_is_apparent                                 = true:suggestion
-csharp_style_var_elsewhere                                             = false:suggestion
+# Preferência por 'var' para tipos integrados (int, string, etc.)
+csharp_style_var_for_built_in_types                                    = true:warning
+# Preferência por 'var' quando o tipo é óbvio (ex: var x = new Customer())
+csharp_style_var_when_type_is_apparent                                 = true:warning
+# Preferência por 'var' em todos os outros casos
+csharp_style_var_elsewhere                                             = false:warning
+# Use primary constructor
+csharp_style_prefer_primary_constructors                               = true:warning
 
 # ── Unnecessary code ──────────────────────────────────────────────────────────
 dotnet_style_prefer_simplified_boolean_expressions                     = true:suggestion
@@ -87,7 +92,7 @@ dotnet_diagnostic.CA2007.severity                                      = error
 # CA1031: Do not catch general exception types — catch specific exceptions.
 dotnet_diagnostic.CA1031.severity                                      = warning
 # SA1600: Public members must be documented.
-dotnet_diagnostic.SA1600.severity                                      = suggestion
+dotnet_diagnostic.SA1600.severity                                      = none
 # SA1633: File header — copyright block is a convention, not a build-breaking rule.
 dotnet_diagnostic.SA1633.severity                                      = suggestion
 # RCS1018: Add accessibility modifiers.
@@ -98,6 +103,34 @@ dotnet_diagnostic.S3776.severity                                       = warning
 dotnet_diagnostic.S2068.severity                                       = error
 # S1481: Remove unused local variables.
 dotnet_diagnostic.S1481.severity                                       = warning
+# SA1516: Elements must be separated by blank line — we prefer compact code over vertical spacing.
+dotnet_diagnostic.SA1516.severity                                      = none
+dotnet_diagnostic.SA1101.severity                                      = none
+dotnet_diagnostic.SA1309.severity                                      = none
+dotnet_diagnostic.CA1873.severity                                      = none
+dotnet_diagnostic.CA1848.severity                                      = none
+dotnet_diagnostic.SA1602.severity                                      = none
+dotnet_diagnostic.CS1591.severity                                      = none
+dotnet_diagnostic.SA1615.severity                                      = none
+dotnet_diagnostic.SA1611.severity                                      = none
+dotnet_diagnostic.CA2007.severity                                      = none
+# Detetar membros privados não utilizados (métodos, propriedades, campos)
+dotnet_diagnostic.IDE0051.severity = error
+# Opcional: Detetar parâmetros não utilizados
+dotnet_diagnostic.IDE0060.severity = error
+# SA0001: Fires when GenerateDocumentationFile=false — we intentionally don't generate XML docs.
+dotnet_diagnostic.SA0001.severity                                      = none
+# CA1716: "Shared" in namespace conflicts with a VB.NET keyword — this is our product name, not a problem.
+dotnet_diagnostic.CA1716.severity                                      = none
+# SA1402 / SA1649: Multiple small, closely related types in one file is an accepted pattern in this codebase.
+dotnet_diagnostic.SA1402.severity                                      = none
+dotnet_diagnostic.SA1649.severity                                      = none
+# S4035: ValueObject is an abstract base class by design — sealing it would break the pattern.
+dotnet_diagnostic.S4035.severity                                       = none
+# CA1000: Static factory members on generic Result<T> is intentional API design.
+dotnet_diagnostic.CA1000.severity                                      = none
+# S1144: EF Core reads/writes private setters via the change tracker — Sonar cannot see this usage.
+dotnet_diagnostic.S1144.severity                                       = none
 
 # ─────────────────────────────────────────────────────────────────────────────
 # JSON / YAML / XML

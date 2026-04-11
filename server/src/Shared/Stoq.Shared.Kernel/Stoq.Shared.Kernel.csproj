@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- No external dependencies — pure domain base classes -->
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- MediatR INotification is used for domain events -->
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+</Project>

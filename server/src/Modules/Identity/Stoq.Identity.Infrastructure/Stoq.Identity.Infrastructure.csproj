@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Stoq.Identity.Application\Stoq.Identity.Application.csproj" />
+    <ProjectReference Include="..\Stoq.Identity.Domain\Stoq.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Stoq.Shared.Contracts\Stoq.Shared.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- EF Core + PostgreSQL -->
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+    <!-- ASP.NET Identity -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <!-- Apple Sign-In JWKS validation -->
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />
+    <!-- MediatR (publish domain events) -->
+    <PackageReference Include="MediatR" />
+    <!-- MassTransit — integration events + Outbox -->
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="MassTransit.EntityFrameworkCore" />
+    <PackageReference Include="Aspire.RabbitMQ.Client" />
+    <PackageReference Include="Resend" />
+  </ItemGroup>
+</Project>

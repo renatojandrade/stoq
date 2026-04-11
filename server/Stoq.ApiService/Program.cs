@@ -1,47 +1,90 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.EntityFrameworkCore;
+using Stoq.ApiService.Services;
+using Stoq.Catalog.Application;
+using Stoq.Catalog.Infrastructure;
+using Stoq.Catalog.Infrastructure.Persistence;
+using Stoq.Identity.Application;
+using Stoq.Identity.Infrastructure;
+using Stoq.Identity.Infrastructure.Persistence;
+using Stoq.Shared.Kernel;
+using Stoq.Shared.Kernel.Services;
 
-// Add service defaults & Aspire client integrations.
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+// ─── Aspire service defaults (OTel, health checks, service discovery) ─────────
 builder.AddServiceDefaults();
 
-// Add services to the container.
+// ─── HTTP context & current-user service ─────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// ─── Identity module — Application layer (MediatR, FluentValidation) ─────────
+builder.Services.AddIdentityApplication();
+builder.Services.AddSharedServices();
+
+// ─── Identity module — Infrastructure (ASP.NET Identity, JWT, MassTransit) ───
+builder.Services.AddIdentityInfrastructure(builder.Configuration);
+
+// ─── EF Core: IdentityModuleDbContext ─────────────────────────────────────────
+// Aspire populates "stoq-identity" from service discovery at runtime.
+// During local Aspire dev, the connection string is injected via environment variables.
+var identityConnectionString = builder.Configuration.GetConnectionString("stoq-identity")
+    ?? throw new InvalidOperationException("Connection string 'stoq-identity' is not configured.");
+
+builder.Services.AddIdentityDbContext(identityConnectionString);
+
+// ─── Catalog module — Application layer (MediatR, FluentValidation) ──────────
+builder.Services.AddCatalogApplication();
+
+// ─── Catalog module — Infrastructure (EF Core, repositories) ─────────────────
+builder.Services.AddCatalogInfrastructure();
+
+// ─── EF Core: CatalogModuleDbContext ──────────────────────────────────────────
+var catalogConnectionString = builder.Configuration.GetConnectionString("stoq-catalog")
+    ?? throw new InvalidOperationException("Connection string 'stoq-catalog' is not configured.");
+
+builder.Services.AddCatalogDbContext(catalogConnectionString);
+
+// ─── Controllers & OpenAPI ────────────────────────────────────────────────────
+builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ─── Middleware pipeline ──────────────────────────────────────────────────────
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/openapi/v1.json", "ByCoders API v1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+app.MapControllers();
 app.MapDefaultEndpoints();
 
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+// ─── Apply EF Core migrations on startup (development only) ──────────────────
+if (app.Environment.IsDevelopment())
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    AsyncServiceScope scope = app.Services.CreateAsyncScope();
+    await using (scope)
+    {
+        IdentityModuleDbContext identityDb = scope.ServiceProvider.GetRequiredService<IdentityModuleDbContext>();
+        await identityDb.Database.MigrateAsync();
+
+        CatalogModuleDbContext catalogDb = scope.ServiceProvider.GetRequiredService<CatalogModuleDbContext>();
+        await catalogDb.Database.MigrateAsync();
+    }
 }
+
+await app.RunAsync();

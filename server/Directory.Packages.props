@@ -31,6 +31,8 @@
   <ItemGroup Label="Identity">
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer"    Version="10.0.1" />
+    <!-- JWKS-based Apple Sign-In token validation -->
+    <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect"  Version="8.4.0" />
   </ItemGroup>
 
   <!-- ─────────────────────────────────────────────────────
@@ -78,7 +80,15 @@
        ASP.NET Core misc
   ───────────────────────────────────────────────────────── -->
   <ItemGroup Label="AspNetCore">
+    <PackageVersion Include="Swashbuckle.AspNetCore"                           Version="10.0.1" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi"                     Version="10.0.1" />
+  </ItemGroup>
+
+  <!-- ─────────────────────────────────────────────────────
+       Email
+  ───────────────────────────────────────────────────────── -->
+  <ItemGroup Label="Email">
+    <PackageVersion Include="Resend"                                           Version="0.4.0-beta.1" />
   </ItemGroup>
 
   <!-- ─────────────────────────────────────────────────────

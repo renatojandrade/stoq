@@ -127,9 +127,18 @@
       "title": "Catálogo de produtos",
       "searchPlaceholder": "Buscar produtos…",
       "empty": "Nenhum produto ainda. Toque em + para adicionar.",
-      "addProduct": "Adicionar produto",
+      "addProduct": "Adicionar manualmente",
+      "scanBarcode": "Escanear código de barras",
       "edit": "Editar produto",
       "delete": "Excluir produto"
+    },
+    "barcode": {
+      "scanTitle": "Escanear código de barras",
+      "hint": "Aponte a câmera para o código de barras do produto",
+      "permissionRequired": "Permissão de câmera é necessária para escanear códigos de barras.",
+      "grantPermission": "Permitir acesso à câmera",
+      "notFound": "Produto não encontrado no banco de dados. Você pode adicioná-lo manualmente.",
+      "lookingUp": "Buscando produto…"
     },
     "detail": {
       "title": "Produto",
@@ -163,6 +172,43 @@
       "nameRequired": "O nome do produto é obrigatório.",
       "categoryRequired": "A categoria é obrigatória.",
       "minQuantityInvalid": "A qtd. mínima deve ser um número não negativo."
+    }
+  },
+  "inventory": {
+    "list": {
+      "title": "Estoque",
+      "searchPlaceholder": "Buscar itens…",
+      "empty": "Nenhum item ainda. Toque em + para adicionar.",
+      "addItem": "Adicionar item",
+      "consume": "Consumir",
+      "remove": "Remover",
+      "expires": "Venc.",
+      "lowStock": "Estoque baixo"
+    },
+    "add": {
+      "title": "Adicionar ao estoque",
+      "searchProduct": "Buscar produto",
+      "quantity": "Quantidade",
+      "unit": "Unidade",
+      "unitPlaceholder": "ex: g, ml, unidades",
+      "expiryDate": "Data de validade",
+      "notes": "Observações",
+      "notesPlaceholder": "Opcional",
+      "submit": "Adicionar ao estoque"
+    },
+    "consume": {
+      "title": "Consumir item",
+      "currentStock": "Em estoque: {{quantity}} {{unit}}",
+      "amount": "Quantidade a consumir",
+      "submit": "Consumir"
+    },
+    "validation": {
+      "productRequired": "Selecione um produto.",
+      "quantityInvalid": "A quantidade deve ser um número não negativo.",
+      "unitRequired": "Unidade é obrigatória.",
+      "expiryDateInvalid": "A data deve estar no formato AAAA-MM-DD.",
+      "amountInvalid": "A quantidade deve ser maior que zero.",
+      "amountExceedsStock": "Apenas {{available}} {{unit}} disponível."
     }
   },
   "common": {

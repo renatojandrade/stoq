@@ -20,7 +20,16 @@
       "Bash(grep -n \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Services/IdentityServiceImpl.cs\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Services/SocialAuthServiceImpl.cs\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Infrastructure/Persistence/IdentityModuleDbContext.cs\")",
       "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Catalog\" --include=\"*.cs\")",
       "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/src/Modules/Identity/Stoq.Identity.Application\" --include=\"*.cs\")",
-      "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/Stoq.ApiService\" --include=\"*.cs\")"
+      "Bash(grep -rn \"^\\\\s*//\" \"c:/Users/renat/source/repos/stoq/server/Stoq.ApiService\" --include=\"*.cs\")",
+      "Bash(powershell -Command 'Add-Type -AssemblyName System.IO; $bytes = [System.IO.File]::ReadAllBytes\\('\\\\''c:/Users/renat/source/repos/stoq/PDR.pdf'\\\\''\\); Write-Host \\('\\\\''File size: '\\\\'' + $bytes.Length + '\\\\'' bytes'\\\\''\\)')",
+      "Bash(python3 -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(python -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(python -c \"import pypdf; print\\('pypdf ok'\\)\")",
+      "Bash(python -c \"import PyPDF2; print\\('PyPDF2 ok'\\)\")",
+      "Bash(python -c \"import pdfplumber; print\\('pdfplumber ok'\\)\")",
+      "Bash(python -c \"import fitz; print\\('fitz ok'\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python -c \"import pypdf; print\\('ok'\\)\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\renat\\.claude\\projects\\c--Users-renat-source-repos-stoq\\memory"

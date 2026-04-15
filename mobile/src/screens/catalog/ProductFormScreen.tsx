@@ -25,14 +25,16 @@ export default function ProductFormScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const existing = route.params?.product;
+  const prefill = route.params?.prefill;
 
-  const [name, setName] = useState(existing?.name ?? '');
-  const [brand, setBrand] = useState(existing?.brand ?? '');
-  const [category, setCategory] = useState(existing?.category ?? '');
+  // Existing product takes priority, then barcode scan prefill, then empty.
+  const [name, setName] = useState(existing?.name ?? prefill?.name ?? '');
+  const [brand, setBrand] = useState(existing?.brand ?? prefill?.brand ?? '');
+  const [category, setCategory] = useState(existing?.category ?? prefill?.category ?? '');
   const [unit, setUnit] = useState<ProductUnit>(existing?.unit ?? 'Units');
   const [minQuantity, setMinQuantity] = useState(String(existing?.minQuantity ?? '0'));
-  const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? '');
-  const [barcode, setBarcode] = useState(existing?.barcode ?? '');
+  const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? prefill?.imageUrl ?? '');
+  const [barcode, setBarcode] = useState(existing?.barcode ?? prefill?.barcode ?? '');
 
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -154,6 +156,15 @@ export default function ProductFormScreen({ route, navigation }: Props) {
         onChangeText={setBarcode}
         placeholder={t('catalog.form.barcodePlaceholder')}
         keyboardType="number-pad"
+        right={
+          !existing ? (
+            <TextInput.Icon
+              icon="barcode-scan"
+              onPress={() => navigation.navigate('BarcodeScanner')}
+              accessibilityLabel={t('catalog.barcode.scanTitle')}
+            />
+          ) : undefined
+        }
       />
 
       <TextInput

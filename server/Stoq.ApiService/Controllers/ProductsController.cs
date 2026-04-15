@@ -8,6 +8,7 @@ using Stoq.Catalog.Application.Products.Commands.DeleteProduct;
 using Stoq.Catalog.Application.Products.Commands.UpdateProduct;
 using Stoq.Catalog.Application.Products.Queries.GetProduct;
 using Stoq.Catalog.Application.Products.Queries.ListProducts;
+using Stoq.Catalog.Application.Products.Queries.LookupProductByBarcode;
 using Stoq.Shared.Kernel.Common;
 using Stoq.Shared.Kernel.Services;
 
@@ -21,6 +22,32 @@ public sealed class ProductsController(
     ICurrentUserService currentUserService)
     : ControllerBase
 {
+    /// <summary>Looks up a product by barcode from Open Food Facts. Returns pre-filled data to seed the product form.</summary>
+    /// <response code="200">Product data found.</response>
+    /// <response code="404">No product found for this barcode.</response>
+    /// <response code="400">Barcode is not 8–14 digits.</response>
+    [HttpGet("barcode/{code}")]
+    [ProducesResponseType<ProductLookupDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> LookupBarcode(string code, CancellationToken ct)
+    {
+        var query = new LookupProductByBarcodeQuery(code);
+        Result<ProductLookupDto> result = await mediator.Send(query, ct);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        if (result.IsNotFound)
+        {
+            return NotFound(Problem(result.Error, StatusCodes.Status404NotFound));
+        }
+
+        return BadRequest(Problem(result.Error));
+    }
+
     /// <summary>Lists products for the caller's household, with optional name/category filters.</summary>
     /// <response code="200">Product list returned.</response>
     /// <response code="400">Caller is not a member of any household.</response>

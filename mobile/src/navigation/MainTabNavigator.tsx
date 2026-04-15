@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BottomNavigation, useTheme } from 'react-native-paper';
 import type { Route } from 'react-native-paper/src/components/BottomNavigation/BottomNavigation';
-import HomeScreen from '../screens/main/HomeScreen';
 import CatalogNavigator from './CatalogNavigator';
+import InventoryNavigator from './InventoryNavigator';
 import ProfileNavigator from './ProfileNavigator';
 
 export default function MainTabNavigator() {
@@ -11,14 +11,18 @@ export default function MainTabNavigator() {
   const [index, setIndex] = useState(0);
 
   const routes: Route[] = [
-    { key: 'home', title: 'Inventory', focusedIcon: 'fridge', unfocusedIcon: 'fridge-outline' },
+    { key: 'inventory', title: 'Inventory', focusedIcon: 'fridge', unfocusedIcon: 'fridge-outline' },
     { key: 'catalog', title: 'Catalog', focusedIcon: 'package-variant', unfocusedIcon: 'package-variant-closed' },
     { key: 'profile', title: 'Profile', focusedIcon: 'account-circle', unfocusedIcon: 'account-circle-outline' },
   ];
 
   const renderScene = ({ route }: { route: Route }) => {
     switch (route.key) {
-      case 'home': return <HomeScreen />;
+      case 'inventory': return (
+        <View style={styles.fill}>
+          <InventoryNavigator />
+        </View>
+      );
       case 'catalog': return (
         <View style={styles.fill}>
           <CatalogNavigator />

@@ -6,6 +6,9 @@ using Stoq.Catalog.Infrastructure.Persistence;
 using Stoq.Identity.Application;
 using Stoq.Identity.Infrastructure;
 using Stoq.Identity.Infrastructure.Persistence;
+using Stoq.Inventory.Application;
+using Stoq.Inventory.Infrastructure;
+using Stoq.Inventory.Infrastructure.Persistence;
 using Stoq.Shared.Kernel;
 using Stoq.Shared.Kernel.Services;
 
@@ -37,13 +40,25 @@ builder.Services.AddIdentityDbContext(identityConnectionString);
 builder.Services.AddCatalogApplication();
 
 // ─── Catalog module — Infrastructure (EF Core, repositories) ─────────────────
-builder.Services.AddCatalogInfrastructure();
+builder.Services.AddCatalogInfrastructure(builder.Configuration);
 
 // ─── EF Core: CatalogModuleDbContext ──────────────────────────────────────────
 var catalogConnectionString = builder.Configuration.GetConnectionString("stoq-catalog")
     ?? throw new InvalidOperationException("Connection string 'stoq-catalog' is not configured.");
 
 builder.Services.AddCatalogDbContext(catalogConnectionString);
+
+// ─── Inventory module — Application layer (MediatR, FluentValidation) ────────
+builder.Services.AddInventoryApplication();
+
+// ─── Inventory module — Infrastructure (EF Core, repositories) ───────────────
+builder.Services.AddInventoryInfrastructure();
+
+// ─── EF Core: InventoryModuleDbContext ────────────────────────────────────────
+var inventoryConnectionString = builder.Configuration.GetConnectionString("stoq-inventory")
+    ?? throw new InvalidOperationException("Connection string 'stoq-inventory' is not configured.");
+
+builder.Services.AddInventoryDbContext(inventoryConnectionString);
 
 // ─── Controllers & OpenAPI ────────────────────────────────────────────────────
 builder.Services.AddControllers();
@@ -84,6 +99,9 @@ if (app.Environment.IsDevelopment())
 
         CatalogModuleDbContext catalogDb = scope.ServiceProvider.GetRequiredService<CatalogModuleDbContext>();
         await catalogDb.Database.MigrateAsync();
+
+        InventoryModuleDbContext inventoryDb = scope.ServiceProvider.GetRequiredService<InventoryModuleDbContext>();
+        await inventoryDb.Database.MigrateAsync();
     }
 }
 

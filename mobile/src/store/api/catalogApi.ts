@@ -42,6 +42,14 @@ export interface ListProductsParams {
   category?: string;
 }
 
+export interface ProductLookupDto {
+  barcode: string;
+  name: string;
+  brand: string | null;
+  category: string | null;
+  imageUrl: string | null;
+}
+
 export const catalogApi = createApi({
   reducerPath: 'catalogApi',
   baseQuery: fetchBaseQuery({
@@ -91,6 +99,9 @@ export const catalogApi = createApi({
         { type: 'Product', id: 'LIST' },
       ],
     }),
+    lookupByBarcode: builder.query<ProductLookupDto, string>({
+      query: (code) => `/api/products/barcode/${encodeURIComponent(code)}`,
+    }),
   }),
 });
 
@@ -100,4 +111,6 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useLookupByBarcodeQuery,
+  useLazyLookupByBarcodeQuery,
 } = catalogApi;

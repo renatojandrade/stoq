@@ -8,6 +8,8 @@
     <ProjectReference Include="..\src\Modules\Identity\Stoq.Identity.Infrastructure\Stoq.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\src\Modules\Catalog\Stoq.Catalog.Application\Stoq.Catalog.Application.csproj" />
     <ProjectReference Include="..\src\Modules\Catalog\Stoq.Catalog.Infrastructure\Stoq.Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\Modules\Inventory\Stoq.Inventory.Application\Stoq.Inventory.Application.csproj" />
+    <ProjectReference Include="..\src\Modules\Inventory\Stoq.Inventory.Infrastructure\Stoq.Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\src\Shared\Stoq.Shared.Kernel\Stoq.Shared.Kernel.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -102,11 +102,26 @@ export default function ProductListScreen({ navigation }: Props) {
         />
       )}
 
-      <FAB
+      <FAB.Group
+        open={false}
+        visible
         icon="plus"
-        style={[styles.fab, { backgroundColor: colors.primary }]}
-        color={colors.onPrimary}
-        onPress={() => navigation.navigate('ProductForm', {})}
+        style={styles.fabGroup}
+        actions={[
+          {
+            icon: 'barcode-scan',
+            label: t('catalog.list.scanBarcode'),
+            onPress: () => navigation.navigate('BarcodeScanner'),
+            accessibilityLabel: t('catalog.list.scanBarcode'),
+          },
+          {
+            icon: 'pencil-plus-outline',
+            label: t('catalog.list.addProduct'),
+            onPress: () => navigation.navigate('ProductForm', {}),
+            accessibilityLabel: t('catalog.list.addProduct'),
+          },
+        ]}
+        onStateChange={() => {}}
         accessibilityLabel={t('catalog.list.addProduct')}
       />
     </View>
@@ -117,7 +132,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   searchbar: { margin: 16 },
-  list: { paddingBottom: 80 },
+  list: { paddingBottom: 96 },
   actions: { flexDirection: 'row', alignItems: 'center' },
-  fab: { position: 'absolute', right: 16, bottom: 24 },
+  fabGroup: { position: 'absolute', right: 0, bottom: 0 },
 });

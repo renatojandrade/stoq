@@ -1,12 +1,22 @@
 ﻿IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
+// ─── Stable credentials (stored in AppHost user secrets, never committed) ────
+// Set once with:
+//   dotnet user-secrets set "Parameters:postgres-password" "yourpassword" --project server/Stoq.AppHost
+//   dotnet user-secrets set "Parameters:rabbitmq-password" "yourpassword" --project server/Stoq.AppHost
+IResourceBuilder<ParameterResource> postgresPassword = builder.AddParameter("postgres-password", secret: true);
+IResourceBuilder<ParameterResource> rabbitmqPassword = builder.AddParameter("rabbitmq-password", secret: true);
+
 // ─── Infrastructure ───────────────────────────────────────────────────────────
 // PostgreSQL — one server, five named databases (one per module schema).
-// Each module's Infrastructure project receives its connection string via Aspire
-// service discovery — no hard-coded connection strings anywhere in the solution.
-IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres")
+// ContainerLifetime.Persistent keeps the container alive after AppHost exits so
+// Stoq.ApiService can be debugged directly from Visual Studio without Aspire.
+// Fixed host port 5432 makes the connection string stable across restarts.
+IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres", password: postgresPassword)
     .WithDataVolume("stoq-postgres-data")
-    .WithPgAdmin();
+    .WithPgAdmin()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpoint("tcp", e => e.Port = 5432);
 
 IResourceBuilder<PostgresDatabaseResource> dbIdentity = postgres.AddDatabase("stoq-identity");
 IResourceBuilder<PostgresDatabaseResource> dbCatalog = postgres.AddDatabase("stoq-catalog");
@@ -15,10 +25,12 @@ IResourceBuilder<PostgresDatabaseResource> dbShopping = postgres.AddDatabase("st
 IResourceBuilder<PostgresDatabaseResource> dbRetailer = postgres.AddDatabase("stoq-retailer");
 
 // RabbitMQ — used by MassTransit 8.x for all async inter-module integration events.
-// The management UI is available in the Aspire dashboard sidebar when running locally.
-IResourceBuilder<RabbitMQServerResource> rabbitmq = builder.AddRabbitMQ("rabbitmq")
+// ContainerLifetime.Persistent + fixed port 5672 mirrors the postgres approach above.
+IResourceBuilder<RabbitMQServerResource> rabbitmq = builder.AddRabbitMQ("rabbitmq", password: rabbitmqPassword)
     .WithDataVolume("stoq-rabbitmq-data")
-    .WithManagementPlugin();
+    .WithManagementPlugin()
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpoint("tcp", e => e.Port = 5672);
 
 // ─── Application services ─────────────────────────────────────────────────────
 IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.Stoq_ApiService>("apiservice")

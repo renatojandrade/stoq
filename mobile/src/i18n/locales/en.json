@@ -127,9 +127,18 @@
       "title": "Product catalog",
       "searchPlaceholder": "Search products…",
       "empty": "No products yet. Tap + to add one.",
-      "addProduct": "Add product",
+      "addProduct": "Add manually",
+      "scanBarcode": "Scan barcode",
       "edit": "Edit product",
       "delete": "Delete product"
+    },
+    "barcode": {
+      "scanTitle": "Scan barcode",
+      "hint": "Point the camera at a product barcode",
+      "permissionRequired": "Camera permission is required to scan barcodes.",
+      "grantPermission": "Allow camera access",
+      "notFound": "Product not found in our database. You can add it manually.",
+      "lookingUp": "Looking up product…"
     },
     "detail": {
       "title": "Product",
@@ -163,6 +172,43 @@
       "nameRequired": "Product name is required.",
       "categoryRequired": "Category is required.",
       "minQuantityInvalid": "Min. quantity must be a non-negative number."
+    }
+  },
+  "inventory": {
+    "list": {
+      "title": "Inventory",
+      "searchPlaceholder": "Search items…",
+      "empty": "No items yet. Tap + to add one.",
+      "addItem": "Add item",
+      "consume": "Consume",
+      "remove": "Remove",
+      "expires": "Exp.",
+      "lowStock": "Low stock"
+    },
+    "add": {
+      "title": "Add to inventory",
+      "searchProduct": "Search product",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "unitPlaceholder": "e.g. g, ml, units",
+      "expiryDate": "Expiry date",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional",
+      "submit": "Add to inventory"
+    },
+    "consume": {
+      "title": "Consume item",
+      "currentStock": "In stock: {{quantity}} {{unit}}",
+      "amount": "Amount to consume",
+      "submit": "Consume"
+    },
+    "validation": {
+      "productRequired": "Select a product.",
+      "quantityInvalid": "Quantity must be a non-negative number.",
+      "unitRequired": "Unit is required.",
+      "expiryDateInvalid": "Expiry date must be in YYYY-MM-DD format.",
+      "amountInvalid": "Amount must be greater than zero.",
+      "amountExceedsStock": "Only {{available}} {{unit}} available."
     }
   },
   "common": {

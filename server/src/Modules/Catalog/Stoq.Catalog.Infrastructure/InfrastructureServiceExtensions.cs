@@ -49,6 +49,7 @@ public static class InfrastructureServiceExtensions
     {
         services.AddScoped<AuditSaveChangesInterceptor>();
         services.AddScoped<DomainEventDispatchInterceptor>();
+        services.AddScoped<CatalogDataSeeder>();
 
         services.AddDbContext<CatalogModuleDbContext>((sp, options) =>
         {

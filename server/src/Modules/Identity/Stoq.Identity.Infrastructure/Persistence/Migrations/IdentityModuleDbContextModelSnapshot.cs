@@ -266,6 +266,11 @@ namespace Stoq.Identity.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<Guid?>("DefaultDeliveryAddressId")
                         .HasColumnType("uuid");
 

@@ -32,7 +32,18 @@
       "Bash(python -c \"import pypdf; print\\('ok'\\)\")",
       "Bash(netstat -ano)",
       "Bash(grep -v \"^C:\\\\\\\\Program\")",
-      "Bash(dotnet new:*)"
+      "Bash(dotnet new:*)",
+      "Bash(awk -F'\\\\t' 'NR==1{print $41; next} NR<=500{print $41}' \"c:/Users/renat/source/repos/stoq/en.openfoodfacts.org.products.csv\")",
+      "Bash(awk '-F\\\\t' 'NR==1 || $41 ~ /en:brazil|en:united-states/' c:/Users/renat/source/repos/stoq/en.openfoodfacts.org.products.csv)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(awk -F'\\\\t' 'NR>1 && $41 ~ /en:brazil/ && $41 !~ /en:united-states/' \"c:/Users/renat/source/repos/stoq/products_br_us.csv\")",
+      "Bash(awk -F'\\\\t' 'NR>1 && $41 ~ /en:united-states/ && $41 !~ /en:brazil/' \"c:/Users/renat/source/repos/stoq/products_br_us.csv\")",
+      "Bash(awk -F'\\\\t' 'NR>1 && $41 ~ /en:brazil/ && $41 ~ /en:united-states/' \"c:/Users/renat/source/repos/stoq/products_br_us.csv\")",
+      "Bash(awk -F'\\\\t' 'NR>1' \"c:/Users/renat/source/repos/stoq/products_br_us.csv\")",
+      "Bash(awk -F'\\\\t' 'NR>1 && $1!=\"\"' \"c:/Users/renat/source/repos/stoq/products_br_us.csv\")",
+      "Bash(awk '-F\\\\t' 'NR==2 || NR==100 || NR==500 {print NR\": code=\"$1\" | name=\"$11\" | countries=\"$41}' c:/Users/renat/source/repos/stoq/products_br_us.csv)",
+      "Read(//tmp/**)",
+      "Bash(grep -E \"\\\\.cs$\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\renat\\.claude\\projects\\c--Users-renat-source-repos-stoq\\memory"

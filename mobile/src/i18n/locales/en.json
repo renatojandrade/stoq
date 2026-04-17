@@ -73,6 +73,9 @@
       "submit": "Create household",
       "namePlaceholder": "e.g. Smith Family",
       "nameRequired": "Household name is required.",
+      "country": "Country",
+      "countryBR": "Brazil",
+      "countryUS": "United States",
       "successTitle": "Household created!",
       "successSubtitle": "Share this invite code with your household members.",
       "inviteCodeLabel": "Invite code",
@@ -116,6 +119,7 @@
     }
   },
   "profile": {
+    "title": "Profile",
     "householdSettings": "Household settings",
     "householdSettingsDesc": "Invite code, members, and address",
     "logout": "Sign out",
@@ -179,6 +183,9 @@
       "title": "Inventory",
       "searchPlaceholder": "Search items…",
       "empty": "No items yet. Tap + to add one.",
+      "emptyTitle": "Your inventory is empty",
+      "emptySubtitle": "Start by adding the products you have at home.",
+      "addFirstItem": "Add first item",
       "addItem": "Add item",
       "consume": "Consume",
       "remove": "Remove",
@@ -216,6 +223,7 @@
     "retry": "Retry",
     "cancel": "Cancel",
     "ok": "OK",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "networkError": "No connection. Check your internet and try again."
   }
 }

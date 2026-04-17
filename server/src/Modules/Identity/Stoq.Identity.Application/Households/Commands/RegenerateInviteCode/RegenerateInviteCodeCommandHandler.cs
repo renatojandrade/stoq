@@ -35,6 +35,7 @@ internal sealed class RegenerateInviteCodeCommandHandler(IIdentityRepository rep
             household.Id,
             household.Name,
             household.InviteCode.Value,
-            household.Members.Count));
+            household.Members.Count,
+            household.Country.ToString()));
     }
 }

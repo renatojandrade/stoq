@@ -19,7 +19,7 @@ internal sealed class CreateHouseholdCommandHandler(IIdentityRepository reposito
             return Result<HouseholdDto>.Failure("User is already a member of a household.");
         }
 
-        var household = Household.Create(request.Name, request.AdminUserId);
+        var household = Household.Create(request.Name, request.AdminUserId, request.Country);
 
         await repository.AddHouseholdAsync(household, cancellationToken);
 
@@ -29,6 +29,7 @@ internal sealed class CreateHouseholdCommandHandler(IIdentityRepository reposito
             household.Id,
             household.Name,
             household.InviteCode.Value,
-            household.Members.Count));
+            household.Members.Count,
+            household.Country.ToString()));
     }
 }

@@ -6,11 +6,17 @@ public interface IProductRepository
 {
     Task<Product?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
+    /// <summary>
+    /// Lists products for a household (household-owned + reference products filtered by country).
+    /// </summary>
     Task<IReadOnlyList<Product>> ListByHouseholdAsync(
         Guid householdId,
+        string? country,
         string? nameFilter,
         string? categoryFilter,
         CancellationToken ct = default);
+
+    Task<bool> ExistsByBarcodeAsync(string barcode, CancellationToken ct = default);
 
     Task AddAsync(Product product, CancellationToken ct = default);
 

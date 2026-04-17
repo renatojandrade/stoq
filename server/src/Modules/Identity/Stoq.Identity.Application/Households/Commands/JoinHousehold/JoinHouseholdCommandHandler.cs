@@ -45,6 +45,7 @@ internal sealed class JoinHouseholdCommandHandler(IIdentityRepository repository
             household.Id,
             household.Name,
             household.InviteCode.Value,
-            household.Members.Count));
+            household.Members.Count,
+            household.Country.ToString()));
     }
 }

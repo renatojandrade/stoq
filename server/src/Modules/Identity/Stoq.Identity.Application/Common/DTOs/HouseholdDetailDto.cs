@@ -7,7 +7,8 @@ public sealed record HouseholdDetailDto(
     string InviteCode,
     DateTimeOffset InviteCodeExpiresAt,
     bool IsInviteCodeExpired,
-    IReadOnlyList<MemberDto> Members);
+    IReadOnlyList<MemberDto> Members,
+    string Country);
 
 /// <summary>Represents a household member with user profile info.</summary>
 public sealed record MemberDto(

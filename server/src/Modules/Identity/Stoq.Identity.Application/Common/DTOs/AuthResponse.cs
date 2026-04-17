@@ -13,10 +13,12 @@ public sealed record UserDto(
     string? AvatarUrl,
     string PreferredLanguage,
     string Role,
-    Guid? HouseholdId);
+    Guid? HouseholdId,
+    string? HouseholdCountry);
 
 public sealed record HouseholdDto(
     Guid Id,
     string Name,
     string InviteCode,
-    int MemberCount);
+    int MemberCount,
+    string Country);

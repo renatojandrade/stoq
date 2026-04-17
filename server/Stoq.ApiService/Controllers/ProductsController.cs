@@ -65,7 +65,7 @@ public sealed class ProductsController(
             return BadRequest(Problem("User is not a member of any household."));
         }
 
-        var query = new ListProductsQuery(householdId.Value, name, category);
+        var query = new ListProductsQuery(householdId.Value, currentUserService.HouseholdCountry, name, category);
         Result<IReadOnlyList<ProductDto>> result = await mediator.Send(query, ct);
 
         if (result.IsSuccess)

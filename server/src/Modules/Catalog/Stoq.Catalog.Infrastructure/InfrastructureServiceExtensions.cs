@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Stoq.Catalog.Application.Ports;
+using Stoq.Catalog.Infrastructure.Database;
 using Stoq.Catalog.Infrastructure.Persistence;
 using Stoq.Catalog.Infrastructure.Persistence.Interceptors;
 using Stoq.Catalog.Infrastructure.Persistence.Repositories;
 using Stoq.Catalog.Infrastructure.Services;
+using Stoq.Shared.Contracts.Database;
 
 namespace Stoq.Catalog.Infrastructure;
 
@@ -55,6 +57,8 @@ public static class InfrastructureServiceExtensions
                 sp.GetRequiredService<AuditSaveChangesInterceptor>(),
                 sp.GetRequiredService<DomainEventDispatchInterceptor>());
         });
+
+        services.AddScoped<IModuleDatabaseMigrator, CatalogDatabaseMigrator>();
 
         return services;
     }

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Stoq.Inventory.Application.Ports;
 using Stoq.Inventory.Domain.Aggregates;
 using Stoq.Inventory.Infrastructure.Persistence;
@@ -28,8 +28,7 @@ internal sealed class InventoryRepositoryImpl(InventoryModuleDbContext context) 
 
         return await query
             .OrderBy(i => i.ProductName)
-            .ToListAsync(ct)
-            .ConfigureAwait(false);
+            .ToListAsync(ct);
     }
 
     public async Task<IReadOnlyList<InventoryItem>> GetExpiringAsync(
@@ -45,8 +44,7 @@ internal sealed class InventoryRepositoryImpl(InventoryModuleDbContext context) 
                         && i.ExpiryDate.HasValue
                         && i.ExpiryDate.Value <= cutoff)
             .OrderBy(i => i.ExpiryDate)
-            .ToListAsync(ct)
-            .ConfigureAwait(false);
+            .ToListAsync(ct);
     }
 
     public async Task AddAsync(InventoryItem item, CancellationToken ct = default) =>

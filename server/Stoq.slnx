@@ -25,4 +25,10 @@
     <Project Path="src/Modules/Catalog/Stoq.Catalog.Application/Stoq.Catalog.Application.csproj" />
     <Project Path="src/Modules/Catalog/Stoq.Catalog.Infrastructure/Stoq.Catalog.Infrastructure.csproj" />
   </Folder>
+
+  <Folder Name="/Modules/Inventory/">
+    <Project Path="src/Modules/Inventory/Stoq.Inventory.Domain/Stoq.Inventory.Domain.csproj" />
+    <Project Path="src/Modules/Inventory/Stoq.Inventory.Application/Stoq.Inventory.Application.csproj" />
+    <Project Path="src/Modules/Inventory/Stoq.Inventory.Infrastructure/Stoq.Inventory.Infrastructure.csproj" />
+  </Folder>
 </Solution>

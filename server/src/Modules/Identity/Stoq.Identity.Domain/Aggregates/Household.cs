@@ -2,12 +2,14 @@
 using Stoq.Identity.Domain.Enums;
 using Stoq.Identity.Domain.Events;
 using Stoq.Identity.Domain.ValueObjects;
+using Stoq.Shared.Contracts.Entities;
 using Stoq.Shared.Kernel.Aggregates;
 using Stoq.Shared.Kernel.Common;
 
+
 namespace Stoq.Identity.Domain.Aggregates;
 
-public sealed class Household : AggregateRoot<Guid>
+public sealed class Household : AggregateRoot<Guid>, IAuditableEntity
 {
     private readonly List<HouseholdMember> _members = [];
 
@@ -19,10 +21,12 @@ public sealed class Household : AggregateRoot<Guid>
     private Household(
         Guid id,
         string name,
-        Guid adminUserId)
+        Guid adminUserId,
+        HouseholdCountry country)
         : base(id)
     {
         Name = name;
+        Country = country;
         InviteCode = InviteCode.Generate();
 
         var adminMember = new HouseholdMember(id, adminUserId, AppRole.HouseholdAdmin);
@@ -33,27 +37,29 @@ public sealed class Household : AggregateRoot<Guid>
 
     public string Name { get; private set; } = string.Empty;
 
+    public HouseholdCountry Country { get; private set; }
+
     public InviteCode InviteCode { get; private set; } = null!;
 
     public Guid? DefaultDeliveryAddressId { get; private set; }
 
-    // Audit columns.
+    // Audit columns (IAuditableEntity).
     public DateTimeOffset CreatedAt { get; set; }
 
     public Guid CreatedBy { get; set; }
 
-    public DateTimeOffset? UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 
-    public Guid? UpdatedBy { get; set; }
+    public Guid UpdatedBy { get; set; }
 
     public IReadOnlyList<HouseholdMember> Members => _members.AsReadOnly();
 
-    public static Household Create(string name, Guid adminUserId)
+    public static Household Create(string name, Guid adminUserId, HouseholdCountry country)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Guard.AgainstEmptyGuid(adminUserId, nameof(adminUserId));
 
-        return new Household(Guid.NewGuid(), name, adminUserId);
+        return new Household(Guid.NewGuid(), name, adminUserId, country);
     }
 
     public Result AddMember(Guid userId, AppRole role = AppRole.HouseholdMember)

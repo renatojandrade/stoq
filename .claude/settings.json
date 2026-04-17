@@ -29,7 +29,10 @@
       "Bash(python -c \"import pdfplumber; print\\('pdfplumber ok'\\)\")",
       "Bash(python -c \"import fitz; print\\('fitz ok'\\)\")",
       "Bash(pip install:*)",
-      "Bash(python -c \"import pypdf; print\\('ok'\\)\")"
+      "Bash(python -c \"import pypdf; print\\('ok'\\)\")",
+      "Bash(netstat -ano)",
+      "Bash(grep -v \"^C:\\\\\\\\Program\")",
+      "Bash(dotnet new:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\renat\\.claude\\projects\\c--Users-renat-source-repos-stoq\\memory"

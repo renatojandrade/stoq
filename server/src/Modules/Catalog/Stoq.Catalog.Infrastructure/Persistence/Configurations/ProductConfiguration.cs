@@ -15,7 +15,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         // DomainEvents are an in-memory-only concept — never persisted.
         builder.Ignore(p => p.DomainEvents);
 
-        builder.Property(p => p.HouseholdId).IsRequired();
+        // NULL = reference product (no household owner).
+        builder.Property(p => p.HouseholdId).IsRequired(false);
         builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
         builder.Property(p => p.Brand).HasMaxLength(200);
         builder.Property(p => p.Category).IsRequired().HasMaxLength(100);
@@ -23,8 +24,11 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.MinQuantity).IsRequired().HasPrecision(18, 4);
         builder.Property(p => p.ImageUrl).HasMaxLength(2000);
         builder.Property(p => p.Barcode).HasMaxLength(14);
+        builder.Property(p => p.Country).HasMaxLength(10);
 
         builder.HasIndex(p => p.HouseholdId);
         builder.HasIndex(p => new { p.HouseholdId, p.Name });
+        builder.HasIndex(p => p.Barcode).IsUnique().HasFilter("\"Barcode\" IS NOT NULL");
+        builder.HasIndex(p => p.Country);
     }
 }

@@ -73,6 +73,9 @@
       "submit": "Criar residência",
       "namePlaceholder": "ex: Família Silva",
       "nameRequired": "Nome da residência é obrigatório.",
+      "country": "País",
+      "countryBR": "Brasil",
+      "countryUS": "Estados Unidos",
       "successTitle": "Residência criada!",
       "successSubtitle": "Compartilhe este código de convite com os membros da sua residência.",
       "inviteCodeLabel": "Código de convite",
@@ -116,6 +119,7 @@
     }
   },
   "profile": {
+    "title": "Perfil",
     "householdSettings": "Configurações da residência",
     "householdSettingsDesc": "Código de convite, membros e endereço",
     "logout": "Sair",
@@ -179,6 +183,9 @@
       "title": "Estoque",
       "searchPlaceholder": "Buscar itens…",
       "empty": "Nenhum item ainda. Toque em + para adicionar.",
+      "emptyTitle": "Seu estoque está vazio",
+      "emptySubtitle": "Comece adicionando os produtos que você tem em casa.",
+      "addFirstItem": "Adicionar primeiro item",
       "addItem": "Adicionar item",
       "consume": "Consumir",
       "remove": "Remover",
@@ -216,6 +223,7 @@
     "retry": "Tentar novamente",
     "cancel": "Cancelar",
     "ok": "OK",
-    "error": "Algo deu errado. Tente novamente."
+    "error": "Algo deu errado. Tente novamente.",
+    "networkError": "Sem conexão. Verifique sua internet e tente novamente."
   }
 }

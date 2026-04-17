@@ -5,6 +5,7 @@ using Stoq.ApiService.DTOs;
 using Stoq.Identity.Application.Common.DTOs;
 using Stoq.Identity.Application.Households.Commands.ChangeMemberRole;
 using Stoq.Identity.Application.Households.Commands.CreateHousehold;
+using Stoq.Identity.Domain.Enums;
 using Stoq.Identity.Application.Households.Commands.JoinHousehold;
 using Stoq.Identity.Application.Households.Commands.RegenerateInviteCode;
 using Stoq.Identity.Application.Households.Commands.RemoveMember;
@@ -36,7 +37,12 @@ public sealed class HouseholdsController(
             return Unauthorized();
         }
 
-        var command = new CreateHouseholdCommand(request.Name, userId.Value);
+        if (!Enum.TryParse<HouseholdCountry>(request.Country, ignoreCase: true, out var country))
+        {
+            return BadRequest(Problem("Invalid country. Supported values: BR, US."));
+        }
+
+        var command = new CreateHouseholdCommand(request.Name, userId.Value, country);
         Result<HouseholdDto> result = await mediator.Send(command, ct);
 
         if (result.IsSuccess)

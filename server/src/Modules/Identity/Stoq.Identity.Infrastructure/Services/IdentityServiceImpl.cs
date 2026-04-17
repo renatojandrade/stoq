@@ -201,16 +201,23 @@ internal sealed class IdentityServiceImpl(
 
     public async Task<HouseholdMembership> GetHouseholdMembershipAsync(Guid userId, CancellationToken ct = default)
     {
-        HouseholdMember? member = await dbContext.HouseholdMembers
+        var result = await dbContext.HouseholdMembers
             .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.UserId == userId, ct);
+            .Where(m => m.UserId == userId)
+            .Join(
+                dbContext.Households.AsNoTracking(),
+                m => m.HouseholdId,
+                h => h.Id,
+                (m, h) => new { m.HouseholdId, m.Role, h.Country })
+            .FirstOrDefaultAsync(ct)
+            .ConfigureAwait(false);
 
-        if (member is null)
+        if (result is null)
         {
-            return new HouseholdMembership(null, null);
+            return new HouseholdMembership(null, null, null);
         }
 
-        return new HouseholdMembership(member.HouseholdId, member.Role);
+        return new HouseholdMembership(result.HouseholdId, result.Role, result.Country);
     }
 
     private static UserInfo MapToUserInfo(ApplicationUser user) =>

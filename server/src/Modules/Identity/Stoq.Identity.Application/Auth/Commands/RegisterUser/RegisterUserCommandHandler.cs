@@ -46,6 +46,7 @@ internal sealed class RegisterUserCommandHandler(
                 user.AvatarUrl,
                 user.PreferredLanguage,
                 user.Role.ToString(),
-                HouseholdId: null)));
+                HouseholdId: null,
+                HouseholdCountry: null)));
     }
 }

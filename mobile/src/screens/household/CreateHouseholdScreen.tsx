@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Share, StyleSheet, View } from 'react-native';
-import { Button, Card, HelperText, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Card, HelperText, SegmentedButtons, Text, TextInput, useTheme } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,6 +17,7 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
   const [createHousehold, { isLoading }] = useCreateHouseholdMutation();
 
   const [name, setName] = useState('');
+  const [country, setCountry] = useState('BR');
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<HouseholdDto | null>(null);
 
@@ -25,7 +26,7 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
     if (!name.trim()) { setError(t('household.create.nameRequired')); return; }
 
     try {
-      const household = await createHousehold({ name: name.trim() }).unwrap();
+      const household = await createHousehold({ name: name.trim(), country }).unwrap();
       setCreated(household);
     } catch (err: unknown) {
       const message = (err as { data?: { detail?: string } })?.data?.detail;
@@ -42,7 +43,7 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
 
   function handleContinue() {
     if (created) {
-      dispatch(setHousehold(created.id));
+      dispatch(setHousehold({ id: created.id, country: created.country }));
     }
   }
 
@@ -107,6 +108,19 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
         autoFocus
       />
 
+      <Text variant="labelMedium" style={[styles.countryLabel, { color: colors.onSurfaceVariant }]}>
+        {t('household.create.country')}
+      </Text>
+      <SegmentedButtons
+        value={country}
+        onValueChange={setCountry}
+        buttons={[
+          { value: 'BR', label: t('household.create.countryBR'), icon: 'flag' },
+          { value: 'US', label: t('household.create.countryUS'), icon: 'flag' },
+        ]}
+        style={styles.countryPicker}
+      />
+
       {error && <HelperText type="error">{error}</HelperText>}
 
       <Button
@@ -131,6 +145,8 @@ const styles = StyleSheet.create({
   title: { marginBottom: 8 },
   subtitle: { marginBottom: 24 },
   input: { marginBottom: 12 },
+  countryLabel: { marginBottom: 8 },
+  countryPicker: { marginBottom: 12 },
   button: { marginTop: 8 },
   backButton: { marginTop: 4 },
   codeCard: { marginVertical: 24 },

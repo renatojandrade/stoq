@@ -12,6 +12,7 @@ export interface UserDto {
   preferredLanguage: string;
   role: string;
   householdId: string | null;
+  householdCountry: string | null;
 }
 
 export interface AuthResponse {
@@ -26,6 +27,7 @@ export interface HouseholdDto {
   name: string;
   inviteCode: string;
   memberCount: number;
+  country: string;
 }
 
 export interface MemberDto {
@@ -44,6 +46,7 @@ export interface HouseholdDetailDto {
   inviteCodeExpiresAt: string;
   isInviteCodeExpired: boolean;
   members: MemberDto[];
+  country: string;
 }
 
 export interface ChangeMemberRoleRequest {
@@ -83,6 +86,7 @@ export interface LogoutRequest {
 
 export interface CreateHouseholdRequest {
   name: string;
+  country: string;
 }
 
 export interface JoinHouseholdRequest {

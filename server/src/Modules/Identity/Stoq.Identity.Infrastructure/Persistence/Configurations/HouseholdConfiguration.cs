@@ -18,6 +18,11 @@ internal sealed class HouseholdConfiguration : IEntityTypeConfiguration<Househol
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.Property(h => h.Country)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(10);
+
         // InviteCode owned value object â€” stored as two columns.
         builder.OwnsOne(h => h.InviteCode, invite =>
         {

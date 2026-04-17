@@ -26,7 +26,7 @@ export default function JoinHouseholdScreen({ navigation }: Props) {
 
     try {
       const household = await joinHousehold({ inviteCode: code }).unwrap();
-      dispatch(setHousehold(household.id));
+      dispatch(setHousehold({ id: household.id, country: household.country }));
     } catch (err: unknown) {
       const message = (err as { data?: { detail?: string } })?.data?.detail;
       setError(message ?? t('auth.errors.unknown'));

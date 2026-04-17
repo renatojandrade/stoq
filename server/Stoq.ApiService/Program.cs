@@ -1,14 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Stoq.ApiService.Database;
 using Stoq.ApiService.Services;
 using Stoq.Catalog.Application;
 using Stoq.Catalog.Infrastructure;
-using Stoq.Catalog.Infrastructure.Persistence;
 using Stoq.Identity.Application;
 using Stoq.Identity.Infrastructure;
-using Stoq.Identity.Infrastructure.Persistence;
 using Stoq.Inventory.Application;
 using Stoq.Inventory.Infrastructure;
-using Stoq.Inventory.Infrastructure.Persistence;
 using Stoq.Shared.Kernel;
 using Stoq.Shared.Kernel.Services;
 
@@ -91,18 +88,8 @@ app.MapDefaultEndpoints();
 // ─── Apply EF Core migrations on startup (development only) ──────────────────
 if (app.Environment.IsDevelopment())
 {
-    AsyncServiceScope scope = app.Services.CreateAsyncScope();
-    await using (scope)
-    {
-        IdentityModuleDbContext identityDb = scope.ServiceProvider.GetRequiredService<IdentityModuleDbContext>();
-        await identityDb.Database.MigrateAsync();
-
-        CatalogModuleDbContext catalogDb = scope.ServiceProvider.GetRequiredService<CatalogModuleDbContext>();
-        await catalogDb.Database.MigrateAsync();
-
-        InventoryModuleDbContext inventoryDb = scope.ServiceProvider.GetRequiredService<InventoryModuleDbContext>();
-        await inventoryDb.Database.MigrateAsync();
-    }
+    await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
+    await scope.MigrateModuleDatabasesAsync();
 }
 
 await app.RunAsync();

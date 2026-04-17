@@ -1,52 +1,129 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { BottomNavigation, useTheme } from 'react-native-paper';
-import type { Route } from 'react-native-paper/src/components/BottomNavigation/BottomNavigation';
-import CatalogNavigator from './CatalogNavigator';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import InventoryNavigator from './InventoryNavigator';
+import CatalogNavigator from './CatalogNavigator';
 import ProfileNavigator from './ProfileNavigator';
+
+const Tab = createBottomTabNavigator();
+
+// Placeholder — ScanTab never actually mounts because tabBarButton intercepts all presses.
+function ScanPlaceholder() {
+  return <View />;
+}
+
+function ScanTabButton() {
+  const { colors } = useTheme();
+  const { t } = useTranslation();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const navigation = useNavigation<any>();
+
+  function handlePress() {
+    navigation.navigate('CatalogTab', { screen: 'BarcodeScanner' });
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={handlePress}
+      style={styles.scanButtonWrapper}
+      accessibilityLabel={t('catalog.barcode.scanTitle')}
+      accessibilityRole="button"
+    >
+      <View style={[styles.scanButtonCircle, { backgroundColor: colors.primary }]}>
+        <MaterialCommunityIcons name="barcode-scan" size={26} color={colors.onPrimary} />
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export default function MainTabNavigator() {
   const { colors } = useTheme();
-  const [index, setIndex] = useState(0);
-
-  const routes: Route[] = [
-    { key: 'inventory', title: 'Inventory', focusedIcon: 'fridge', unfocusedIcon: 'fridge-outline' },
-    { key: 'catalog', title: 'Catalog', focusedIcon: 'package-variant', unfocusedIcon: 'package-variant-closed' },
-    { key: 'profile', title: 'Profile', focusedIcon: 'account-circle', unfocusedIcon: 'account-circle-outline' },
-  ];
-
-  const renderScene = ({ route }: { route: Route }) => {
-    switch (route.key) {
-      case 'inventory': return (
-        <View style={styles.fill}>
-          <InventoryNavigator />
-        </View>
-      );
-      case 'catalog': return (
-        <View style={styles.fill}>
-          <CatalogNavigator />
-        </View>
-      );
-      case 'profile': return (
-        <View style={styles.fill}>
-          <ProfileNavigator />
-        </View>
-      );
-      default: return null;
-    }
-  };
+  const { t } = useTranslation();
 
   return (
-    <BottomNavigation
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-      barStyle={{ backgroundColor: colors.surface }}
-    />
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.onSurfaceVariant,
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.surfaceVariant },
+      }}
+    >
+      <Tab.Screen
+        name="InventoryTab"
+        component={InventoryNavigator}
+        options={{
+          title: t('inventory.list.title'),
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'fridge' : 'fridge-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ScanTab"
+        component={ScanPlaceholder}
+        options={{
+          title: '',
+          tabBarButton: () => <ScanTabButton />,
+        }}
+      />
+      <Tab.Screen
+        name="CatalogTab"
+        component={CatalogNavigator}
+        options={{
+          title: t('catalog.list.title'),
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'package-variant' : 'package-variant-closed'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileNavigator}
+        options={{
+          title: t('profile.title'),
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'account-circle' : 'account-circle-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
+  scanButtonWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scanButtonCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -14,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
 });

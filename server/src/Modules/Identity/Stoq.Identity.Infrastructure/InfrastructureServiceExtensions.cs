@@ -1,5 +1,9 @@
+using System.Reflection;
 using System.Text;
 using MassTransit;
+using MediatR;
+using Stoq.Shared.Contracts.Database;
+using Stoq.Identity.Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +25,9 @@ public static class InfrastructureServiceExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Register infrastructure-layer MediatR handlers (e.g. domain event handlers).
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
         services.AddOptions<ResendClientOptions>()
             .Configure<IConfiguration>((opt, cfg) => opt.ApiToken = cfg["Resend:ApiKey"] ?? string.Empty);
         services.AddHttpClient<ResendClient>();
@@ -49,6 +56,8 @@ public static class InfrastructureServiceExtensions
                 sp.GetRequiredService<AuditSaveChangesInterceptor>(),
                 sp.GetRequiredService<DomainEventDispatchInterceptor>());
         });
+
+        services.AddScoped<IModuleDatabaseMigrator, IdentityDatabaseMigrator>();
 
         return services;
     }

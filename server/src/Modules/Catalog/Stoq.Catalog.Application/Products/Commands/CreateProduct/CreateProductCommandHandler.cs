@@ -34,5 +34,5 @@ internal sealed class CreateProductCommandHandler(IProductRepository repository)
     }
 
     internal static ProductDto ToDto(Product p) =>
-        new(p.Id, p.HouseholdId, p.Name, p.Brand, p.Category, p.Unit.ToString(), p.MinQuantity, p.ImageUrl, p.Barcode);
+        new(p.Id, p.HouseholdId, p.Name, p.Brand, p.Category, p.Unit.ToString(), p.MinQuantity, p.ImageUrl, p.Barcode, p.Country, IsReference: p.HouseholdId is null);
 }

@@ -14,7 +14,7 @@ internal sealed class TokenServiceImpl(IConfiguration configuration)
 {
     private const int _accessTokenLifetimeMinutes = 15;
 
-    public string GenerateAccessToken(Guid userId, string email, AppRole role, Guid? householdId)
+    public string GenerateAccessToken(Guid userId, string email, AppRole role, Guid? householdId, HouseholdCountry? householdCountry = null)
     {
         SymmetricSecurityKey key = GetSigningKey();
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -30,6 +30,11 @@ internal sealed class TokenServiceImpl(IConfiguration configuration)
         if (householdId.HasValue)
         {
             claims.Add(new Claim("household_id", householdId.Value.ToString()));
+        }
+
+        if (householdCountry.HasValue)
+        {
+            claims.Add(new Claim("household_country", householdCountry.Value.ToString()));
         }
 
         var token = new JwtSecurityToken(

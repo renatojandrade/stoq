@@ -30,7 +30,7 @@ internal sealed class LoginUserCommandHandler(IIdentityService identityService, 
         HouseholdMembership membership = await identityService.GetHouseholdMembershipAsync(user.Id, cancellationToken);
         AppRole effectiveRole = membership.HouseholdRole ?? user.Role;
 
-        var accessToken = tokenService.GenerateAccessToken(user.Id, user.Email, effectiveRole, membership.HouseholdId);
+        var accessToken = tokenService.GenerateAccessToken(user.Id, user.Email, effectiveRole, membership.HouseholdId, membership.HouseholdCountry);
         var refreshToken = tokenService.GenerateRefreshToken();
 
         await identityService.StoreRefreshTokenAsync(
@@ -47,6 +47,7 @@ internal sealed class LoginUserCommandHandler(IIdentityService identityService, 
                 user.AvatarUrl,
                 user.PreferredLanguage,
                 effectiveRole.ToString(),
-                membership.HouseholdId)));
+                membership.HouseholdId,
+                membership.HouseholdCountry?.ToString())));
     }
 }

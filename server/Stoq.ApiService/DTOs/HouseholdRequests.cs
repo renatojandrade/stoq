@@ -1,7 +1,7 @@
 namespace Stoq.ApiService.DTOs;
 
 /// <summary>Request body for creating a household.</summary>
-public sealed record CreateHouseholdRequest(string Name);
+public sealed record CreateHouseholdRequest(string Name, string Country);
 
 /// <summary>Request body for joining a household via invite code.</summary>
 public sealed record JoinHouseholdRequest(string InviteCode);

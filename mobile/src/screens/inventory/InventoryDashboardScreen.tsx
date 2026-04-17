@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
   ActivityIndicator,
-  Badge,
+  Button,
   Chip,
   FAB,
   IconButton,
@@ -27,7 +27,7 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
 
-  const { data: items, isLoading, isError, refetch } = useListInventoryQuery(
+  const { data: items, isLoading, isError, error, refetch } = useListInventoryQuery(
     search ? { name: search } : undefined,
     { refetchOnFocus: true },
   );
@@ -42,6 +42,15 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
     navigation.navigate('ConsumeInventoryItem', { item });
   }
 
+  // A 400 means the JWT doesn't carry householdId yet (e.g. right after household
+  // creation before a token refresh). Treat it like an empty list rather than a
+  // hard error so the user sees the onboarding prompt instead of "something went wrong".
+  const isExpectedEmpty =
+    isError && typeof error === 'object' && error !== null && 'status' in error && error.status === 400;
+
+  const isFetchError =
+    isError && typeof error === 'object' && error !== null && 'status' in error && error.status === 'FETCH_ERROR';
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -50,29 +59,52 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
     );
   }
 
-  if (isError) {
+  if (isError && !isExpectedEmpty) {
     return (
       <View style={styles.center}>
-        <Text>{t('common.error')}</Text>
-        <IconButton icon="refresh" onPress={refetch} accessibilityLabel={t('common.retry')} />
+        <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
+          {isFetchError ? t('common.networkError') : t('common.error')}
+        </Text>
+        <Button mode="text" onPress={refetch} icon="refresh">
+          {t('common.retry')}
+        </Button>
       </View>
     );
   }
 
+  const isEmpty = isExpectedEmpty || items?.length === 0;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Searchbar
-        placeholder={t('inventory.list.searchPlaceholder')}
-        value={search}
-        onChangeText={setSearch}
-        style={styles.searchbar}
-      />
+      {!isEmpty && (
+        <Searchbar
+          placeholder={t('inventory.list.searchPlaceholder')}
+          value={search}
+          onChangeText={setSearch}
+          style={styles.searchbar}
+        />
+      )}
 
-      {items?.length === 0 ? (
+      {isEmpty ? (
         <View style={styles.center}>
-          <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant }}>
-            {t('inventory.list.empty')}
+          <List.Icon icon="fridge-outline" color={colors.onSurfaceVariant} />
+          <Text variant="titleMedium" style={{ color: colors.onSurface }}>
+            {t('inventory.list.emptyTitle')}
           </Text>
+          <Text
+            variant="bodyMedium"
+            style={[styles.emptySubtitle, { color: colors.onSurfaceVariant }]}
+          >
+            {t('inventory.list.emptySubtitle')}
+          </Text>
+          <Button
+            mode="contained"
+            icon="plus"
+            onPress={() => navigation.navigate('AddInventoryItem')}
+            style={styles.emptyButton}
+          >
+            {t('inventory.list.addFirstItem')}
+          </Button>
         </View>
       ) : (
         <FlatList
@@ -124,24 +156,28 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
         />
       )}
 
-      <FAB
-        icon="plus"
-        style={[styles.fab, { backgroundColor: colors.primaryContainer }]}
-        color={colors.onPrimaryContainer}
-        onPress={() => navigation.navigate('AddInventoryItem')}
-        accessibilityLabel={t('inventory.list.addItem')}
-      />
+      {!isEmpty && (
+        <FAB
+          icon="plus"
+          style={[styles.fab, { backgroundColor: colors.primaryContainer }]}
+          color={colors.onPrimaryContainer}
+          onPress={() => navigation.navigate('AddInventoryItem')}
+          accessibilityLabel={t('inventory.list.addItem')}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
   searchbar: { margin: 16 },
   list: { paddingBottom: 96 },
   actions: { flexDirection: 'row', alignItems: 'center' },
   descRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   lowStockChip: { height: 24 },
   fab: { position: 'absolute', right: 16, bottom: 16 },
+  emptySubtitle: { textAlign: 'center' },
+  emptyButton: { marginTop: 8 },
 });

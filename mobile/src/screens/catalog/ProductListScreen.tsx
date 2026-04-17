@@ -21,6 +21,7 @@ export default function ProductListScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
+  const [fabOpen, setFabOpen] = useState(false);
 
   const { data: products, isLoading, isError, refetch } = useListProductsQuery(
     search ? { name: search } : undefined,
@@ -65,7 +66,7 @@ export default function ProductListScreen({ navigation }: Props) {
 
       {products?.length === 0 ? (
         <View style={styles.center}>
-          <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant }}>
+          <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
             {t('catalog.list.empty')}
           </Text>
         </View>
@@ -103,9 +104,9 @@ export default function ProductListScreen({ navigation }: Props) {
       )}
 
       <FAB.Group
-        open={false}
+        open={fabOpen}
         visible
-        icon="plus"
+        icon={fabOpen ? 'close' : 'plus'}
         style={styles.fabGroup}
         actions={[
           {
@@ -121,7 +122,7 @@ export default function ProductListScreen({ navigation }: Props) {
             accessibilityLabel: t('catalog.list.addProduct'),
           },
         ]}
-        onStateChange={() => {}}
+        onStateChange={({ open }) => setFabOpen(open)}
         accessibilityLabel={t('catalog.list.addProduct')}
       />
     </View>

@@ -7,6 +7,12 @@ namespace Stoq.Catalog.Infrastructure.Services;
 
 internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFactsService
 {
+    private static readonly Dictionary<string, string> _countryTags = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["BR"] = "brazil",
+        ["US"] = "united-states",
+    };
+
     public async Task<ProductLookupDto?> LookupByBarcodeAsync(string barcode, CancellationToken ct = default)
     {
         OpenFoodFactsResponse? response = await httpClient
@@ -18,8 +24,62 @@ internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFac
             return null;
         }
 
-        OpenFoodFactsProduct product = response.Product;
+        return MapProduct(barcode, response.Product);
+    }
 
+    public async Task<IReadOnlyList<ProductLookupDto>> SearchByNameAsync(string name, string? country, CancellationToken ct = default)
+    {
+        var url = BuildSearchUrl(name, country);
+
+        OpenFoodFactsSearchResponse? response = await httpClient
+            .GetFromJsonAsync<OpenFoodFactsSearchResponse>(url, ct)
+            .ConfigureAwait(false);
+
+        if (response?.Products is null || response.Products.Length == 0)
+        {
+            return [];
+        }
+
+        var results = new List<ProductLookupDto>();
+
+        foreach (OpenFoodFactsProduct product in response.Products)
+        {
+            var name2 = product.ProductName ?? product.ProductNameEn;
+            if (string.IsNullOrWhiteSpace(name2))
+            {
+                continue;
+            }
+
+            var barcode = string.IsNullOrWhiteSpace(product.Code) ? null : product.Code;
+            var brand = string.IsNullOrWhiteSpace(product.Brands) ? null : product.Brands.Split(',')[0].Trim();
+            var category = ParseCategory(product.CategoriesHierarchy, product.Categories);
+
+            results.Add(new ProductLookupDto(
+                barcode ?? string.Empty,
+                name2.Trim(),
+                brand,
+                category,
+                product.ImageFrontUrl ?? product.ImageUrl));
+        }
+
+        return results;
+    }
+
+    private static string BuildSearchUrl(string name, string? country)
+    {
+        var encoded = Uri.EscapeDataString(name);
+        var url = $"cgi/search.pl?search_terms={encoded}&json=1&page_size=10&action=process";
+
+        if (country is not null && _countryTags.TryGetValue(country, out var tag))
+        {
+            url += $"&countries_tags_en={tag}";
+        }
+
+        return url;
+    }
+
+    private static ProductLookupDto? MapProduct(string barcode, OpenFoodFactsProduct product)
+    {
         var name = product.ProductName ?? product.ProductNameEn;
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -71,8 +131,17 @@ internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFac
         public OpenFoodFactsProduct? Product { get; set; }
     }
 
+    private sealed class OpenFoodFactsSearchResponse
+    {
+        [JsonPropertyName("products")]
+        public OpenFoodFactsProduct[]? Products { get; set; }
+    }
+
     private sealed class OpenFoodFactsProduct
     {
+        [JsonPropertyName("code")]
+        public string? Code { get; set; }
+
         [JsonPropertyName("product_name")]
         public string? ProductName { get; set; }
 

@@ -14,14 +14,15 @@ public sealed class Product : AggregateRoot<Guid>
 
     private Product(
         Guid id,
-        Guid householdId,
+        Guid? householdId,
         string name,
         string? brand,
         string category,
         ProductUnit unit,
         decimal minQuantity,
         string? imageUrl,
-        string? barcode)
+        string? barcode,
+        string? country)
         : base(id)
     {
         HouseholdId = householdId;
@@ -32,11 +33,13 @@ public sealed class Product : AggregateRoot<Guid>
         MinQuantity = minQuantity;
         ImageUrl = imageUrl;
         Barcode = barcode;
+        Country = country;
 
-        RaiseDomainEvent(new ProductCreatedDomainEvent(id, householdId));
+        RaiseDomainEvent(new ProductCreatedDomainEvent(id, householdId ?? Guid.Empty));
     }
 
-    public Guid HouseholdId { get; private set; }
+    /// <summary>The owning household. NULL means this is a global reference product.</summary>
+    public Guid? HouseholdId { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
 
@@ -52,6 +55,9 @@ public sealed class Product : AggregateRoot<Guid>
 
     public string? Barcode { get; private set; }
 
+    /// <summary>Country this product is associated with (e.g. "BR", "US"). NULL means available to all countries.</summary>
+    public string? Country { get; private set; }
+
     // Audit columns
     public DateTimeOffset CreatedAt { get; set; }
 
@@ -61,6 +67,7 @@ public sealed class Product : AggregateRoot<Guid>
 
     public Guid? UpdatedBy { get; set; }
 
+    /// <summary>Creates a household-owned product.</summary>
     public static Product Create(
         Guid householdId,
         string name,
@@ -80,7 +87,23 @@ public sealed class Product : AggregateRoot<Guid>
             throw new ArgumentOutOfRangeException(nameof(minQuantity), "MinQuantity must be non-negative.");
         }
 
-        return new Product(Guid.NewGuid(), householdId, name, brand, category, unit, minQuantity, imageUrl, barcode);
+        return new Product(Guid.NewGuid(), householdId, name, brand, category, unit, minQuantity, imageUrl, barcode, country: null);
+    }
+
+    /// <summary>Creates a global reference product (not owned by any household).</summary>
+    public static Product CreateReference(
+        string name,
+        string? brand,
+        string category,
+        ProductUnit unit,
+        string? imageUrl,
+        string? barcode,
+        string? country)
+    {
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+        Guard.AgainstNullOrWhiteSpace(category, nameof(category));
+
+        return new Product(Guid.NewGuid(), householdId: null, name, brand, category, unit, minQuantity: 0, imageUrl, barcode, country);
     }
 
     public Result Update(
@@ -108,7 +131,7 @@ public sealed class Product : AggregateRoot<Guid>
         ImageUrl = imageUrl;
         Barcode = barcode;
 
-        RaiseDomainEvent(new ProductUpdatedDomainEvent(Id, HouseholdId));
+        RaiseDomainEvent(new ProductUpdatedDomainEvent(Id, HouseholdId ?? Guid.Empty));
 
         return Result.Success();
     }

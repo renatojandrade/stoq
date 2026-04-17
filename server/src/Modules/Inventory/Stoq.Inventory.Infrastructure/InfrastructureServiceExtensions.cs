@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Stoq.Inventory.Application.Ports;
+using Stoq.Inventory.Infrastructure.Database;
 using Stoq.Inventory.Infrastructure.Persistence;
 using Stoq.Inventory.Infrastructure.Persistence.Interceptors;
 using Stoq.Inventory.Infrastructure.Persistence.Repositories;
+using Stoq.Shared.Contracts.Database;
 
 namespace Stoq.Inventory.Infrastructure;
 
@@ -30,6 +32,8 @@ public static class InfrastructureServiceExtensions
                 sp.GetRequiredService<AuditSaveChangesInterceptor>(),
                 sp.GetRequiredService<DomainEventDispatchInterceptor>());
         });
+
+        services.AddScoped<IModuleDatabaseMigrator, InventoryDatabaseMigrator>();
 
         return services;
     }

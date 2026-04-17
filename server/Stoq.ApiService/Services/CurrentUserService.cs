@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Stoq.Shared.Kernel.Services;
 
@@ -39,6 +39,9 @@ internal sealed class CurrentUserService(IHttpContextAccessor httpContextAccesso
             return null;
         }
     }
+
+    public string? HouseholdCountry =>
+        httpContextAccessor.HttpContext?.User.FindFirstValue("household_country");
 
     public bool IsAuthenticated =>
         httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;

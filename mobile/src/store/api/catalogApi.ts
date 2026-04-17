@@ -7,7 +7,7 @@ export type ProductUnit = 'Units' | 'Grams' | 'Kilograms' | 'Millilitres' | 'Lit
 
 export interface ProductDto {
   id: string;
-  householdId: string;
+  householdId: string | null;
   name: string;
   brand: string | null;
   category: string;
@@ -15,6 +15,8 @@ export interface ProductDto {
   minQuantity: number;
   imageUrl: string | null;
   barcode: string | null;
+  country: string | null;
+  isReference: boolean;
 }
 
 export interface CreateProductRequest {

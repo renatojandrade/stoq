@@ -8,6 +8,7 @@ export interface AuthState {
   accessToken: string | null;
   user: UserDto | null;
   householdId: string | null;
+  householdCountry: string | null;
   isAuthenticated: boolean;
 }
 
@@ -15,6 +16,7 @@ const initialState: AuthState = {
   accessToken: null,
   user: null,
   householdId: null,
+  householdCountry: null,
   isAuthenticated: false,
 };
 
@@ -26,19 +28,22 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user;
       state.householdId = action.payload.user.householdId;
+      state.householdCountry = action.payload.user.householdCountry;
       state.isAuthenticated = true;
       SecureStore.setItemAsync(REFRESH_TOKEN_KEY, action.payload.refreshToken).catch(() => null);
     },
-    setHousehold(state, action: PayloadAction<string>) {
-      state.householdId = action.payload;
+    setHousehold(state, action: PayloadAction<{ id: string; country: string }>) {
+      state.householdId = action.payload.id;
+      state.householdCountry = action.payload.country;
       if (state.user) {
-        state.user = { ...state.user, householdId: action.payload };
+        state.user = { ...state.user, householdId: action.payload.id, householdCountry: action.payload.country };
       }
     },
     clearCredentials(state) {
       state.accessToken = null;
       state.user = null;
       state.householdId = null;
+      state.householdCountry = null;
       state.isAuthenticated = false;
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY).catch(() => null);
     },

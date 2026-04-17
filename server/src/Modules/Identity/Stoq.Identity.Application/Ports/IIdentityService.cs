@@ -47,4 +47,4 @@ public sealed record UserInfo(
     string PreferredLanguage,
     AppRole Role);
 
-public sealed record HouseholdMembership(Guid? HouseholdId, AppRole? HouseholdRole);
+public sealed record HouseholdMembership(Guid? HouseholdId, AppRole? HouseholdRole, HouseholdCountry? HouseholdCountry);

@@ -45,6 +45,7 @@ internal sealed class GetMyHouseholdQueryHandler(IIdentityRepository repository)
             household.InviteCode.Value,
             household.InviteCode.ExpiresAt,
             household.InviteCode.IsExpired,
-            members));
+            members,
+            household.Country.ToString()));
     }
 }

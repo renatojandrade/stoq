@@ -13,7 +13,8 @@ internal sealed class GetProductQueryHandler(IProductRepository repository)
     {
         Product? product = await repository.GetByIdAsync(request.ProductId, cancellationToken).ConfigureAwait(false);
 
-        if (product is null || product.HouseholdId != request.RequestingHouseholdId)
+        // Allow fetching household-owned products or reference products visible to the household.
+        if (product is null || (product.HouseholdId is not null && product.HouseholdId != request.RequestingHouseholdId))
         {
             return Result<ProductDto>.NotFound("Product not found.");
         }
@@ -27,6 +28,8 @@ internal sealed class GetProductQueryHandler(IProductRepository repository)
             product.Unit.ToString(),
             product.MinQuantity,
             product.ImageUrl,
-            product.Barcode));
+            product.Barcode,
+            product.Country,
+            IsReference: product.HouseholdId is null));
     }
 }

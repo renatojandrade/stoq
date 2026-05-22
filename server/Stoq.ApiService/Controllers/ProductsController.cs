@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stoq.ApiService.DTOs;
@@ -7,7 +7,10 @@ using Stoq.Catalog.Application.Products.Commands.CreateProduct;
 using Stoq.Catalog.Application.Products.Commands.DeleteProduct;
 using Stoq.Catalog.Application.Products.Commands.UpdateProduct;
 using Stoq.Catalog.Application.Products.Queries.GetProduct;
+using Stoq.Catalog.Application.Products.Queries.ListBrands;
+using Stoq.Catalog.Application.Products.Queries.ListCategories;
 using Stoq.Catalog.Application.Products.Queries.ListProducts;
+using Stoq.Catalog.Application.Products.Queries.ListUnits;
 using Stoq.Catalog.Application.Products.Queries.LookupProductByBarcode;
 using Stoq.Shared.Kernel.Common;
 using Stoq.Shared.Kernel.Services;
@@ -22,7 +25,62 @@ public sealed class ProductsController(
     ICurrentUserService currentUserService)
     : ControllerBase
 {
-    /// <summary>Looks up a product by barcode from Open Food Facts. Returns pre-filled data to seed the product form.</summary>
+    /// <summary>Lists all product categories.</summary>
+    /// <response code="200">Category list returned.</response>
+    [HttpGet("categories")]
+    [ProducesResponseType<IReadOnlyList<CategoryDto>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListCategories(CancellationToken ct)
+    {
+        Result<IReadOnlyList<CategoryDto>> result = await mediator.Send(new ListCategoriesQuery(), ct);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(Problem(result.Error));
+    }
+
+    /// <summary>Lists units of measure.</summary>
+    /// <response code="200">Unit list returned.</response>
+    [HttpGet("units")]
+    [ProducesResponseType<IReadOnlyList<UnitDto>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListUnits(CancellationToken ct)
+    {
+        Result<IReadOnlyList<UnitDto>> result = await mediator.Send(new ListUnitsQuery(), ct);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(Problem(result.Error));
+    }
+
+    /// <summary>Searches brands visible to the caller's household (global + household-owned).</summary>
+    /// <response code="200">Brand list returned.</response>
+    [HttpGet("brands")]
+    [ProducesResponseType<IReadOnlyList<BrandDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ListBrands([FromQuery] string? name, CancellationToken ct)
+    {
+        Guid? householdId = currentUserService.HouseholdId;
+        if (householdId is null)
+        {
+            return BadRequest(Problem("User is not a member of any household."));
+        }
+
+        Result<IReadOnlyList<BrandDto>> result = await mediator.Send(new ListBrandsQuery(householdId.Value, name), ct);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(Problem(result.Error));
+    }
+
+    /// <summary>Looks up a product by barcode. Returns pre-filled data to seed the product form.</summary>
     /// <response code="200">Product data found.</response>
     /// <response code="404">No product found for this barcode.</response>
     /// <response code="400">Barcode is not 8–14 digits.</response>
@@ -32,7 +90,13 @@ public sealed class ProductsController(
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LookupBarcode(string code, CancellationToken ct)
     {
-        var query = new LookupProductByBarcodeQuery(code);
+        Guid? householdId = currentUserService.HouseholdId;
+        if (householdId is null)
+        {
+            return BadRequest(Problem("User is not a member of any household."));
+        }
+
+        var query = new LookupProductByBarcodeQuery(code, householdId.Value);
         Result<ProductLookupDto> result = await mediator.Send(query, ct);
 
         if (result.IsSuccess)
@@ -56,8 +120,11 @@ public sealed class ProductsController(
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> List(
         [FromQuery] string? name,
-        [FromQuery] string? category,
-        CancellationToken ct)
+        [FromQuery] Guid? categoryId,
+        [FromQuery] bool? isReference = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
     {
         Guid? householdId = currentUserService.HouseholdId;
         if (householdId is null)
@@ -65,7 +132,7 @@ public sealed class ProductsController(
             return BadRequest(Problem("User is not a member of any household."));
         }
 
-        var query = new ListProductsQuery(householdId.Value, currentUserService.HouseholdCountry, name, category);
+        var query = new ListProductsQuery(householdId.Value, currentUserService.HouseholdCountry, name, categoryId, isReference, page, pageSize);
         Result<IReadOnlyList<ProductDto>> result = await mediator.Send(query, ct);
 
         if (result.IsSuccess)
@@ -118,9 +185,9 @@ public sealed class ProductsController(
         var command = new CreateProductCommand(
             householdId.Value,
             request.Name,
-            request.Brand,
-            request.Category,
-            request.Unit,
+            request.CategoryId,
+            request.BrandName,
+            request.UnitId,
             request.MinQuantity,
             request.ImageUrl,
             request.Barcode);
@@ -155,9 +222,9 @@ public sealed class ProductsController(
             id,
             householdId.Value,
             request.Name,
-            request.Brand,
-            request.Category,
-            request.Unit,
+            request.CategoryId,
+            request.BrandName,
+            request.UnitId,
             request.MinQuantity,
             request.ImageUrl,
             request.Barcode);

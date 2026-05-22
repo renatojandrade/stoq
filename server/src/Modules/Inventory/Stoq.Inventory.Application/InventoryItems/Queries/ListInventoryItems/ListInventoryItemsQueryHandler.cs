@@ -15,8 +15,7 @@ internal sealed class ListInventoryItemsQueryHandler(IInventoryRepository reposi
         CancellationToken cancellationToken)
     {
         IReadOnlyList<InventoryItem> items = await repository
-            .ListByHouseholdAsync(request.HouseholdId, request.NameFilter, cancellationToken)
-            .ConfigureAwait(false);
+            .ListByHouseholdAsync(request.HouseholdId, request.NameFilter, request.ProductIdFilter, cancellationToken);
 
         IReadOnlyList<InventoryItemDto> dtos = items.Select(AddInventoryItemCommandHandler.ToDto).ToList();
 

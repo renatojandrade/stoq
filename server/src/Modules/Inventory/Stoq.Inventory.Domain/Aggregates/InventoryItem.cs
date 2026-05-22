@@ -1,4 +1,4 @@
-using Stoq.Inventory.Domain.Events;
+﻿using Stoq.Inventory.Domain.Events;
 using Stoq.Shared.Contracts.Entities;
 using Stoq.Shared.Kernel.Aggregates;
 using Stoq.Shared.Kernel.Common;
@@ -44,18 +44,14 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
 
     public Guid ProductId { get; private set; }
 
-    /// <summary>Snapshot of product name at time of insertion.</summary>
     public string ProductName { get; private set; } = string.Empty;
 
-    /// <summary>Snapshot of product brand at time of insertion.</summary>
     public string? ProductBrand { get; private set; }
 
-    /// <summary>Snapshot of product image URL at time of insertion.</summary>
     public string? ProductImageUrl { get; private set; }
 
     public decimal Quantity { get; private set; }
 
-    /// <summary>Snapshot of product MinQuantity — used to detect low-stock.</summary>
     public decimal MinQuantity { get; private set; }
 
     public string Unit { get; private set; } = string.Empty;
@@ -66,7 +62,6 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
 
     public bool IsStockLow => Quantity <= MinQuantity && MinQuantity > 0;
 
-    // Audit columns (IAuditableEntity)
     public DateTimeOffset CreatedAt { get; set; }
 
     public Guid CreatedBy { get; set; }
@@ -135,6 +130,16 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
             Unit));
 
         return Result.Success();
+    }
+
+    public void AddQuantity(decimal amount)
+    {
+        if (amount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be greater than zero.");
+        }
+
+        Quantity += amount;
     }
 
     public void UpdateDetails(string? notes, DateOnly? expiryDate)

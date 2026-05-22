@@ -5,4 +5,5 @@ public sealed record ProductLookupDto(
     string Name,
     string? Brand,
     string? Category,
-    string? ImageUrl);
+    string? ImageUrl,
+    Guid? ExistingProductId = null);

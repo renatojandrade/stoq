@@ -1,13 +1,19 @@
-﻿using Stoq.ApiService.Database;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Stoq.ApiService.Database;
+using Stoq.ApiService.Hubs;
 using Stoq.ApiService.Services;
 using Stoq.Catalog.Application;
 using Stoq.Catalog.Infrastructure;
 using Stoq.Identity.Application;
 using Stoq.Identity.Infrastructure;
 using Stoq.Inventory.Application;
+using Stoq.Inventory.Application.Ports;
 using Stoq.Inventory.Infrastructure;
 using Stoq.Shared.Kernel;
 using Stoq.Shared.Kernel.Services;
+using Stoq.Shopping.Application;
+using Stoq.Shopping.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +29,17 @@ builder.Services.AddIdentityApplication();
 builder.Services.AddSharedServices();
 
 // ─── Identity module — Infrastructure (ASP.NET Identity, JWT, MassTransit) ───
-builder.Services.AddIdentityInfrastructure(builder.Configuration);
+// All module consumers are registered here so they share the single MassTransit bus.
+builder.Services.AddIdentityInfrastructure(
+    builder.Configuration,
+    configureAdditionalConsumers: configurator =>
+    {
+        Stoq.Identity.Infrastructure.InfrastructureServiceExtensions.AddIdentityConsumers(configurator);
+        Stoq.Shopping.Infrastructure.InfrastructureServiceExtensions.AddShoppingConsumers(configurator);
+        int prefetchCount = builder.Configuration.GetValue<int?>("ReceiptParsing:GlobalPrefetchCount") ?? 10;
+        Stoq.Inventory.Infrastructure.InfrastructureServiceExtensions.AddInventoryConsumers(configurator, prefetchCount);
+        Stoq.Catalog.Infrastructure.InfrastructureServiceExtensions.AddCatalogConsumers(configurator);
+    });
 
 // ─── EF Core: IdentityModuleDbContext ─────────────────────────────────────────
 // Aspire populates "stoq-identity" from service discovery at runtime.
@@ -49,7 +65,7 @@ builder.Services.AddCatalogDbContext(catalogConnectionString);
 builder.Services.AddInventoryApplication();
 
 // ─── Inventory module — Infrastructure (EF Core, repositories) ───────────────
-builder.Services.AddInventoryInfrastructure();
+builder.Services.AddInventoryInfrastructure(builder.Configuration);
 
 // ─── EF Core: InventoryModuleDbContext ────────────────────────────────────────
 var inventoryConnectionString = builder.Configuration.GetConnectionString("stoq-inventory")
@@ -57,8 +73,46 @@ var inventoryConnectionString = builder.Configuration.GetConnectionString("stoq-
 
 builder.Services.AddInventoryDbContext(inventoryConnectionString);
 
+// ─── Shopping module — Application layer (MediatR, FluentValidation) ─────────
+builder.Services.AddShoppingApplication();
+
+// ─── Shopping module — Infrastructure (EF Core, repositories) ────────────────
+builder.Services.AddShoppingInfrastructure();
+
+// ─── EF Core: ShoppingModuleDbContext ─────────────────────────────────────────
+var shoppingConnectionString = builder.Configuration.GetConnectionString("stoq-shopping")
+    ?? throw new InvalidOperationException("Connection string 'stoq-shopping' is not configured.");
+
+builder.Services.AddShoppingDbContext(shoppingConnectionString);
+
+// ─── SignalR ──────────────────────────────────────────────────────────────────
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IReceiptNotificationService, CompositeReceiptNotificationService>();
+
+// Allow JWT via query string for SignalR WebSocket connections.
+builder.Services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+{
+    var original = options.Events?.OnMessageReceived;
+    options.Events ??= new JwtBearerEvents();
+    options.Events.OnMessageReceived = async context =>
+    {
+        if (original is not null)
+        {
+            await original(context);
+        }
+
+        var token = context.Request.Query["access_token"];
+        if (!string.IsNullOrEmpty(token) &&
+            context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+        {
+            context.Token = token;
+        }
+    };
+});
+
 // ─── Controllers & OpenAPI ────────────────────────────────────────────────────
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -83,6 +137,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ReceiptHub>("/hubs/receipts");
 app.MapDefaultEndpoints();
 
 // ─── Apply EF Core migrations on startup (development only) ──────────────────

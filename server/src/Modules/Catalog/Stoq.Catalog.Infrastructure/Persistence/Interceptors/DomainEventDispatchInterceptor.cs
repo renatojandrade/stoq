@@ -16,7 +16,7 @@ internal sealed class DomainEventDispatchInterceptor(IPublisher publisher)
     {
         if (eventData.Context is not null)
         {
-            await DispatchDomainEventsAsync(eventData.Context, cancellationToken).ConfigureAwait(false);
+            await DispatchDomainEventsAsync(eventData.Context, cancellationToken);
         }
 
         return result;
@@ -35,7 +35,7 @@ internal sealed class DomainEventDispatchInterceptor(IPublisher publisher)
 
         foreach (DomainEvent? domainEvent in events)
         {
-            await publisher.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
+            await publisher.Publish(domainEvent, cancellationToken);
         }
     }
 }

@@ -7,6 +7,7 @@ import {
   Chip,
   Dialog,
   Divider,
+  IconButton,
   List,
   Portal,
   RadioButton,
@@ -140,14 +141,14 @@ export default function ManageMembersScreen() {
               isAdmin && !item.isCurrentUser
                 ? (
                     <View style={styles.actions}>
-                      <List.Icon
+                      <IconButton
                         icon="account-edit"
-                        color={colors.primary}
+                        iconColor={colors.primary}
                         onPress={() => setRoleDialog({ member: item, selectedRole: item.role as Role })}
                       />
-                      <List.Icon
+                      <IconButton
                         icon="account-remove"
-                        color={colors.error}
+                        iconColor={colors.error}
                         onPress={() => handleRemove(item)}
                       />
                     </View>

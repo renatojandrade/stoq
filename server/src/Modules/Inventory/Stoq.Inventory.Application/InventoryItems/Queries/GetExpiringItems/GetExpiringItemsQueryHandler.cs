@@ -15,8 +15,7 @@ internal sealed class GetExpiringItemsQueryHandler(IInventoryRepository reposito
         CancellationToken cancellationToken)
     {
         IReadOnlyList<InventoryItem> items = await repository
-            .GetExpiringAsync(request.HouseholdId, request.DaysAhead, cancellationToken)
-            .ConfigureAwait(false);
+            .GetExpiringAsync(request.HouseholdId, request.DaysAhead, cancellationToken);
 
         IReadOnlyList<InventoryItemDto> dtos = items.Select(AddInventoryItemCommandHandler.ToDto).ToList();
 

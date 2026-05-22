@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
+  ActivityIndicator,
   Button,
   HelperText,
   Menu,
@@ -14,28 +15,32 @@ import type { CatalogStackParamList } from '../../navigation/CatalogNavigator';
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
-  type ProductUnit,
+  useListCategoriesQuery,
+  useListUnitsQuery,
+  type CategoryDto,
+  type UnitDto,
 } from '../../store/api/catalogApi';
 
 type Props = NativeStackScreenProps<CatalogStackParamList, 'ProductForm'>;
 
-const UNITS: ProductUnit[] = ['Units', 'Grams', 'Kilograms', 'Millilitres', 'Litres'];
-
 export default function ProductFormScreen({ route, navigation }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const existing = route.params?.product;
   const prefill = route.params?.prefill;
 
-  // Existing product takes priority, then barcode scan prefill, then empty.
+  const { data: categories = [], isLoading: loadingCategories } = useListCategoriesQuery();
+  const { data: units = [], isLoading: loadingUnits } = useListUnitsQuery();
+
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '');
-  const [brand, setBrand] = useState(existing?.brand ?? prefill?.brand ?? '');
-  const [category, setCategory] = useState(existing?.category ?? prefill?.category ?? '');
-  const [unit, setUnit] = useState<ProductUnit>(existing?.unit ?? 'Units');
+  const [brandName, setBrandName] = useState(existing?.brandName ?? prefill?.brandName ?? '');
+  const [categoryId, setCategoryId] = useState(existing?.categoryId ?? '');
+  const [unitId, setUnitId] = useState(existing?.unitId ?? '');
   const [minQuantity, setMinQuantity] = useState(String(existing?.minQuantity ?? '0'));
   const [imageUrl, setImageUrl] = useState(existing?.imageUrl ?? prefill?.imageUrl ?? '');
   const [barcode, setBarcode] = useState(existing?.barcode ?? prefill?.barcode ?? '');
 
+  const [categoryMenuVisible, setCategoryMenuVisible] = useState(false);
   const [unitMenuVisible, setUnitMenuVisible] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
@@ -44,12 +49,25 @@ export default function ProductFormScreen({ route, navigation }: Props) {
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
   const isLoading = isCreating || isUpdating;
+  const isLoadingPickerData = loadingCategories || loadingUnits;
+
+  const selectedCategory = categories.find((c) => c.id === categoryId);
+  const selectedUnit = units.find((u) => u.id === unitId);
+
+  function categoryLabel(c: CategoryDto): string {
+    return i18n.language.startsWith('pt') ? c.namePt : c.nameEn;
+  }
+
+  function unitLabel(u: UnitDto): string {
+    return i18n.language.startsWith('pt') ? u.namePt : u.nameEn;
+  }
 
   function validate(): boolean {
     const next: Record<string, string> = {};
 
     if (!name.trim()) next['name'] = t('catalog.validation.nameRequired');
-    if (!category.trim()) next['category'] = t('catalog.validation.categoryRequired');
+    if (!categoryId) next['category'] = t('catalog.validation.categoryRequired');
+    if (!unitId) next['unit'] = t('catalog.validation.unitRequired');
 
     const qty = parseFloat(minQuantity);
     if (isNaN(qty) || qty < 0) next['minQuantity'] = t('catalog.validation.minQuantityInvalid');
@@ -64,9 +82,9 @@ export default function ProductFormScreen({ route, navigation }: Props) {
 
     const payload = {
       name: name.trim(),
-      brand: brand.trim() || null,
-      category: category.trim(),
-      unit,
+      categoryId,
+      brandName: brandName.trim() || null,
+      unitId,
       minQuantity: parseFloat(minQuantity),
       imageUrl: imageUrl.trim() || null,
       barcode: barcode.trim() || null,
@@ -75,13 +93,22 @@ export default function ProductFormScreen({ route, navigation }: Props) {
     try {
       if (existing) {
         await updateProduct({ id: existing.id, ...payload }).unwrap();
+        navigation.navigate('ProductList');
       } else {
-        await createProduct(payload).unwrap();
+        const created = await createProduct(payload).unwrap();
+        navigation.replace('ProductDetail', { productId: created.id });
       }
-      navigation.goBack();
     } catch {
       setServerError(t('common.error'));
     }
+  }
+
+  if (isLoadingPickerData) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   return (
@@ -102,18 +129,34 @@ export default function ProductFormScreen({ route, navigation }: Props) {
       <TextInput
         mode="outlined"
         label={t('catalog.form.brand')}
-        value={brand}
-        onChangeText={setBrand}
+        value={brandName}
+        onChangeText={setBrandName}
         placeholder={t('catalog.form.brandPlaceholder')}
       />
 
-      <TextInput
-        mode="outlined"
-        label={t('catalog.form.category')}
-        value={category}
-        onChangeText={setCategory}
-        error={!!errors['category']}
-      />
+      <Menu
+        visible={categoryMenuVisible}
+        onDismiss={() => setCategoryMenuVisible(false)}
+        anchor={
+          <TextInput
+            mode="outlined"
+            label={t('catalog.form.category')}
+            value={selectedCategory ? categoryLabel(selectedCategory) : ''}
+            editable={false}
+            error={!!errors['category']}
+            right={<TextInput.Icon icon="chevron-down" onPress={() => setCategoryMenuVisible(true)} />}
+            onPressIn={() => setCategoryMenuVisible(true)}
+          />
+        }
+      >
+        {categories.map((c) => (
+          <Menu.Item
+            key={c.id}
+            title={categoryLabel(c)}
+            onPress={() => { setCategoryId(c.id); setCategoryMenuVisible(false); }}
+          />
+        ))}
+      </Menu>
       {errors['category'] && <HelperText type="error">{errors['category']}</HelperText>}
 
       <Menu
@@ -123,21 +166,23 @@ export default function ProductFormScreen({ route, navigation }: Props) {
           <TextInput
             mode="outlined"
             label={t('catalog.form.unit')}
-            value={t(`catalog.units.${unit}`)}
+            value={selectedUnit ? unitLabel(selectedUnit) : ''}
             editable={false}
+            error={!!errors['unit']}
             right={<TextInput.Icon icon="chevron-down" onPress={() => setUnitMenuVisible(true)} />}
             onPressIn={() => setUnitMenuVisible(true)}
           />
         }
       >
-        {UNITS.map((u) => (
+        {units.map((u) => (
           <Menu.Item
-            key={u}
-            title={t(`catalog.units.${u}`)}
-            onPress={() => { setUnit(u); setUnitMenuVisible(false); }}
+            key={u.id}
+            title={unitLabel(u)}
+            onPress={() => { setUnitId(u.id); setUnitMenuVisible(false); }}
           />
         ))}
       </Menu>
+      {errors['unit'] && <HelperText type="error">{errors['unit']}</HelperText>}
 
       <TextInput
         mode="outlined"
@@ -182,7 +227,7 @@ export default function ProductFormScreen({ route, navigation }: Props) {
       ) : null}
 
       <View style={styles.buttonRow}>
-        <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button}>
+        <Button mode="outlined" onPress={() => navigation.navigate('ProductList')} style={styles.button}>
           {t('common.cancel')}
         </Button>
         <Button
@@ -200,6 +245,7 @@ export default function ProductFormScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   content: { padding: 16, gap: 8 },
   buttonRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
   button: { flex: 1 },

@@ -18,7 +18,7 @@ public static class DatabaseMigrationExtensions
         {
             try
             {
-                await migrator.MigrateAsync(cancellationToken).ConfigureAwait(false);
+                await migrator.MigrateAsync(cancellationToken);
             }
             catch (Exception ex)
             {

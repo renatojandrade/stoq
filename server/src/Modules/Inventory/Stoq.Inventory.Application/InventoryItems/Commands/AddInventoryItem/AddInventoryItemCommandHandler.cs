@@ -11,22 +11,33 @@ internal sealed class AddInventoryItemCommandHandler(IInventoryRepository reposi
 {
     public async Task<Result<InventoryItemDto>> Handle(AddInventoryItemCommand request, CancellationToken cancellationToken)
     {
-        var item = InventoryItem.Create(
-            request.HouseholdId,
-            request.ProductId,
-            request.ProductName,
-            request.ProductBrand,
-            request.ProductImageUrl,
-            request.Quantity,
-            request.MinQuantity,
-            request.Unit,
-            request.ExpiryDate,
-            request.Notes);
+        InventoryItem? existing = await repository
+            .FindBatchAsync(request.HouseholdId, request.ProductId, request.ExpiryDate, cancellationToken);
 
-        await repository.AddAsync(item, cancellationToken).ConfigureAwait(false);
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (existing is not null)
+        {
+            existing.AddQuantity(request.Quantity);
+        }
+        else
+        {
+            existing = InventoryItem.Create(
+                request.HouseholdId,
+                request.ProductId,
+                request.ProductName,
+                request.ProductBrand,
+                request.ProductImageUrl,
+                request.Quantity,
+                request.MinQuantity,
+                request.Unit,
+                request.ExpiryDate,
+                request.Notes);
 
-        return Result<InventoryItemDto>.Success(ToDto(item));
+            await repository.AddAsync(existing, cancellationToken);
+        }
+
+        await repository.SaveChangesAsync(cancellationToken);
+
+        return Result<InventoryItemDto>.Success(ToDto(existing));
     }
 
     internal static InventoryItemDto ToDto(InventoryItem item) =>

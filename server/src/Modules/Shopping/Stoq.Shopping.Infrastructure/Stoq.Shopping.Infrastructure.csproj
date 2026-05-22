@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Stoq.Shopping.Application\Stoq.Shopping.Application.csproj" />
+    <ProjectReference Include="..\Stoq.Shopping.Domain\Stoq.Shopping.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Stoq.Shared.Contracts\Stoq.Shared.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Force patched OTel.Api version; Aspire packages pull in a vulnerable transitive 1.14.x. -->
+    <PackageReference Include="OpenTelemetry.Api" />
+    <!-- EF Core + PostgreSQL -->
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+    <!-- MediatR (publish domain events) -->
+    <PackageReference Include="MediatR" />
+    <!-- MassTransit consumer -->
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
+</Project>

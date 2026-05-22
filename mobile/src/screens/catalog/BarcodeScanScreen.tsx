@@ -24,15 +24,20 @@ export default function BarcodeScanScreen({ navigation }: Props) {
       // Always navigate to the form — prefill whatever we find, fallback to barcode only.
       try {
         const result = await lookupBarcode(data).unwrap();
-        navigation.replace('ProductForm', {
-          prefill: {
-            barcode: result.barcode,
-            name: result.name,
-            brand: result.brand,
-            category: result.category ?? undefined,
-            imageUrl: result.imageUrl,
-          },
-        });
+
+        if (result.existingProductId) {
+          // Product already exists in catalog — go directly to its detail page.
+          navigation.replace('ProductDetail', { productId: result.existingProductId });
+        } else {
+          navigation.replace('ProductForm', {
+            prefill: {
+              barcode: result.barcode,
+              name: result.name,
+              brandName: result.brand,
+              imageUrl: result.imageUrl,
+            },
+          });
+        }
       } catch {
         // Not found in Open Food Facts — still open form with just the barcode pre-filled.
         navigation.replace('ProductForm', { prefill: { barcode: data } });

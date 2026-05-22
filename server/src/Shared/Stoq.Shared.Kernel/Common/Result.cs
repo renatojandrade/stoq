@@ -24,6 +24,7 @@ public sealed class Result<TValue>
     public bool IsFailure => _status == ResultStatus.Failure;
     public bool IsForbidden => _status == ResultStatus.Forbidden;
     public bool IsNotFound => _status == ResultStatus.NotFound;
+    public bool IsTooManyRequests => _status == ResultStatus.TooManyRequests;
 
     public TValue Value =>
         IsSuccess ? _value! : throw new InvalidOperationException("Cannot access Value on a failed result.");
@@ -35,6 +36,7 @@ public sealed class Result<TValue>
     public static Result<TValue> Failure(string error) => new(error, ResultStatus.Failure);
     public static Result<TValue> Forbidden(string error) => new(error, ResultStatus.Forbidden);
     public static Result<TValue> NotFound(string error) => new(error, ResultStatus.NotFound);
+    public static Result<TValue> TooManyRequests(string error) => new(error, ResultStatus.TooManyRequests);
 
     public TOut Match<TOut>(Func<TValue, TOut> onSuccess, Func<string, TOut> onFailure) =>
         IsSuccess ? onSuccess(_value!) : onFailure(_error!);
@@ -57,6 +59,7 @@ public sealed class Result
     public bool IsFailure => _status == ResultStatus.Failure;
     public bool IsForbidden => _status == ResultStatus.Forbidden;
     public bool IsNotFound => _status == ResultStatus.NotFound;
+    public bool IsTooManyRequests => _status == ResultStatus.TooManyRequests;
 
     public string Error =>
         !IsSuccess ? _error! : throw new InvalidOperationException("Cannot access Error on a successful result.");
@@ -65,4 +68,5 @@ public sealed class Result
     public static Result Failure(string error) => new(error, ResultStatus.Failure);
     public static Result Forbidden(string error) => new(error, ResultStatus.Forbidden);
     public static Result NotFound(string error) => new(error, ResultStatus.NotFound);
+    public static Result TooManyRequests(string error) => new(error, ResultStatus.TooManyRequests);
 }

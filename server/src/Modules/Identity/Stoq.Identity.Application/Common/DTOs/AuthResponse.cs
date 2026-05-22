@@ -22,3 +22,10 @@ public sealed record HouseholdDto(
     string InviteCode,
     int MemberCount,
     string Country);
+
+public sealed record HouseholdAuthResponse(
+    string AccessToken,
+    string RefreshToken,
+    int ExpiresInSeconds,
+    UserDto User,
+    HouseholdDto Household);

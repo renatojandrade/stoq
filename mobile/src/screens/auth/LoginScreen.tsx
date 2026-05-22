@@ -31,8 +31,13 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       const result = await login({ email: email.trim(), password }).unwrap();
       dispatch(setCredentials(result));
-    } catch {
-      setError(t('auth.errors.invalidCredentials'));
+    } catch (err: unknown) {
+      const status = (err as { status?: unknown })?.status;
+      if (status === 'FETCH_ERROR' || status === 'TIMEOUT_ERROR') {
+        setError(t('common.networkError'));
+      } else {
+        setError(t('auth.errors.invalidCredentials'));
+      }
     }
   }
 

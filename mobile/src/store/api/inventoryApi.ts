@@ -32,6 +32,7 @@ export interface ConsumeInventoryItemRequest {
 
 export interface ListInventoryParams {
   name?: string;
+  productId?: string;
 }
 
 export const inventoryApi = createApi({
@@ -52,6 +53,7 @@ export const inventoryApi = createApi({
       query: (params) => {
         const searchParams = new URLSearchParams();
         if (params?.name) searchParams.set('name', params.name);
+        if (params?.productId) searchParams.set('productId', params.productId);
         const qs = searchParams.toString();
         return `/api/inventory${qs ? `?${qs}` : ''}`;
       },
@@ -97,6 +99,10 @@ export const inventoryApi = createApi({
         { type: 'InventoryItem', id: 'EXPIRING' },
       ],
     }),
+    triggerExpiryScan: builder.mutation<number, void>({
+      query: () => ({ url: '/api/inventory/expiry-scan', method: 'POST' }),
+      invalidatesTags: [{ type: 'InventoryItem', id: 'EXPIRING' }],
+    }),
   }),
 });
 
@@ -106,4 +112,5 @@ export const {
   useAddInventoryItemMutation,
   useConsumeInventoryItemMutation,
   useRemoveInventoryItemMutation,
+  useTriggerExpiryScanMutation,
 } = inventoryApi;

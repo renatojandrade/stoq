@@ -1,4 +1,4 @@
-using Stoq.Catalog.Domain.Enums;
+using Stoq.Catalog.Domain.Entities;
 using Stoq.Catalog.Domain.Events;
 using Stoq.Shared.Kernel.Aggregates;
 using Stoq.Shared.Kernel.Common;
@@ -16,9 +16,9 @@ public sealed class Product : AggregateRoot<Guid>
         Guid id,
         Guid? householdId,
         string name,
-        string? brand,
-        string category,
-        ProductUnit unit,
+        Guid categoryId,
+        Guid? brandId,
+        Guid unitId,
         decimal minQuantity,
         string? imageUrl,
         string? barcode,
@@ -27,9 +27,9 @@ public sealed class Product : AggregateRoot<Guid>
     {
         HouseholdId = householdId;
         Name = name;
-        Brand = brand;
-        Category = category;
-        Unit = unit;
+        CategoryId = categoryId;
+        BrandId = brandId;
+        UnitId = unitId;
         MinQuantity = minQuantity;
         ImageUrl = imageUrl;
         Barcode = barcode;
@@ -43,11 +43,11 @@ public sealed class Product : AggregateRoot<Guid>
 
     public string Name { get; private set; } = string.Empty;
 
-    public string? Brand { get; private set; }
+    public Guid CategoryId { get; private set; }
 
-    public string Category { get; private set; } = string.Empty;
+    public Guid? BrandId { get; private set; }
 
-    public ProductUnit Unit { get; private set; }
+    public Guid UnitId { get; private set; }
 
     public decimal MinQuantity { get; private set; }
 
@@ -57,6 +57,13 @@ public sealed class Product : AggregateRoot<Guid>
 
     /// <summary>Country this product is associated with (e.g. "BR", "US"). NULL means available to all countries.</summary>
     public string? Country { get; private set; }
+
+    // Navigation properties — populated by EF Core via Include(). Not part of domain logic.
+    public Category Category { get; private set; } = null!;
+
+    public Brand? Brand { get; private set; }
+
+    public UnitOfMeasure Unit { get; private set; } = null!;
 
     // Audit columns
     public DateTimeOffset CreatedAt { get; set; }
@@ -71,52 +78,49 @@ public sealed class Product : AggregateRoot<Guid>
     public static Product Create(
         Guid householdId,
         string name,
-        string? brand,
-        string category,
-        ProductUnit unit,
+        Guid categoryId,
+        Guid? brandId,
+        Guid unitId,
         decimal minQuantity,
         string? imageUrl,
         string? barcode)
     {
         Guard.AgainstEmptyGuid(householdId, nameof(householdId));
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Guard.AgainstNullOrWhiteSpace(category, nameof(category));
 
         if (minQuantity < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(minQuantity), "MinQuantity must be non-negative.");
         }
 
-        return new Product(Guid.NewGuid(), householdId, name, brand, category, unit, minQuantity, imageUrl, barcode, country: null);
+        return new Product(Guid.NewGuid(), householdId, name, categoryId, brandId, unitId, minQuantity, imageUrl, barcode, country: null);
     }
 
     /// <summary>Creates a global reference product (not owned by any household).</summary>
     public static Product CreateReference(
         string name,
-        string? brand,
-        string category,
-        ProductUnit unit,
+        Guid categoryId,
+        Guid? brandId,
+        Guid unitId,
         string? imageUrl,
         string? barcode,
         string? country)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Guard.AgainstNullOrWhiteSpace(category, nameof(category));
 
-        return new Product(Guid.NewGuid(), householdId: null, name, brand, category, unit, minQuantity: 0, imageUrl, barcode, country);
+        return new Product(Guid.NewGuid(), householdId: null, name, categoryId, brandId, unitId, minQuantity: 0, imageUrl, barcode, country);
     }
 
     public Result Update(
         string name,
-        string? brand,
-        string category,
-        ProductUnit unit,
+        Guid categoryId,
+        Guid? brandId,
+        Guid unitId,
         decimal minQuantity,
         string? imageUrl,
         string? barcode)
     {
         Guard.AgainstNullOrWhiteSpace(name, nameof(name));
-        Guard.AgainstNullOrWhiteSpace(category, nameof(category));
 
         if (minQuantity < 0)
         {
@@ -124,9 +128,9 @@ public sealed class Product : AggregateRoot<Guid>
         }
 
         Name = name;
-        Brand = brand;
-        Category = category;
-        Unit = unit;
+        CategoryId = categoryId;
+        BrandId = brandId;
+        UnitId = unitId;
         MinQuantity = minQuantity;
         ImageUrl = imageUrl;
         Barcode = barcode;

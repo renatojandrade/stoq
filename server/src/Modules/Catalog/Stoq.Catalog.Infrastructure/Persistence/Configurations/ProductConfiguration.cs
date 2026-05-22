@@ -18,17 +18,31 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         // NULL = reference product (no household owner).
         builder.Property(p => p.HouseholdId).IsRequired(false);
         builder.Property(p => p.Name).IsRequired().HasMaxLength(200);
-        builder.Property(p => p.Brand).HasMaxLength(200);
-        builder.Property(p => p.Category).IsRequired().HasMaxLength(100);
-        builder.Property(p => p.Unit).IsRequired().HasConversion<string>().HasMaxLength(20);
         builder.Property(p => p.MinQuantity).IsRequired().HasPrecision(18, 4);
         builder.Property(p => p.ImageUrl).HasMaxLength(2000);
         builder.Property(p => p.Barcode).HasMaxLength(14);
         builder.Property(p => p.Country).HasMaxLength(10);
 
+        builder.HasOne(p => p.Category)
+            .WithMany()
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(p => p.Brand)
+            .WithMany()
+            .HasForeignKey(p => p.BrandId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(p => p.Unit)
+            .WithMany()
+            .HasForeignKey(p => p.UnitId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(p => p.HouseholdId);
         builder.HasIndex(p => new { p.HouseholdId, p.Name });
         builder.HasIndex(p => p.Barcode).IsUnique().HasFilter("\"Barcode\" IS NOT NULL");
         builder.HasIndex(p => p.Country);
+        builder.HasIndex(p => p.CategoryId);
     }
 }

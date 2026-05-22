@@ -14,5 +14,9 @@ internal sealed class AddInventoryItemCommandValidator : AbstractValidator<AddIn
         RuleFor(x => x.MinQuantity).GreaterThanOrEqualTo(0);
         RuleFor(x => x.Unit).NotEmpty().MaximumLength(20);
         RuleFor(x => x.Notes).MaximumLength(500).When(x => x.Notes is not null);
+        RuleFor(x => x.ExpiryDate)
+            .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow.Date))
+            .WithMessage("Expiry date cannot be in the past.")
+            .When(x => x.ExpiryDate is not null);
     }
 }

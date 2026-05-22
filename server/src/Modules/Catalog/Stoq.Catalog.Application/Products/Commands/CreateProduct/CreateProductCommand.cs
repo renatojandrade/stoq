@@ -7,9 +7,9 @@ namespace Stoq.Catalog.Application.Products.Commands.CreateProduct;
 public sealed record CreateProductCommand(
     Guid HouseholdId,
     string Name,
-    string? Brand,
-    string Category,
-    string Unit,
+    Guid CategoryId,
+    string? BrandName,
+    Guid UnitId,
     decimal MinQuantity,
     string? ImageUrl,
     string? Barcode) : IRequest<Result<ProductDto>>;

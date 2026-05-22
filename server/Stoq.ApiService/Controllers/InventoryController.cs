@@ -6,10 +6,12 @@ using Stoq.Catalog.Application.Common.DTOs;
 using Stoq.Catalog.Application.Products.Queries.GetProduct;
 using Stoq.Inventory.Application.Common.DTOs;
 using Stoq.Inventory.Application.InventoryItems.Commands.AddInventoryItem;
+using Stoq.Inventory.Application.InventoryItems.Commands.BatchAddInventoryItems;
 using Stoq.Inventory.Application.InventoryItems.Commands.ConsumeInventoryItem;
 using Stoq.Inventory.Application.InventoryItems.Commands.RemoveInventoryItem;
 using Stoq.Inventory.Application.InventoryItems.Queries.GetExpiringItems;
 using Stoq.Inventory.Application.InventoryItems.Queries.ListInventoryItems;
+using Stoq.Inventory.Application.Ports;
 using Stoq.Shared.Kernel.Common;
 using Stoq.Shared.Kernel.Services;
 
@@ -20,7 +22,8 @@ namespace Stoq.ApiService.Controllers;
 [Authorize]
 public sealed class InventoryController(
     IMediator mediator,
-    ICurrentUserService currentUserService)
+    ICurrentUserService currentUserService,
+    IExpiryCheckService expiryCheckService)
     : ControllerBase
 {
     /// <summary>Lists all inventory items for the caller's household, with an optional name filter.</summary>
@@ -29,7 +32,7 @@ public sealed class InventoryController(
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<InventoryItemDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> List([FromQuery] string? name, CancellationToken ct)
+    public async Task<IActionResult> List([FromQuery] string? name, [FromQuery] Guid? productId, CancellationToken ct)
     {
         Guid? householdId = currentUserService.HouseholdId;
         if (householdId is null)
@@ -37,7 +40,7 @@ public sealed class InventoryController(
             return BadRequest(Problem("User is not a member of any household."));
         }
 
-        var query = new ListInventoryItemsQuery(householdId.Value, name);
+        var query = new ListInventoryItemsQuery(householdId.Value, name, productId);
         Result<IReadOnlyList<InventoryItemDto>> result = await mediator.Send(query, ct);
 
         if (result.IsSuccess)
@@ -110,7 +113,7 @@ public sealed class InventoryController(
             householdId.Value,
             product.Id,
             product.Name,
-            product.Brand,
+            product.BrandName,
             product.ImageUrl,
             request.Quantity,
             product.MinQuantity,
@@ -188,6 +191,65 @@ public sealed class InventoryController(
         }
 
         return BadRequest(Problem(result.Error));
+    }
+
+    /// <summary>
+    /// Batch-adds inventory items from a confirmed receipt scan.
+    /// Each item is added with a synthetic product ID (not linked to the catalog).
+    /// </summary>
+    /// <response code="201">Items added; returns the created inventory items.</response>
+    /// <response code="400">Validation failed or caller has no household.</response>
+    [HttpPost("batch")]
+    [ProducesResponseType<IReadOnlyList<InventoryItemDto>>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> BatchAdd([FromBody] BatchAddInventoryItemsRequest request, CancellationToken ct)
+    {
+        Guid? householdId = currentUserService.HouseholdId;
+        if (householdId is null)
+        {
+            return BadRequest(Problem("User is not a member of any household."));
+        }
+
+        IReadOnlyList<BatchInventoryItem> items = request.Items
+            .Select(i => new BatchInventoryItem(
+                i.ProductName,
+                i.Quantity,
+                i.Unit,
+                i.ExpiryDate,
+                i.Notes,
+                CorrectionItemId: i.CorrectionItemId,
+                MatchedProductId: i.MatchedProductId,
+                Barcode: i.Barcode,
+                RetailerSku: i.RetailerSku))
+            .ToList();
+
+        var command = new BatchAddInventoryItemsCommand(
+            householdId.Value,
+            items,
+            request.CorrectionId,
+            Country: currentUserService.HouseholdCountry,
+            InitiatedByUserId: currentUserService.UserId);
+        Result<IReadOnlyList<InventoryItemDto>> result = await mediator.Send(command, ct);
+
+        if (result.IsSuccess)
+        {
+            return CreatedAtAction(nameof(List), result.Value);
+        }
+
+        return BadRequest(Problem(result.Error));
+    }
+
+    /// <summary>
+    /// Manually triggers the expiry alert scan across all households.
+    /// Useful for testing or forcing an early run outside the daily schedule.
+    /// </summary>
+    /// <response code="200">Scan completed; returns the number of alert events published.</response>
+    [HttpPost("expiry-scan")]
+    [ProducesResponseType<int>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> TriggerExpiryScan(CancellationToken ct)
+    {
+        var count = await expiryCheckService.RunAsync(ct);
+        return Ok(count);
     }
 
     private static ProblemDetails Problem(string detail, int status = StatusCodes.Status400BadRequest) =>

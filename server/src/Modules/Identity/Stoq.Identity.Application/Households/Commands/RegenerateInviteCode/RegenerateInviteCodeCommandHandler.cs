@@ -14,8 +14,7 @@ internal sealed class RegenerateInviteCodeCommandHandler(IIdentityRepository rep
     public async Task<Result<HouseholdDto>> Handle(RegenerateInviteCodeCommand request, CancellationToken cancellationToken)
     {
         Household? household = await repository
-            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken)
-            .ConfigureAwait(false);
+            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken);
 
         if (household is null)
         {
@@ -29,7 +28,7 @@ internal sealed class RegenerateInviteCodeCommandHandler(IIdentityRepository rep
         }
 
         household.RegenerateInviteCode();
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await repository.SaveChangesAsync(cancellationToken);
 
         return Result<HouseholdDto>.Success(new HouseholdDto(
             household.Id,

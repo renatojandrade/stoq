@@ -19,6 +19,8 @@ export default function ConsumeInventoryItemScreen({ route, navigation }: Props)
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { item } = route.params;
+  const unitCode = item.unit;
+  const translatedUnit = t(`catalog.units.${unitCode}`, { defaultValue: unitCode });
 
   const [amount, setAmount] = useState('1');
   const [error, setError] = useState('');
@@ -33,7 +35,7 @@ export default function ConsumeInventoryItemScreen({ route, navigation }: Props)
       return false;
     }
     if (val > item.quantity) {
-      setError(t('inventory.validation.amountExceedsStock', { available: item.quantity, unit: item.unit }));
+      setError(t('inventory.validation.amountExceedsStock', { available: item.quantity, unit: translatedUnit }));
       return false;
     }
     setError('');
@@ -63,7 +65,7 @@ export default function ConsumeInventoryItemScreen({ route, navigation }: Props)
             </Text>
           )}
           <Text variant="bodyMedium" style={styles.stockInfo}>
-            {t('inventory.consume.currentStock', { quantity: item.quantity, unit: item.unit })}
+            {t('inventory.consume.currentStock', { quantity: item.quantity, unit: translatedUnit })}
           </Text>
         </Card.Content>
       </Card>
@@ -76,7 +78,7 @@ export default function ConsumeInventoryItemScreen({ route, navigation }: Props)
           onChangeText={setAmount}
           keyboardType="decimal-pad"
           error={!!error}
-          right={<TextInput.Affix text={item.unit} />}
+          right={<TextInput.Affix text={translatedUnit} />}
         />
         {error ? <HelperText type="error">{error}</HelperText> : null}
 

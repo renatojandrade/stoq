@@ -84,11 +84,182 @@ namespace Stoq.Inventory.Infrastructure.Migrations
 
                     b.HasIndex("HouseholdId");
 
+                    b.HasIndex("ProductName")
+                        .HasDatabaseName("IX_InventoryItems_ProductName_Trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("ProductName"), "GIN");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("ProductName"), new[] { "gin_trgm_ops" });
+
                     b.HasIndex("HouseholdId", "ExpiryDate");
 
                     b.HasIndex("HouseholdId", "ProductId");
 
                     b.ToTable("InventoryItems", "inventory");
+                });
+
+            modelBuilder.Entity("Stoq.Inventory.Domain.Entities.ParseCorrection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("EmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("HouseholdId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("InitiatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ParsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ParsedItemCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("QrCodeUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("character varying(2048)");
+
+                    b.Property<string>("ReceiptNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RetailerCity")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RetailerCnpj")
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)");
+
+                    b.Property<string>("RetailerName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("RetailerState")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<string>("RetailerStreet")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("RetailerTradeName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("RetailerZipCode")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Pending");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HouseholdId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("HouseholdId", "RetailerName");
+
+                    b.HasIndex("InitiatedByUserId", "Status");
+
+                    b.ToTable("ParseCorrections", "inventory");
+                });
+
+            modelBuilder.Entity("Stoq.Inventory.Domain.Entities.ParseCorrectionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Barcode")
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<decimal?>("Discount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("MatchStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<Guid?>("MatchedReferenceProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ParseCorrectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("RetailerSku")
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<decimal?>("UnitPrice")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Barcode");
+
+                    b.HasIndex("MatchStatus");
+
+                    b.HasIndex("ParseCorrectionId");
+
+                    b.ToTable("ParseCorrectionItems", "inventory");
+                });
+
+            modelBuilder.Entity("Stoq.Inventory.Domain.Entities.ParseCorrectionItem", b =>
+                {
+                    b.HasOne("Stoq.Inventory.Domain.Entities.ParseCorrection", null)
+                        .WithMany("Items")
+                        .HasForeignKey("ParseCorrectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Stoq.Inventory.Domain.Entities.ParseCorrection", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

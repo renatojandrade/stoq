@@ -10,7 +10,7 @@ internal sealed class CatalogDatabaseMigrator(
 {
     public async Task MigrateAsync(CancellationToken cancellationToken = default)
     {
-        await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
-        await seeder.SeedAsync(cancellationToken).ConfigureAwait(false);
+        await context.Database.MigrateAsync(cancellationToken);
+        await seeder.SeedAsync(cancellationToken);
     }
 }

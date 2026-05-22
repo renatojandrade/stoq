@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
   ActivityIndicator,
   FAB,
   IconButton,
   List,
+  Menu,
   Searchbar,
   Text,
   useTheme,
@@ -13,22 +14,71 @@ import { useTranslation } from 'react-i18next';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CatalogStackParamList } from '../../navigation/CatalogNavigator';
 import { useListProductsQuery, useDeleteProductMutation } from '../../store/api/catalogApi';
-import type { ProductDto } from '../../store/api/catalogApi';
+import type { ProductDto, ListProductsParams } from '../../store/api/catalogApi';
 
 type Props = NativeStackScreenProps<CatalogStackParamList, 'ProductList'>;
+
+type FilterType = 'all' | 'general' | 'household';
 
 export default function ProductListScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<FilterType>('all');
   const [fabOpen, setFabOpen] = useState(false);
+  const [filterMenuVisible, setFilterMenuVisible] = useState(false);
 
-  const { data: products, isLoading, isError, refetch } = useListProductsQuery(
-    search ? { name: search } : undefined,
-    { refetchOnFocus: true },
+  const activeSearch = search.length >= 4 ? search : '';
+
+  const requiresSearch = filter !== 'household';
+  const shouldSkip = requiresSearch && !activeSearch;
+
+  const queryParams: ListProductsParams = {};
+  if (activeSearch) queryParams.name = activeSearch;
+  if (filter === 'general') queryParams.isReference = true;
+  if (filter === 'household') queryParams.isReference = false;
+
+  const { data: products, isLoading, isFetching, isError, refetch } = useListProductsQuery(
+    Object.keys(queryParams).length > 0 ? queryParams : undefined,
+    { skip: shouldSkip, refetchOnFocus: false },
   );
 
   const [deleteProduct] = useDeleteProductMutation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Menu
+          visible={filterMenuVisible}
+          onDismiss={() => setFilterMenuVisible(false)}
+          anchor={
+            <IconButton
+              icon="filter-variant"
+              size={22}
+              onPress={() => setFilterMenuVisible(true)}
+              accessibilityLabel={t('catalog.list.filter')}
+            />
+          }
+        >
+          <Menu.Item
+            leadingIcon={filter === 'all' ? 'check' : undefined}
+            onPress={() => { setFilter('all'); setFilterMenuVisible(false); }}
+            title={t('catalog.list.filterAll')}
+          />
+          <Menu.Item
+            leadingIcon={filter === 'general' ? 'check' : undefined}
+            onPress={() => { setFilter('general'); setFilterMenuVisible(false); }}
+            title={t('catalog.list.filterGeneral')}
+          />
+          <Menu.Item
+            leadingIcon={filter === 'household' ? 'check' : undefined}
+            onPress={() => { setFilter('household'); setFilterMenuVisible(false); }}
+            title={t('catalog.list.filterHousehold')}
+          />
+        </Menu>
+      ),
+    });
+  }, [navigation, filterMenuVisible, filter, t]);
 
   function handleEdit(product: ProductDto) {
     navigation.navigate('ProductForm', { product });
@@ -38,22 +88,7 @@ export default function ProductListScreen({ navigation }: Props) {
     await deleteProduct(id);
   }
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View style={styles.center}>
-        <Text>{t('common.retry')}</Text>
-        <IconButton icon="refresh" onPress={refetch} />
-      </View>
-    );
-  }
+  const showSearchPrompt = shouldSkip;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -64,7 +99,24 @@ export default function ProductListScreen({ navigation }: Props) {
         style={styles.searchbar}
       />
 
-      {products?.length === 0 ? (
+      {showSearchPrompt ? (
+        <View style={styles.center}>
+          <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
+            {t('catalog.list.searchPrompt')}
+          </Text>
+        </View>
+      ) : isLoading || isFetching ? (
+        <View style={styles.center}>
+          <ActivityIndicator />
+        </View>
+      ) : isError ? (
+        <View style={styles.center}>
+          <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
+            {t('common.error')}
+          </Text>
+          <IconButton icon="refresh" onPress={refetch} />
+        </View>
+      ) : products?.length === 0 ? (
         <View style={styles.center}>
           <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
             {t('catalog.list.empty')}
@@ -77,9 +129,9 @@ export default function ProductListScreen({ navigation }: Props) {
           renderItem={({ item }) => (
             <List.Item
               title={item.name}
-              description={[item.brand, item.category].filter(Boolean).join(' · ')}
-              left={(props) => <List.Icon {...props} icon="package-variant" />}
-              right={() => (
+              description={[item.brandName, item.categoryNameEn].filter(Boolean).join(' · ')}
+              left={(props) => <List.Icon {...props} icon={item.isReference ? 'package-variant' : 'home-outline'} />}
+              right={item.isReference ? undefined : () => (
                 <View style={styles.actions}>
                   <IconButton
                     icon="pencil-outline"
@@ -132,7 +184,7 @@ export default function ProductListScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  searchbar: { margin: 16 },
+  searchbar: { margin: 16, marginBottom: 8 },
   list: { paddingBottom: 96 },
   actions: { flexDirection: 'row', alignItems: 'center' },
   fabGroup: { position: 'absolute', right: 0, bottom: 0 },

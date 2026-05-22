@@ -10,7 +10,7 @@ internal sealed class RemoveInventoryItemCommandHandler(IInventoryRepository rep
 {
     public async Task<Result> Handle(RemoveInventoryItemCommand request, CancellationToken cancellationToken)
     {
-        InventoryItem? item = await repository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        InventoryItem? item = await repository.GetByIdAsync(request.Id, cancellationToken);
 
         if (item is null || item.HouseholdId != request.HouseholdId)
         {
@@ -18,7 +18,7 @@ internal sealed class RemoveInventoryItemCommandHandler(IInventoryRepository rep
         }
 
         repository.Remove(item);
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await repository.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

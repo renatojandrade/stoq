@@ -130,11 +130,16 @@
     "list": {
       "title": "Product catalog",
       "searchPlaceholder": "Search products…",
-      "empty": "No products yet. Tap + to add one.",
+      "searchPrompt": "Search for a product by name to browse the catalog.",
+      "empty": "No products found. Try a different name or add one manually.",
       "addProduct": "Add manually",
       "scanBarcode": "Scan barcode",
       "edit": "Edit product",
-      "delete": "Delete product"
+      "delete": "Delete product",
+      "filter": "Filter",
+      "filterAll": "All",
+      "filterGeneral": "General",
+      "filterHousehold": "Mine"
     },
     "barcode": {
       "scanTitle": "Scan barcode",
@@ -148,6 +153,7 @@
       "title": "Product",
       "edit": "Edit",
       "delete": "Delete",
+      "addToStock": "Add to stock",
       "notFound": "Product not found."
     },
     "form": {
@@ -170,11 +176,20 @@
       "Grams": "Grams",
       "Kilograms": "Kilograms",
       "Millilitres": "Millilitres",
-      "Litres": "Litres"
+      "Litres": "Litres",
+      "Milligrams": "Milligrams",
+      "Pieces": "Pieces",
+      "Boxes": "Boxes",
+      "Packs": "Packs",
+      "Bottles": "Bottles",
+      "Cans": "Cans",
+      "Bags": "Bags",
+      "Dozens": "Dozens"
     },
     "validation": {
       "nameRequired": "Product name is required.",
       "categoryRequired": "Category is required.",
+      "unitRequired": "Unit is required.",
       "minQuantityInvalid": "Min. quantity must be a non-negative number."
     }
   },
@@ -190,11 +205,28 @@
       "consume": "Consume",
       "remove": "Remove",
       "expires": "Exp.",
-      "lowStock": "Low stock"
+      "lowStock": "Low stock",
+      "batchCount": "{{count}} batches"
+    },
+    "detail": {
+      "batchesTitle": "Batches",
+      "minStock": "Min. stock: {{quantity}} {{unit}}",
+      "noExpiry": "No expiry date",
+      "addBatch": "Add batch",
+      "addOne": "Add one",
+      "addToShoppingList": "Add to shopping list",
+      "addedToShoppingList": "Added to shopping list"
+    },
+    "productSearch": {
+      "title": "Select product",
+      "placeholder": "Search by name or brand…",
+      "noResults": "No products found. Try a different name.",
+      "startTyping": "Type to search the catalog."
     },
     "add": {
       "title": "Add to inventory",
-      "searchProduct": "Search product",
+      "searchProduct": "Product",
+      "tapToSelect": "Tap to select a product",
       "quantity": "Quantity",
       "unit": "Unit",
       "unitPlaceholder": "e.g. g, ml, units",
@@ -209,13 +241,93 @@
       "amount": "Amount to consume",
       "submit": "Consume"
     },
+    "expiry": {
+      "title": "Expiry Alerts",
+      "empty": "No items expiring in the next 7 days.",
+      "expired": "Expired",
+      "today": "Expires today",
+      "daysLeft_one": "{{count}} day left",
+      "daysLeft_other": "{{count}} days left",
+      "banner_one": "{{count}} item expiring soon",
+      "banner_other": "{{count}} items expiring soon",
+      "bannerEmpty": "No products expiring in the next 7 days.",
+      "runScan": "Check expiring products",
+      "scanHint": "Products expiring in the next 7 days.",
+      "scanComplete": "Expiry scan complete."
+    },
     "validation": {
       "productRequired": "Select a product.",
       "quantityInvalid": "Quantity must be a non-negative number.",
       "unitRequired": "Unit is required.",
       "expiryDateInvalid": "Expiry date must be in YYYY-MM-DD format.",
+      "expiryDatePast": "Expiry date cannot be in the past.",
       "amountInvalid": "Amount must be greater than zero.",
       "amountExceedsStock": "Only {{available}} {{unit}} available."
+    }
+  },
+  "shopping": {
+    "list": {
+      "title": "Shopping List",
+      "emptyTitle": "Your shopping list is empty",
+      "emptySubtitle": "Add items to buy at the store.",
+      "addFirstItem": "Add first item",
+      "addItem": "Add item",
+      "remove": "Remove",
+      "autoAdded": "Auto-added",
+      "clearChecked": "Clear checked",
+      "scanReceipt": "Scan receipt"
+    },
+    "add": {
+      "title": "Add item",
+      "productName": "Product name",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional",
+      "submit": "Add to list"
+    },
+    "receipt": {
+      "scanTitle": "Scan Receipt",
+      "hint": "Point the camera at the full receipt. NF-e QR codes are detected automatically.",
+      "nfeDetected": "NF-e QR code detected! Processing…",
+      "scanning": "Analyzing your receipt… This may take a few seconds.",
+      "tooManyScans": "Too many active scans. Please wait a moment and try again.",
+      "capture": "Capture photo",
+      "permissionRequired": "Camera permission is required to scan receipts.",
+      "grantPermission": "Allow camera access",
+      "parsing": "Reading receipt…",
+      "nfeError": "Could not read the NF-e QR code. This state may not support direct access — try taking a photo instead.",
+      "parseError": "Could not read the receipt. Please try again.",
+      "nfeNotSupported": "NF-e direct XML access is not supported for this state. Try the photo mode instead.",
+      "confirmTitle": "Confirm items",
+      "confirmSubtitle": "Review and adjust the items before adding them to your inventory.",
+      "alreadyConfirmed": "These items have already been added to your inventory.",
+      "confirmEmpty": "No items were recognised. Try again or add items manually.",
+      "expiryDate": "Expiry date (optional)",
+      "expiryPlaceholder": "YYYY-MM-DD",
+      "addToInventory": "Add to inventory",
+      "successMessage": "Items added to your inventory.",
+      "removeItem": "Remove item"
+    },
+    "scanList": {
+      "title": "Scan History",
+      "empty": "No scans yet. Tap the button below to scan a receipt.",
+      "scanButton": "Scan Receipt",
+      "tapToConfirm": "Review & confirm",
+      "unknownRetailer": "Unknown retailer",
+      "items": "items",
+      "status": {
+        "pending": "Waiting",
+        "processing": "Processing",
+        "parsed": "Ready to confirm",
+        "confirmed": "Confirmed",
+        "failed": "Failed"
+      }
+    },
+    "validation": {
+      "productNameRequired": "Product name is required.",
+      "quantityInvalid": "Quantity must be greater than zero.",
+      "unitRequired": "Unit is required."
     }
   },
   "common": {
@@ -224,6 +336,7 @@
     "cancel": "Cancel",
     "ok": "OK",
     "error": "Something went wrong. Please try again.",
+    "loadError": "Unable to load data. Please try again.",
     "networkError": "No connection. Check your internet and try again."
   }
 }

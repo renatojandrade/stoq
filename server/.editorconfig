@@ -87,8 +87,8 @@ dotnet_style_prefer_simplified_boolean_expressions                     = true:su
 dotnet_code_quality_unused_parameters                                  = all:suggestion
 
 # ── Analyser severities ───────────────────────────────────────────────────────
-# CA2007: Always call ConfigureAwait on awaited tasks.
-dotnet_diagnostic.CA2007.severity                                      = error
+# CA2007: ConfigureAwait not needed in ASP.NET Core (no SynchronizationContext).
+dotnet_diagnostic.CA2007.severity                                      = none
 # CA1031: Do not catch general exception types — catch specific exceptions.
 dotnet_diagnostic.CA1031.severity                                      = warning
 # SA1600: Public members must be documented.
@@ -113,7 +113,6 @@ dotnet_diagnostic.SA1602.severity                                      = none
 dotnet_diagnostic.CS1591.severity                                      = none
 dotnet_diagnostic.SA1615.severity                                      = none
 dotnet_diagnostic.SA1611.severity                                      = none
-dotnet_diagnostic.CA2007.severity                                      = none
 # Detetar membros privados não utilizados (métodos, propriedades, campos)
 dotnet_diagnostic.IDE0051.severity = error
 # Opcional: Detetar parâmetros não utilizados

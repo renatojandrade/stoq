@@ -5,4 +5,4 @@ using Stoq.Shared.Kernel.Common;
 namespace Stoq.Identity.Application.Households.Commands.JoinHousehold;
 public sealed record JoinHouseholdCommand(
     string InviteCode,
-    Guid UserId) : IRequest<Result<HouseholdDto>>;
+    Guid UserId) : IRequest<Result<HouseholdAuthResponse>>;

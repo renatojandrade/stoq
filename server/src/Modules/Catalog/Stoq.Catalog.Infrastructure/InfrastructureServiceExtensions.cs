@@ -1,13 +1,16 @@
+﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Stoq.Catalog.Application.Ports;
+using Stoq.Catalog.Infrastructure.Consumers;
 using Stoq.Catalog.Infrastructure.Database;
 using Stoq.Catalog.Infrastructure.Persistence;
 using Stoq.Catalog.Infrastructure.Persistence.Interceptors;
 using Stoq.Catalog.Infrastructure.Persistence.Repositories;
 using Stoq.Catalog.Infrastructure.Services;
 using Stoq.Shared.Contracts.Database;
+using Stoq.Shared.Kernel.Services;
 
 namespace Stoq.Catalog.Infrastructure;
 
@@ -17,7 +20,11 @@ public static class InfrastructureServiceExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<IProductRepository, ProductRepositoryImpl>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<IUnitRepository, UnitRepository>();
+        services.AddScoped<IHouseholdProductLookupService, HouseholdProductLookupService>();
 
 #pragma warning disable S1075 // Well-known public API base URLs — not configurable resource paths.
         services.AddHttpClient<IOpenFoodFactsService, OpenFoodFactsService>(client =>
@@ -42,6 +49,9 @@ public static class InfrastructureServiceExtensions
 
         return services;
     }
+
+    public static void AddCatalogConsumers(IBusRegistrationConfigurator configurator) =>
+        configurator.AddConsumer<ReceiptItemsSavedIntegrationEventConsumer>();
 
     public static IServiceCollection AddCatalogDbContext(
         this IServiceCollection services,

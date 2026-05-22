@@ -5,11 +5,11 @@ using Stoq.ApiService.DTOs;
 using Stoq.Identity.Application.Common.DTOs;
 using Stoq.Identity.Application.Households.Commands.ChangeMemberRole;
 using Stoq.Identity.Application.Households.Commands.CreateHousehold;
-using Stoq.Identity.Domain.Enums;
 using Stoq.Identity.Application.Households.Commands.JoinHousehold;
 using Stoq.Identity.Application.Households.Commands.RegenerateInviteCode;
 using Stoq.Identity.Application.Households.Commands.RemoveMember;
 using Stoq.Identity.Application.Households.Queries.GetMyHousehold;
+using Stoq.Identity.Domain.Enums;
 using Stoq.Shared.Kernel.Common;
 using Stoq.Shared.Kernel.Services;
 
@@ -27,7 +27,7 @@ public sealed class HouseholdsController(
     /// <response code="201">Household created successfully.</response>
     /// <response code="400">Caller is already a member of another household, or validation failed.</response>
     [HttpPost]
-    [ProducesResponseType<HouseholdDto>(StatusCodes.Status201Created)]
+    [ProducesResponseType<HouseholdAuthResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateHouseholdRequest request, CancellationToken ct)
     {
@@ -37,13 +37,13 @@ public sealed class HouseholdsController(
             return Unauthorized();
         }
 
-        if (!Enum.TryParse<HouseholdCountry>(request.Country, ignoreCase: true, out var country))
+        if (!Enum.TryParse<HouseholdCountry>(request.Country, ignoreCase: true, out HouseholdCountry country))
         {
             return BadRequest(Problem("Invalid country. Supported values: BR, US."));
         }
 
         var command = new CreateHouseholdCommand(request.Name, userId.Value, country);
-        Result<HouseholdDto> result = await mediator.Send(command, ct);
+        Result<HouseholdAuthResponse> result = await mediator.Send(command, ct);
 
         if (result.IsSuccess)
         {
@@ -57,7 +57,7 @@ public sealed class HouseholdsController(
     /// <response code="200">Successfully joined the household.</response>
     /// <response code="400">Invalid or expired invite code, or caller is already a member.</response>
     [HttpPost("join")]
-    [ProducesResponseType<HouseholdDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<HouseholdAuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Join([FromBody] JoinHouseholdRequest request, CancellationToken ct)
     {
@@ -68,7 +68,7 @@ public sealed class HouseholdsController(
         }
 
         var command = new JoinHouseholdCommand(request.InviteCode, userId.Value);
-        Result<HouseholdDto> result = await mediator.Send(command, ct);
+        Result<HouseholdAuthResponse> result = await mediator.Send(command, ct);
 
         if (result.IsSuccess)
         {

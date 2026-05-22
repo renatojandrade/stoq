@@ -11,8 +11,7 @@ internal sealed class CosmosProductService(HttpClient httpClient) : ICosmosProdu
     public async Task<ProductLookupDto?> LookupByBarcodeAsync(string barcode, CancellationToken ct = default)
     {
         HttpResponseMessage response = await httpClient
-            .GetAsync($"gtins/{barcode}.json", ct)
-            .ConfigureAwait(false);
+            .GetAsync($"gtins/{barcode}.json", ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound
             || response.StatusCode == HttpStatusCode.Unauthorized
@@ -22,8 +21,7 @@ internal sealed class CosmosProductService(HttpClient httpClient) : ICosmosProdu
         }
 
         CosmosProductResponse? product = await response.Content
-            .ReadFromJsonAsync<CosmosProductResponse>(cancellationToken: ct)
-            .ConfigureAwait(false);
+            .ReadFromJsonAsync<CosmosProductResponse>(cancellationToken: ct);
 
         if (product is null || string.IsNullOrWhiteSpace(product.Description))
         {

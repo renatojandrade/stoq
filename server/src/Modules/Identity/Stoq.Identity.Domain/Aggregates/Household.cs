@@ -6,7 +6,6 @@ using Stoq.Shared.Contracts.Entities;
 using Stoq.Shared.Kernel.Aggregates;
 using Stoq.Shared.Kernel.Common;
 
-
 namespace Stoq.Identity.Domain.Aggregates;
 
 public sealed class Household : AggregateRoot<Guid>, IAuditableEntity

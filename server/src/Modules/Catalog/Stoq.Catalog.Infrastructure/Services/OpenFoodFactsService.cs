@@ -1,4 +1,4 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Stoq.Catalog.Application.Common.DTOs;
 using Stoq.Catalog.Application.Ports;
@@ -16,8 +16,7 @@ internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFac
     public async Task<ProductLookupDto?> LookupByBarcodeAsync(string barcode, CancellationToken ct = default)
     {
         OpenFoodFactsResponse? response = await httpClient
-            .GetFromJsonAsync<OpenFoodFactsResponse>($"api/v0/product/{barcode}.json", ct)
-            .ConfigureAwait(false);
+            .GetFromJsonAsync<OpenFoodFactsResponse>($"api/v0/product/{barcode}.json", ct);
 
         if (response is null || response.Status != 1 || response.Product is null)
         {
@@ -32,8 +31,7 @@ internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFac
         var url = BuildSearchUrl(name, country);
 
         OpenFoodFactsSearchResponse? response = await httpClient
-            .GetFromJsonAsync<OpenFoodFactsSearchResponse>(url, ct)
-            .ConfigureAwait(false);
+            .GetFromJsonAsync<OpenFoodFactsSearchResponse>(url, ct);
 
         if (response?.Products is null || response.Products.Length == 0)
         {
@@ -102,7 +100,7 @@ internal sealed class OpenFoodFactsService(HttpClient httpClient) : IOpenFoodFac
         // Prefer the most-specific English tag from the hierarchy, e.g. "en:yogurts" → "Yogurts"
         if (hierarchy is { Length: > 0 })
         {
-            for (int i = hierarchy.Length - 1; i >= 0; i--)
+            for (var i = hierarchy.Length - 1; i >= 0; i--)
             {
                 var tag = hierarchy[i];
                 if (tag.StartsWith("en:", StringComparison.OrdinalIgnoreCase))

@@ -1,8 +1,9 @@
-using MediatR;
+﻿using MediatR;
 using Stoq.Catalog.Application.Common.DTOs;
 using Stoq.Catalog.Application.Ports;
+using Stoq.Catalog.Application.Products.Commands.CreateProduct;
 using Stoq.Catalog.Domain.Aggregates;
-using Stoq.Catalog.Domain.Enums;
+using Stoq.Catalog.Domain.Constants;
 using Stoq.Shared.Kernel.Common;
 
 namespace Stoq.Catalog.Application.Products.Queries.ListProducts;
@@ -15,16 +16,14 @@ internal sealed class ListProductsQueryHandler(
     public async Task<Result<IReadOnlyList<ProductDto>>> Handle(ListProductsQuery request, CancellationToken cancellationToken)
     {
         IReadOnlyList<Product> products = await repository
-            .ListByHouseholdAsync(request.HouseholdId, request.Country, request.Name, request.Category, cancellationToken)
-            .ConfigureAwait(false);
+            .ListByHouseholdAsync(request.HouseholdId, request.Country, request.Name, request.CategoryId, request.IsReference, request.Page, request.PageSize, cancellationToken);
 
-        // If a name search returned nothing, fall back to Open Food Facts and auto-save any results
-        // as reference products so they appear in future searches without hitting OFFs again.
-        if (products.Count == 0 && !string.IsNullOrWhiteSpace(request.Name))
+        // OFFs fallback only on page 1 — subsequent pages query the DB which already has cached results.
+        // Skip when filtering for household-only products (OFF results are always reference products).
+        if (products.Count == 0 && !string.IsNullOrWhiteSpace(request.Name) && request.Page == 1 && request.IsReference != false)
         {
             IReadOnlyList<ProductLookupDto> offResults = await openFoodFacts
-                .SearchByNameAsync(request.Name, request.Country, cancellationToken)
-                .ConfigureAwait(false);
+                .SearchByNameAsync(request.Name, request.Country, cancellationToken);
 
             if (offResults.Count > 0)
             {
@@ -36,8 +35,7 @@ internal sealed class ListProductsQueryHandler(
                     if (!string.IsNullOrWhiteSpace(dto.Barcode))
                     {
                         var exists = await repository
-                            .ExistsByBarcodeAsync(dto.Barcode, cancellationToken)
-                            .ConfigureAwait(false);
+                            .ExistsByBarcodeAsync(dto.Barcode, cancellationToken);
 
                         if (exists)
                         {
@@ -45,47 +43,38 @@ internal sealed class ListProductsQueryHandler(
                         }
                     }
 
-                    Product reference = Product.CreateReference(
+                    var reference = Product.CreateReference(
                         dto.Name,
-                        dto.Brand,
-                        dto.Category ?? "Other",
-                        ProductUnit.Units,
+                        WellKnownIds.Categories.Uncategorized,
+                        brandId: null,
+                        WellKnownIds.Units.UnitsId,
                         dto.ImageUrl,
                         dto.Barcode,
                         request.Country);
 
-                    await repository.AddAsync(reference, cancellationToken).ConfigureAwait(false);
+                    await repository.AddAsync(reference, cancellationToken);
                     saved.Add(reference);
                 }
 
                 if (saved.Count > 0)
                 {
-                    await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    await repository.SaveChangesAsync(cancellationToken);
                 }
 
-                products = saved;
+                // Reload saved products with navigation properties.
+                var ids = saved.Select(p => p.Id).ToList();
+                products = await repository
+                    .ListByHouseholdAsync(request.HouseholdId, request.Country, nameFilter: null, categoryIdFilter: null, isReferenceFilter: null, page: 1, pageSize: ids.Count + 1, ct: cancellationToken);
+
+                products = products.Where(p => ids.Contains(p.Id)).ToList().AsReadOnly();
             }
         }
 
         IReadOnlyList<ProductDto> dtos = products
-            .Select(p => MapToDto(p))
+            .Select(CreateProductCommandHandler.ToDto)
             .ToList()
             .AsReadOnly();
 
         return Result<IReadOnlyList<ProductDto>>.Success(dtos);
     }
-
-    private static ProductDto MapToDto(Product p) =>
-        new(
-            p.Id,
-            p.HouseholdId,
-            p.Name,
-            p.Brand,
-            p.Category,
-            p.Unit.ToString(),
-            p.MinQuantity,
-            p.ImageUrl,
-            p.Barcode,
-            p.Country,
-            IsReference: p.HouseholdId is null);
 }

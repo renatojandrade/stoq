@@ -13,8 +13,7 @@ internal sealed class ChangeMemberRoleCommandHandler(IIdentityRepository reposit
     public async Task<Result> Handle(ChangeMemberRoleCommand request, CancellationToken cancellationToken)
     {
         Household? household = await repository
-            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken)
-            .ConfigureAwait(false);
+            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken);
 
         if (household is null)
         {
@@ -39,7 +38,7 @@ internal sealed class ChangeMemberRoleCommandHandler(IIdentityRepository reposit
             return result;
         }
 
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

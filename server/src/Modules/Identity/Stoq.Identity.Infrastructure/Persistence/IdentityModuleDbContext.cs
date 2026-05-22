@@ -20,6 +20,8 @@ public sealed class IdentityModuleDbContext(DbContextOptions<IdentityModuleDbCon
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public DbSet<DevicePushToken> DevicePushTokens => Set<DevicePushToken>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

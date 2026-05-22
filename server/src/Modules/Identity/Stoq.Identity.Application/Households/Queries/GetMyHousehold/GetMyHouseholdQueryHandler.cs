@@ -12,8 +12,7 @@ internal sealed class GetMyHouseholdQueryHandler(IIdentityRepository repository)
     public async Task<Result<HouseholdDetailDto>> Handle(GetMyHouseholdQuery request, CancellationToken cancellationToken)
     {
         Household? household = await repository
-            .GetHouseholdByUserIdAsync(request.UserId, cancellationToken)
-            .ConfigureAwait(false);
+            .GetHouseholdByUserIdAsync(request.UserId, cancellationToken);
 
         if (household is null)
         {
@@ -22,8 +21,7 @@ internal sealed class GetMyHouseholdQueryHandler(IIdentityRepository repository)
 
         IEnumerable<Guid> memberUserIds = household.Members.Select(m => m.UserId);
         Dictionary<Guid, (string DisplayName, string? AvatarUrl)> usersInfo = await repository
-            .GetUsersInfoAsync(memberUserIds, cancellationToken)
-            .ConfigureAwait(false);
+            .GetUsersInfoAsync(memberUserIds, cancellationToken);
 
         var members = household.Members
             .Select(m =>

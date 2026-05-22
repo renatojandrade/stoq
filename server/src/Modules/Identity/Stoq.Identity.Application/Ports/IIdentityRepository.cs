@@ -10,5 +10,6 @@ public interface IIdentityRepository
     Task<Dictionary<Guid, (string DisplayName, string? AvatarUrl)>> GetUsersInfoAsync(IEnumerable<Guid> userIds, CancellationToken ct = default);
     Task AddHouseholdAsync(Household household, CancellationToken ct = default);
     Task<bool> IsUserMemberOfAnyHouseholdAsync(Guid userId, CancellationToken ct = default);
+    Task<IReadOnlyList<Guid>> GetHouseholdMemberUserIdsAsync(Guid householdId, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
 }

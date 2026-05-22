@@ -7,7 +7,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { ProfileStackParamList } from '../../navigation/ProfileNavigator';
 import type { RootState, AppDispatch } from '../../store';
 import { clearCredentials, getStoredRefreshToken } from '../../store/authSlice';
-import { useLogoutMutation } from '../../store/api/authApi';
+import { useLogoutMutation, useRemoveDeviceTokenMutation } from '../../store/api/authApi';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Profile'>;
 
@@ -17,6 +17,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const [logout] = useLogoutMutation();
+  const [removeDeviceToken] = useRemoveDeviceTokenMutation();
 
   async function handleLogout() {
     Alert.alert(
@@ -29,6 +30,7 @@ export default function ProfileScreen({ navigation }: Props) {
           style: 'destructive',
           onPress: async () => {
             try {
+              await removeDeviceToken();
               const token = await getStoredRefreshToken();
               if (token) await logout({ refreshToken: token });
             } catch {

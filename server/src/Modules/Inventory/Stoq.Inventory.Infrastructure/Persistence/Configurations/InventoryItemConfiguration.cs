@@ -31,5 +31,12 @@ internal sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Inve
         builder.HasIndex(i => i.HouseholdId);
         builder.HasIndex(i => new { i.HouseholdId, i.ProductId });
         builder.HasIndex(i => new { i.HouseholdId, i.ExpiryDate });
+
+        // GIN trigram index supports word-order-independent and fuzzy-match searches.
+        // Replaces the former B-tree (HouseholdId, ProductName) index.
+        builder.HasIndex(i => i.ProductName)
+            .HasMethod("GIN")
+            .HasOperators("gin_trgm_ops")
+            .HasDatabaseName("IX_InventoryItems_ProductName_Trgm");
     }
 }

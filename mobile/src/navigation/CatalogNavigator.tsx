@@ -11,8 +11,7 @@ import type { ProductDto } from '../store/api/catalogApi';
 export interface ProductPrefill {
   barcode?: string;
   name?: string;
-  brand?: string | null;
-  category?: string | null;
+  brandName?: string | null;
   imageUrl?: string | null;
 }
 

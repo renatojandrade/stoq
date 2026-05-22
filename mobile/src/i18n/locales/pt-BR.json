@@ -130,11 +130,16 @@
     "list": {
       "title": "Catálogo de produtos",
       "searchPlaceholder": "Buscar produtos…",
-      "empty": "Nenhum produto ainda. Toque em + para adicionar.",
+      "searchPrompt": "Busque um produto pelo nome para explorar o catálogo.",
+      "empty": "Nenhum produto encontrado. Tente outro nome ou adicione manualmente.",
       "addProduct": "Adicionar manualmente",
       "scanBarcode": "Escanear código de barras",
       "edit": "Editar produto",
-      "delete": "Excluir produto"
+      "delete": "Excluir produto",
+      "filter": "Filtrar",
+      "filterAll": "Todos",
+      "filterGeneral": "Gerais",
+      "filterHousehold": "Minha casa"
     },
     "barcode": {
       "scanTitle": "Escanear código de barras",
@@ -148,6 +153,7 @@
       "title": "Produto",
       "edit": "Editar",
       "delete": "Excluir",
+      "addToStock": "Adicionar ao estoque",
       "notFound": "Produto não encontrado."
     },
     "form": {
@@ -170,11 +176,20 @@
       "Grams": "Gramas",
       "Kilograms": "Quilogramas",
       "Millilitres": "Mililitros",
-      "Litres": "Litros"
+      "Litres": "Litros",
+      "Milligrams": "Miligramas",
+      "Pieces": "Peças",
+      "Boxes": "Caixas",
+      "Packs": "Pacotes",
+      "Bottles": "Garrafas",
+      "Cans": "Latas",
+      "Bags": "Sacolas",
+      "Dozens": "Dúzias"
     },
     "validation": {
       "nameRequired": "O nome do produto é obrigatório.",
       "categoryRequired": "A categoria é obrigatória.",
+      "unitRequired": "Unidade é obrigatória.",
       "minQuantityInvalid": "A qtd. mínima deve ser um número não negativo."
     }
   },
@@ -190,11 +205,28 @@
       "consume": "Consumir",
       "remove": "Remover",
       "expires": "Venc.",
-      "lowStock": "Estoque baixo"
+      "lowStock": "Estoque baixo",
+      "batchCount": "{{count}} lotes"
+    },
+    "detail": {
+      "batchesTitle": "Lotes",
+      "minStock": "Estoque mín.: {{quantity}} {{unit}}",
+      "noExpiry": "Sem data de validade",
+      "addBatch": "Adicionar lote",
+      "addOne": "Adicionar um",
+      "addToShoppingList": "Adicionar à lista de compras",
+      "addedToShoppingList": "Adicionado à lista de compras"
+    },
+    "productSearch": {
+      "title": "Selecionar produto",
+      "placeholder": "Buscar por nome ou marca…",
+      "noResults": "Nenhum produto encontrado. Tente outro nome.",
+      "startTyping": "Digite para buscar no catálogo."
     },
     "add": {
       "title": "Adicionar ao estoque",
-      "searchProduct": "Buscar produto",
+      "searchProduct": "Produto",
+      "tapToSelect": "Toque para selecionar um produto",
       "quantity": "Quantidade",
       "unit": "Unidade",
       "unitPlaceholder": "ex: g, ml, unidades",
@@ -209,13 +241,93 @@
       "amount": "Quantidade a consumir",
       "submit": "Consumir"
     },
+    "expiry": {
+      "title": "Alertas de Validade",
+      "empty": "Nenhum item vencendo nos próximos 7 dias.",
+      "expired": "Vencido",
+      "today": "Vence hoje",
+      "daysLeft_one": "{{count}} dia restante",
+      "daysLeft_other": "{{count}} dias restantes",
+      "banner_one": "{{count}} item próximo ao vencimento",
+      "banner_other": "{{count}} itens próximos ao vencimento",
+      "bannerEmpty": "Nenhum produto vencendo nos próximos 7 dias.",
+      "runScan": "Verificar produtos a vencer",
+      "scanHint": "Produtos vencendo nos próximos 7 dias.",
+      "scanComplete": "Varredura de validade concluída."
+    },
     "validation": {
       "productRequired": "Selecione um produto.",
       "quantityInvalid": "A quantidade deve ser um número não negativo.",
       "unitRequired": "Unidade é obrigatória.",
       "expiryDateInvalid": "A data deve estar no formato AAAA-MM-DD.",
+      "expiryDatePast": "A data de validade não pode estar no passado.",
       "amountInvalid": "A quantidade deve ser maior que zero.",
       "amountExceedsStock": "Apenas {{available}} {{unit}} disponível."
+    }
+  },
+  "shopping": {
+    "list": {
+      "title": "Lista de compras",
+      "emptyTitle": "Sua lista de compras está vazia",
+      "emptySubtitle": "Adicione itens para comprar no mercado.",
+      "addFirstItem": "Adicionar primeiro item",
+      "addItem": "Adicionar item",
+      "remove": "Remover",
+      "autoAdded": "Adicionado auto.",
+      "clearChecked": "Limpar marcados",
+      "scanReceipt": "Escanear cupom"
+    },
+    "add": {
+      "title": "Adicionar item",
+      "productName": "Nome do produto",
+      "quantity": "Quantidade",
+      "unit": "Unidade",
+      "notes": "Observações",
+      "notesPlaceholder": "Opcional",
+      "submit": "Adicionar à lista"
+    },
+    "receipt": {
+      "scanTitle": "Escanear Cupom",
+      "hint": "Aponte a câmera para o cupom fiscal. QR codes de NF-e são detectados automaticamente.",
+      "nfeDetected": "QR code NF-e detectado! Processando…",
+      "scanning": "Analisando seu cupom fiscal… Isso pode levar alguns segundos.",
+      "tooManyScans": "Muitos escaneamentos ativos. Aguarde um momento e tente novamente.",
+      "capture": "Fotografar cupom",
+      "permissionRequired": "Permissão de câmera é necessária para escanear cupons.",
+      "grantPermission": "Permitir acesso à câmera",
+      "parsing": "Lendo cupom…",
+      "nfeError": "Não foi possível ler o QR code da NF-e. Este estado pode não suportar acesso direto — tente fotografar o cupom.",
+      "parseError": "Não foi possível ler o cupom. Tente novamente.",
+      "nfeNotSupported": "O acesso direto ao XML da NF-e não é suportado neste estado. Tente o modo foto.",
+      "confirmTitle": "Confirmar itens",
+      "confirmSubtitle": "Revise e ajuste os itens antes de adicioná-los ao estoque.",
+      "alreadyConfirmed": "Estes itens já foram adicionados ao seu estoque.",
+      "confirmEmpty": "Nenhum item foi reconhecido. Tente novamente ou adicione manualmente.",
+      "expiryDate": "Data de validade (opcional)",
+      "expiryPlaceholder": "AAAA-MM-DD",
+      "addToInventory": "Adicionar ao estoque",
+      "successMessage": "Itens adicionados ao seu estoque.",
+      "removeItem": "Remover item"
+    },
+    "scanList": {
+      "title": "Histórico de escaneamentos",
+      "empty": "Nenhum escaneamento ainda. Toque no botão abaixo para escanear um cupom.",
+      "scanButton": "Escanear cupom",
+      "tapToConfirm": "Revisar e confirmar",
+      "unknownRetailer": "Estabelecimento desconhecido",
+      "items": "itens",
+      "status": {
+        "pending": "Aguardando",
+        "processing": "Processando",
+        "parsed": "Pronto para confirmar",
+        "confirmed": "Confirmado",
+        "failed": "Falhou"
+      }
+    },
+    "validation": {
+      "productNameRequired": "O nome do produto é obrigatório.",
+      "quantityInvalid": "A quantidade deve ser maior que zero.",
+      "unitRequired": "Unidade é obrigatória."
     }
   },
   "common": {
@@ -224,6 +336,7 @@
     "cancel": "Cancelar",
     "ok": "OK",
     "error": "Algo deu errado. Tente novamente.",
+    "loadError": "Não foi possível carregar os dados. Tente novamente.",
     "networkError": "Sem conexão. Verifique sua internet e tente novamente."
   }
 }

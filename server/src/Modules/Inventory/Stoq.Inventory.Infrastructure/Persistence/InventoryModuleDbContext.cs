@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Stoq.Inventory.Domain.Aggregates;
+using Stoq.Inventory.Domain.Entities;
 
 namespace Stoq.Inventory.Infrastructure.Persistence;
 
@@ -8,6 +9,8 @@ public sealed class InventoryModuleDbContext(DbContextOptions<InventoryModuleDbC
     public const string Schema = "inventory";
 
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
+
+    public DbSet<ParseCorrection> ParseCorrections => Set<ParseCorrection>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

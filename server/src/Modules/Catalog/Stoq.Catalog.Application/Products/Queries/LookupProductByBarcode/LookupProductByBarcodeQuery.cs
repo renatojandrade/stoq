@@ -4,4 +4,4 @@ using Stoq.Shared.Kernel.Common;
 
 namespace Stoq.Catalog.Application.Products.Queries.LookupProductByBarcode;
 
-public sealed record LookupProductByBarcodeQuery(string Barcode) : IRequest<Result<ProductLookupDto>>;
+public sealed record LookupProductByBarcodeQuery(string Barcode, Guid HouseholdId) : IRequest<Result<ProductLookupDto>>;

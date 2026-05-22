@@ -1,50 +1,96 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
   ActivityIndicator,
   Button,
   Chip,
   FAB,
-  IconButton,
+  Icon,
   List,
   Searchbar,
+  Surface,
   Text,
+  TouchableRipple,
   useTheme,
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { InventoryStackParamList } from '../../navigation/InventoryNavigator';
 import {
+  useGetExpiringItemsQuery,
   useListInventoryQuery,
-  useRemoveInventoryItemMutation,
   type InventoryItemDto,
 } from '../../store/api/inventoryApi';
 
 type Props = NativeStackScreenProps<InventoryStackParamList, 'InventoryDashboard'>;
+
+const MIN_SEARCH_LENGTH = 4;
+
+interface ProductGroup {
+  productId: string;
+  productName: string;
+  productBrand: string | null;
+  productImageUrl: string | null;
+  unit: string;
+  minQuantity: number;
+  totalQuantity: number;
+  isStockLow: boolean;
+  batches: InventoryItemDto[];
+}
+
+function groupByProduct(items: InventoryItemDto[]): ProductGroup[] {
+  const map = new Map<string, ProductGroup>();
+
+  for (const item of items) {
+    const existing = map.get(item.productId);
+    if (existing) {
+      existing.batches.push(item);
+      existing.totalQuantity += item.quantity;
+    } else {
+      map.set(item.productId, {
+        productId: item.productId,
+        productName: item.productName,
+        productBrand: item.productBrand,
+        productImageUrl: item.productImageUrl,
+        unit: item.unit,
+        minQuantity: item.minQuantity,
+        totalQuantity: item.quantity,
+        isStockLow: false,
+        batches: [item],
+      });
+    }
+  }
+
+  for (const group of map.values()) {
+    group.isStockLow = group.minQuantity > 0 && group.totalQuantity <= group.minQuantity;
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.productName.localeCompare(b.productName));
+}
 
 export default function InventoryDashboardScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
 
+  const activeSearch = search.length >= MIN_SEARCH_LENGTH ? search : undefined;
+
   const { data: items, isLoading, isError, error, refetch } = useListInventoryQuery(
-    search ? { name: search } : undefined,
-    { refetchOnFocus: true },
+    activeSearch ? { name: activeSearch } : undefined,
   );
 
-  const [removeItem] = useRemoveInventoryItemMutation();
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
-  async function handleRemove(id: string) {
-    await removeItem(id);
-  }
+  const { data: expiringItems } = useGetExpiringItemsQuery(7);
+  const expiringCount = expiringItems?.length ?? 0;
 
-  function handleConsume(item: InventoryItemDto) {
-    navigation.navigate('ConsumeInventoryItem', { item });
-  }
+  const groups = useMemo(() => groupByProduct(items ?? []), [items]);
 
-  // A 400 means the JWT doesn't carry householdId yet (e.g. right after household
-  // creation before a token refresh). Treat it like an empty list rather than a
-  // hard error so the user sees the onboarding prompt instead of "something went wrong".
   const isExpectedEmpty =
     isError && typeof error === 'object' && error !== null && 'status' in error && error.status === 400;
 
@@ -72,10 +118,45 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
     );
   }
 
-  const isEmpty = isExpectedEmpty || items?.length === 0;
+  const isEmpty = isExpectedEmpty || groups.length === 0;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <TouchableRipple
+        onPress={() => navigation.navigate('ExpiryAlerts')}
+        accessibilityLabel={t('inventory.expiry.title')}
+      >
+        <Surface
+          style={[
+            styles.expiryBanner,
+            { backgroundColor: expiringCount > 0 ? colors.errorContainer : colors.surfaceVariant },
+          ]}
+          elevation={0}
+        >
+          <Icon
+            source="calendar-alert"
+            size={20}
+            color={expiringCount > 0 ? colors.onErrorContainer : colors.onSurfaceVariant}
+          />
+          <Text
+            variant="labelLarge"
+            style={[
+              styles.expiryBannerText,
+              { color: expiringCount > 0 ? colors.onErrorContainer : colors.onSurfaceVariant },
+            ]}
+          >
+            {expiringCount > 0
+              ? t('inventory.expiry.banner', { count: expiringCount })
+              : t('inventory.expiry.bannerEmpty')}
+          </Text>
+          <Icon
+            source="chevron-right"
+            size={20}
+            color={expiringCount > 0 ? colors.onErrorContainer : colors.onSurfaceVariant}
+          />
+        </Surface>
+      </TouchableRipple>
+
       {!isEmpty && (
         <Searchbar
           placeholder={t('inventory.list.searchPlaceholder')}
@@ -108,50 +189,57 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
         </View>
       ) : (
         <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <List.Item
-              title={item.productName}
-              description={() => (
-                <View style={styles.descRow}>
-                  <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
-                    {`${item.quantity} ${item.unit}`}
-                    {item.expiryDate
-                      ? `  ·  ${t('inventory.list.expires')} ${item.expiryDate}`
-                      : ''}
-                  </Text>
-                  {item.isStockLow && (
-                    <Chip
-                      compact
-                      style={[styles.lowStockChip, { backgroundColor: colors.errorContainer }]}
-                      textStyle={{ color: colors.onErrorContainer }}
+          data={groups}
+          keyExtractor={(group) => group.productId}
+          renderItem={({ item: group }) => {
+            const unitLabel = t(`catalog.units.${group.unit}`, { defaultValue: group.unit });
+            return (
+              <TouchableRipple
+                onPress={() =>
+                  navigation.navigate('ProductInventoryDetail', {
+                    productId: group.productId,
+                    productName: group.productName,
+                    productBrand: group.productBrand,
+                    productImageUrl: group.productImageUrl,
+                    unit: group.unit,
+                    minQuantity: group.minQuantity,
+                  })
+                }
+                rippleColor={colors.surfaceVariant}
+              >
+                <View style={styles.row}>
+                  <View style={[styles.iconWrap, { backgroundColor: colors.surfaceVariant }]}>
+                    <Icon source="fridge-outline" size={22} color={colors.onSurfaceVariant} />
+                  </View>
+                  <View style={styles.rowContent}>
+                    <Text
+                      variant="bodyLarge"
+                      style={{ color: colors.onSurface }}
+                      numberOfLines={2}
                     >
-                      {t('inventory.list.lowStock')}
-                    </Chip>
-                  )}
+                      {group.productName}
+                    </Text>
+                    <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                      {`${group.totalQuantity} ${unitLabel}`}
+                      {group.batches.length > 1
+                        ? `  ·  ${t('inventory.list.batchCount', { count: group.batches.length })}`
+                        : ''}
+                    </Text>
+                    {group.isStockLow && (
+                      <Chip
+                        compact
+                        style={[styles.lowStockChip, { backgroundColor: colors.errorContainer }]}
+                        textStyle={{ color: colors.onErrorContainer, fontSize: 11 }}
+                      >
+                        {t('inventory.list.lowStock')}
+                      </Chip>
+                    )}
+                  </View>
+                  <Icon source="chevron-right" size={20} color={colors.onSurfaceVariant} />
                 </View>
-              )}
-              left={(props) => <List.Icon {...props} icon="fridge-outline" />}
-              right={() => (
-                <View style={styles.actions}>
-                  <IconButton
-                    icon="minus-circle-outline"
-                    size={20}
-                    onPress={() => handleConsume(item)}
-                    accessibilityLabel={t('inventory.list.consume')}
-                  />
-                  <IconButton
-                    icon="trash-can-outline"
-                    size={20}
-                    iconColor={colors.error}
-                    onPress={() => handleRemove(item.id)}
-                    accessibilityLabel={t('inventory.list.remove')}
-                  />
-                </View>
-              )}
-            />
-          )}
+              </TouchableRipple>
+            );
+          }}
           contentContainerStyle={styles.list}
         />
       )}
@@ -172,11 +260,32 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
+  expiryBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  expiryBannerText: { flex: 1 },
   searchbar: { margin: 16 },
   list: { paddingBottom: 96 },
-  actions: { flexDirection: 'row', alignItems: 'center' },
-  descRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  lowStockChip: { height: 24 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowContent: { flex: 1, gap: 3 },
+  lowStockChip: { alignSelf: 'flex-start', marginTop: 2 },
   fab: { position: 'absolute', right: 16, bottom: 16 },
   emptySubtitle: { textAlign: 'center' },
   emptyButton: { marginTop: 8 },

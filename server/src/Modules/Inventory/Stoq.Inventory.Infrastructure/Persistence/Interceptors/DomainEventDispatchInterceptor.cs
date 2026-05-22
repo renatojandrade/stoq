@@ -9,33 +9,43 @@ namespace Stoq.Inventory.Infrastructure.Persistence.Interceptors;
 internal sealed class DomainEventDispatchInterceptor(IPublisher publisher)
     : SaveChangesInterceptor
 {
+    private readonly List<DomainEvent> _pendingEvents = new();
+
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
+    {
+        // Collect events before save — deleted entities are detached after SaveChanges
+        // and would be invisible to SavedChangesAsync.
+        if (eventData.Context is not null)
+        {
+            var aggregates = eventData.Context.ChangeTracker
+                .Entries<AggregateRoot<Guid>>()
+                .Select(e => e.Entity)
+                .Where(a => a.DomainEvents.Count > 0)
+                .ToList();
+
+            _pendingEvents.AddRange(aggregates.SelectMany(a => a.DomainEvents));
+            aggregates.ForEach(a => a.ClearDomainEvents());
+        }
+
+        return ValueTask.FromResult(result);
+    }
+
     public override async ValueTask<int> SavedChangesAsync(
         SaveChangesCompletedEventData eventData,
         int result,
         CancellationToken cancellationToken = default)
     {
-        if (eventData.Context is not null)
+        var events = _pendingEvents.ToList();
+        _pendingEvents.Clear();
+
+        foreach (DomainEvent domainEvent in events)
         {
-            await DispatchDomainEventsAsync(eventData.Context, cancellationToken).ConfigureAwait(false);
+            await publisher.Publish(domainEvent, cancellationToken);
         }
 
         return result;
-    }
-
-    private async Task DispatchDomainEventsAsync(DbContext context, CancellationToken cancellationToken)
-    {
-        var aggregates = context.ChangeTracker
-            .Entries<AggregateRoot<Guid>>()
-            .Select(e => e.Entity)
-            .Where(a => a.DomainEvents.Count > 0)
-            .ToList();
-
-        var events = aggregates.SelectMany(a => a.DomainEvents).ToList();
-        aggregates.ForEach(a => a.ClearDomainEvents());
-
-        foreach (DomainEvent? domainEvent in events)
-        {
-            await publisher.Publish(domainEvent, cancellationToken).ConfigureAwait(false);
-        }
     }
 }

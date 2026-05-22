@@ -7,5 +7,5 @@ namespace Stoq.Identity.Infrastructure.Database;
 internal sealed class IdentityDatabaseMigrator(IdentityModuleDbContext context) : IModuleDatabaseMigrator
 {
     public async Task MigrateAsync(CancellationToken cancellationToken = default) =>
-        await context.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
+        await context.Database.MigrateAsync(cancellationToken);
 }

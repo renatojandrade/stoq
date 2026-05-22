@@ -7,9 +7,9 @@ public sealed record UpdateProductCommand(
     Guid ProductId,
     Guid RequestingHouseholdId,
     string Name,
-    string? Brand,
-    string Category,
-    string Unit,
+    Guid CategoryId,
+    string? BrandName,
+    Guid UnitId,
     decimal MinQuantity,
     string? ImageUrl,
     string? Barcode) : IRequest<Result>;

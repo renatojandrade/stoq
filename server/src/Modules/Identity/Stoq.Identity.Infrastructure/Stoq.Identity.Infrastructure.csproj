@@ -6,6 +6,8 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Force patched OTel.Api version; Aspire packages pull in a vulnerable transitive 1.14.x. -->
+    <PackageReference Include="OpenTelemetry.Api" />
     <!-- EF Core + PostgreSQL -->
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

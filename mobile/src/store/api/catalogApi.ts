@@ -3,15 +3,37 @@ import type { RootState } from '../index';
 
 const BASE_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:5000';
 
-export type ProductUnit = 'Units' | 'Grams' | 'Kilograms' | 'Millilitres' | 'Litres';
+export interface CategoryDto {
+  id: string;
+  nameEn: string;
+  namePt: string;
+}
+
+export interface BrandDto {
+  id: string;
+  name: string;
+}
+
+export interface UnitDto {
+  id: string;
+  code: string;
+  nameEn: string;
+  namePt: string;
+}
 
 export interface ProductDto {
   id: string;
   householdId: string | null;
   name: string;
-  brand: string | null;
-  category: string;
-  unit: ProductUnit;
+  categoryId: string;
+  categoryNameEn: string;
+  categoryNamePt: string;
+  brandId: string | null;
+  brandName: string | null;
+  unitId: string;
+  unitCode: string;
+  unitNameEn: string;
+  unitNamePt: string;
   minQuantity: number;
   imageUrl: string | null;
   barcode: string | null;
@@ -21,9 +43,9 @@ export interface ProductDto {
 
 export interface CreateProductRequest {
   name: string;
-  brand?: string | null;
-  category: string;
-  unit: ProductUnit;
+  categoryId: string;
+  brandName?: string | null;
+  unitId: string;
   minQuantity: number;
   imageUrl?: string | null;
   barcode?: string | null;
@@ -31,9 +53,9 @@ export interface CreateProductRequest {
 
 export interface UpdateProductRequest {
   name: string;
-  brand?: string | null;
-  category: string;
-  unit: ProductUnit;
+  categoryId: string;
+  brandName?: string | null;
+  unitId: string;
   minQuantity: number;
   imageUrl?: string | null;
   barcode?: string | null;
@@ -41,7 +63,10 @@ export interface UpdateProductRequest {
 
 export interface ListProductsParams {
   name?: string;
-  category?: string;
+  categoryId?: string;
+  isReference?: boolean;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface ProductLookupDto {
@@ -50,6 +75,7 @@ export interface ProductLookupDto {
   brand: string | null;
   category: string | null;
   imageUrl: string | null;
+  existingProductId: string | null;
 }
 
 export const catalogApi = createApi({
@@ -64,13 +90,28 @@ export const catalogApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Product'],
+  tagTypes: ['Product', 'Category', 'Unit', 'Brand'],
   endpoints: (builder) => ({
+    listCategories: builder.query<CategoryDto[], void>({
+      query: () => '/api/products/categories',
+      providesTags: [{ type: 'Category', id: 'LIST' }],
+    }),
+    listUnits: builder.query<UnitDto[], void>({
+      query: () => '/api/products/units',
+      providesTags: [{ type: 'Unit', id: 'LIST' }],
+    }),
+    listBrands: builder.query<BrandDto[], string | void>({
+      query: (name) => `/api/products/brands${name ? `?name=${encodeURIComponent(name)}` : ''}`,
+      providesTags: [{ type: 'Brand', id: 'LIST' }],
+    }),
     listProducts: builder.query<ProductDto[], ListProductsParams | void>({
       query: (params) => {
         const searchParams = new URLSearchParams();
         if (params?.name) searchParams.set('name', params.name);
-        if (params?.category) searchParams.set('category', params.category);
+        if (params?.categoryId) searchParams.set('categoryId', params.categoryId);
+        if (params?.isReference !== undefined) searchParams.set('isReference', String(params.isReference));
+        if (params?.page) searchParams.set('page', String(params.page));
+        if (params?.pageSize) searchParams.set('pageSize', String(params.pageSize));
         const qs = searchParams.toString();
         return `/api/products${qs ? `?${qs}` : ''}`;
       },
@@ -108,6 +149,9 @@ export const catalogApi = createApi({
 });
 
 export const {
+  useListCategoriesQuery,
+  useListUnitsQuery,
+  useListBrandsQuery,
   useListProductsQuery,
   useGetProductQuery,
   useCreateProductMutation,

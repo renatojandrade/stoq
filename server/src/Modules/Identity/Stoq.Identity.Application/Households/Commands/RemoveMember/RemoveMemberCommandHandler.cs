@@ -13,8 +13,7 @@ internal sealed class RemoveMemberCommandHandler(IIdentityRepository repository)
     public async Task<Result> Handle(RemoveMemberCommand request, CancellationToken cancellationToken)
     {
         Household? household = await repository
-            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken)
-            .ConfigureAwait(false);
+            .GetHouseholdByIdAsync(request.HouseholdId, cancellationToken);
 
         if (household is null)
         {
@@ -33,7 +32,7 @@ internal sealed class RemoveMemberCommandHandler(IIdentityRepository repository)
             return result;
         }
 
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await repository.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

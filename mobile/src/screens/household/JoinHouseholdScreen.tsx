@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { HouseholdStackParamList } from '../../navigation/HouseholdSetupNavigator';
 import { useJoinHouseholdMutation } from '../../store/api/authApi';
-import { setHousehold } from '../../store/authSlice';
+import { setCredentials } from '../../store/authSlice';
 
 type Props = NativeStackScreenProps<HouseholdStackParamList, 'JoinHousehold'>;
 
@@ -25,8 +25,8 @@ export default function JoinHouseholdScreen({ navigation }: Props) {
     if (code.length !== 6) { setError(t('household.join.codeLength')); return; }
 
     try {
-      const household = await joinHousehold({ inviteCode: code }).unwrap();
-      dispatch(setHousehold({ id: household.id, country: household.country }));
+      const result = await joinHousehold({ inviteCode: code }).unwrap();
+      dispatch(setCredentials(result));
     } catch (err: unknown) {
       const message = (err as { data?: { detail?: string } })?.data?.detail;
       setError(message ?? t('auth.errors.unknown'));
@@ -43,7 +43,7 @@ export default function JoinHouseholdScreen({ navigation }: Props) {
       <TextInput
         label={t('household.join.inviteCode')}
         value={inviteCode}
-        onChangeText={setInviteCode}
+        onChangeText={(v) => setInviteCode(v.toUpperCase())}
         placeholder={t('household.join.codePlaceholder')}
         autoCapitalize="characters"
         maxLength={6}

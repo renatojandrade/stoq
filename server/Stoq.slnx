@@ -31,4 +31,10 @@
     <Project Path="src/Modules/Inventory/Stoq.Inventory.Application/Stoq.Inventory.Application.csproj" />
     <Project Path="src/Modules/Inventory/Stoq.Inventory.Infrastructure/Stoq.Inventory.Infrastructure.csproj" />
   </Folder>
+
+  <Folder Name="/Modules/Shopping/">
+    <Project Path="src/Modules/Shopping/Stoq.Shopping.Domain/Stoq.Shopping.Domain.csproj" />
+    <Project Path="src/Modules/Shopping/Stoq.Shopping.Application/Stoq.Shopping.Application.csproj" />
+    <Project Path="src/Modules/Shopping/Stoq.Shopping.Infrastructure/Stoq.Shopping.Infrastructure.csproj" />
+  </Folder>
 </Solution>

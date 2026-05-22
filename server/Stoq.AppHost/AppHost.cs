@@ -14,7 +14,6 @@ IResourceBuilder<ParameterResource> rabbitmqPassword = builder.AddParameter("rab
 // Fixed host port 5432 makes the connection string stable across restarts.
 IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres", password: postgresPassword)
     .WithDataVolume("stoq-postgres-data")
-    //.WithPgAdmin()
     .WithLifetime(ContainerLifetime.Persistent)
     .WithEndpoint("tcp", e => { e.Port = 5432; e.IsProxied = false; });
 
@@ -30,7 +29,8 @@ IResourceBuilder<RabbitMQServerResource> rabbitmq = builder.AddRabbitMQ("rabbitm
     .WithDataVolume("stoq-rabbitmq-data")
     .WithManagementPlugin()
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint("tcp", e => { e.Port = 5672; e.IsProxied = false; });
+    .WithEndpoint("tcp", e => { e.Port = 5672; e.IsProxied = false; })
+    .WithEndpoint("management", e => { e.Port = 15672; e.IsProxied = false; });
 
 // ─── Application services ─────────────────────────────────────────────────────
 IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.Stoq_ApiService>("apiservice")

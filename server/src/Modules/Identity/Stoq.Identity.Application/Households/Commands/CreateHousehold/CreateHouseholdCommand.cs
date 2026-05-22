@@ -8,4 +8,4 @@ namespace Stoq.Identity.Application.Households.Commands.CreateHousehold;
 public sealed record CreateHouseholdCommand(
     string Name,
     Guid AdminUserId,
-    HouseholdCountry Country) : IRequest<Result<HouseholdDto>>;
+    HouseholdCountry Country) : IRequest<Result<HouseholdAuthResponse>>;

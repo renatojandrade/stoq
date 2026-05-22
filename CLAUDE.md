@@ -228,6 +228,18 @@ var y = DoMore();
 
 - **Case-insensitive database string search** (PostgreSQL): use `EF.Functions.ILike(column, pattern)` — never `column.ToLower().Contains(filter)` inside LINQ queries.
 
+- **Static members before non-static members** (SA1204): always declare `static` fields, properties, and methods above instance ones within the same class.
+
+- **Multi-line parameter lists** (SA1117): either all parameters on one line, or each parameter on its own line. Never mix.
+
+- **Trailing commas in multi-line initializers** (SA1413): always add a trailing comma after the last element in multi-line object/collection initializers.
+
+- **`static readonly` over constant arrays** (CA1861): use `static readonly` fields for arrays passed to methods that are called repeatedly and do not mutate the array.
+
+- **Value type controller inputs** (S6964 / Sonar RSPEC-6964): value type properties on controller request DTOs must be `nullable`, `required`, or annotated with `[JsonRequired]` to prevent silent under-posting.
+
+- **No `Impl` suffix on concrete classes**: name implementations after what they are, not what they implement. Prefer a noun that describes the mechanism (`SqlProductRepository`, `HttpExpoPushService`) or drop the suffix entirely when the context is unambiguous (`ProductRepository`, `ExpoPushService`). Never append `Impl` to any class name.
+
 ### Domain & Value Objects
 
 - Inherit from `AggregateRoot` or `ValueObject` in `Stoq.Shared.Kernel`.
@@ -270,7 +282,6 @@ var items = await context.InventoryItems
 
 - `async/await` end-to-end. Never use `.Result`, `.Wait()`, or `Task.Run` to wrap sync code.
 - Always accept and propagate `CancellationToken` — from controller actions down to EF Core and HTTP calls.
-- Add `ConfigureAwait(false)` on all awaits in library/infrastructure code (enforced by CA2007).
 - Use **Polly** retry/circuit-breaker (via ServiceDefaults) for external HTTP calls (Open Food Facts, Claude API, SEFAZ).
 
 ### MassTransit 8.x
@@ -391,6 +402,25 @@ mobile/src/
 - Always implement **loading / empty / error states** for every screen that fetches data.
 - RTK Query `baseQuery` intercepts 401 → calls `POST /api/auth/refresh` → retries original request.
 - RTK Query automatically sends `Accept-Language: {{locale}}` header on every request.
+
+**Error state rules — never collapse these into the same message:**
+
+| State | Condition | Message key | UX |
+|---|---|---|---|
+| Server/auth error | `isError === true` | `common.loadError` | Inline error text in error colour + Retry button |
+| Empty results | `!isError && data?.length === 0` | domain-specific empty key | Neutral grey text, no retry |
+| Network error | fetch throws / no response | `common.networkError` | `<OfflineBanner />` or inline |
+
+```tsx
+// Correct pattern
+{isError ? (
+  <ErrorState message={t('common.loadError')} onRetry={refetch} />
+) : data?.length === 0 ? (
+  <EmptyState message={t('catalog.list.empty')} />
+) : (
+  <FlatList data={data} ... />
+)}
+```
 
 ### Real-Time (SignalR)
 

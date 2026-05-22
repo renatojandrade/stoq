@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Stoq.Identity.Application.Common.DTOs;
 using Stoq.Identity.Application.Ports;
-using Stoq.Identity.Domain.Enums;
 using Stoq.Identity.Domain.Events;
 using Stoq.Shared.Kernel.Common;
 

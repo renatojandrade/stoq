@@ -57,11 +57,14 @@
        OpenTelemetry — observability
   ───────────────────────────────────────────────────────── -->
   <ItemGroup Label="OpenTelemetry">
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"     Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting"                 Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore"         Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http"               Version="1.14.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime"            Version="1.14.0" />
+    <!-- Pin Api directly to override vulnerable transitive resolutions (1.14.x/1.15.0). -->
+    <PackageVersion Include="OpenTelemetry.Api"                                Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"     Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting"                 Version="1.15.3" />
+    <!-- Instrumentation packages have independent release cadences. -->
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore"         Version="1.15.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http"               Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime"            Version="1.15.1" />
     <!-- EF Core instrumentation is still in pre-release; use the latest available beta. -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.0-beta.1" />
     <PackageVersion Include="Npgsql.OpenTelemetry"                             Version="10.0.1" />
@@ -89,6 +92,13 @@
   ───────────────────────────────────────────────────────── -->
   <ItemGroup Label="Email">
     <PackageVersion Include="Resend"                                           Version="0.4.0-beta.1" />
+  </ItemGroup>
+
+  <!-- ─────────────────────────────────────────────────────
+       Playwright — headless browser for JS-rendered pages
+  ───────────────────────────────────────────────────────── -->
+  <ItemGroup Label="Playwright">
+    <PackageVersion Include="Microsoft.Playwright"                             Version="1.50.0" />
   </ItemGroup>
 
   <!-- ─────────────────────────────────────────────────────

@@ -10,7 +10,7 @@ internal sealed class DeleteProductCommandHandler(IProductRepository repository)
 {
     public async Task<Result> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        Product? product = await repository.GetByIdAsync(request.ProductId, cancellationToken).ConfigureAwait(false);
+        Product? product = await repository.GetByIdAsync(request.ProductId, cancellationToken);
 
         if (product is null || product.HouseholdId != request.RequestingHouseholdId)
         {
@@ -18,7 +18,7 @@ internal sealed class DeleteProductCommandHandler(IProductRepository repository)
         }
 
         repository.Remove(product);
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await repository.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

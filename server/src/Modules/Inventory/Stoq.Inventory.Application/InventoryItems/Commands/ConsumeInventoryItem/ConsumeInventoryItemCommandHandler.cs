@@ -12,7 +12,7 @@ internal sealed class ConsumeInventoryItemCommandHandler(IInventoryRepository re
 {
     public async Task<Result<InventoryItemDto>> Handle(ConsumeInventoryItemCommand request, CancellationToken cancellationToken)
     {
-        InventoryItem? item = await repository.GetByIdAsync(request.Id, cancellationToken).ConfigureAwait(false);
+        InventoryItem? item = await repository.GetByIdAsync(request.Id, cancellationToken);
 
         if (item is null || item.HouseholdId != request.HouseholdId)
         {
@@ -26,7 +26,12 @@ internal sealed class ConsumeInventoryItemCommandHandler(IInventoryRepository re
             return Result<InventoryItemDto>.Failure(consumeResult.Error ?? "Consume failed.");
         }
 
-        await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        if (item.Quantity == 0)
+        {
+            repository.Remove(item);
+        }
+
+        await repository.SaveChangesAsync(cancellationToken);
 
         return Result<InventoryItemDto>.Success(AddInventoryItemCommandHandler.ToDto(item));
     }

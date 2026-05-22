@@ -1,47 +1,79 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import {
   Button,
   HelperText,
+  Icon,
   Text,
   TextInput,
   useTheme,
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { InventoryStackParamList } from '../../navigation/InventoryNavigator';
-import { useListProductsQuery } from '../../store/api/catalogApi';
 import { useAddInventoryItemMutation } from '../../store/api/inventoryApi';
+import type { RootState } from '../../store';
 
 type Props = NativeStackScreenProps<InventoryStackParamList, 'AddInventoryItem'>;
 
-export default function AddInventoryItemScreen({ navigation }: Props) {
+function formatDateInput(digits: string, isBrazil: boolean): string {
+  // digits: raw digit chars only, up to 8
+  const d = digits.slice(0, 8);
+  if (isBrazil) {
+    // DD/MM/YYYY
+    if (d.length <= 2) return d;
+    if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+    return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+  }
+  // MM/DD/YYYY
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
+function parseDisplayDateToIso(display: string, isBrazil: boolean): string {
+  const parts = display.split('/');
+  if (parts.length !== 3) return display;
+  if (isBrazil) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return `${parts[2]}-${parts[0]}-${parts[1]}`;
+}
+
+export default function AddInventoryItemScreen({ navigation, route }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
 
-  const [productSearch, setProductSearch] = useState('');
-  const [selectedProductId, setSelectedProductId] = useState('');
-  const [selectedProductName, setSelectedProductName] = useState('');
+  const householdCountry = useSelector((s: RootState) => s.auth.householdCountry);
+  const isBrazil = householdCountry === 'BR';
+  const datePlaceholder = isBrazil ? 'DD/MM/AAAA' : 'MM/DD/YYYY';
+
+  const preselected = route.params;
+
+  const [selectedProductId, setSelectedProductId] = useState(preselected?.preselectedProductId ?? '');
+  const [selectedProductName, setSelectedProductName] = useState(preselected?.preselectedProductName ?? '');
   const [quantity, setQuantity] = useState('1');
-  const [unit, setUnit] = useState('');
+  const [unit, setUnit] = useState(preselected?.preselectedUnit ?? '');
   const [expiryDate, setExpiryDate] = useState('');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
 
-  const { data: products } = useListProductsQuery(
-    productSearch ? { name: productSearch } : undefined,
-    { skip: !productSearch },
-  );
+  const isProductLocked = !!preselected?.preselectedProductId;
+
+  // Receive product selection back from ProductSearchScreen.
+  useEffect(() => {
+    const params = route.params;
+    if (params?.selectedProductId && params.selectedProductId !== selectedProductId) {
+      setSelectedProductId(params.selectedProductId);
+      setSelectedProductName(params.selectedProductName ?? '');
+      setUnit(params.selectedProductUnit ?? '');
+      setErrors((prev) => ({ ...prev, product: '' }));
+    }
+  }, [route.params]);
 
   const [addItem, { isLoading }] = useAddInventoryItemMutation();
-
-  function selectProduct(id: string, name: string, productUnit: string) {
-    setSelectedProductId(id);
-    setSelectedProductName(name);
-    setUnit(productUnit);
-    setProductSearch('');
-  }
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -53,8 +85,17 @@ export default function AddInventoryItemScreen({ navigation }: Props) {
 
     if (!unit.trim()) next['unit'] = t('inventory.validation.unitRequired');
 
-    if (expiryDate && !/^\d{4}-\d{2}-\d{2}$/.test(expiryDate)) {
-      next['expiryDate'] = t('inventory.validation.expiryDateInvalid');
+    if (expiryDate) {
+      const iso = parseDisplayDateToIso(expiryDate, isBrazil);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        next['expiryDate'] = t('inventory.validation.expiryDateInvalid');
+      } else {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (new Date(iso) < today) {
+          next['expiryDate'] = t('inventory.validation.expiryDatePast');
+        }
+      }
     }
 
     setErrors(next);
@@ -70,10 +111,14 @@ export default function AddInventoryItemScreen({ navigation }: Props) {
         productId: selectedProductId,
         quantity: parseFloat(quantity),
         unit: unit.trim(),
-        expiryDate: expiryDate || null,
+        expiryDate: expiryDate ? parseDisplayDateToIso(expiryDate, isBrazil) : null,
         notes: notes.trim() || null,
       }).unwrap();
-      navigation.goBack();
+      if (preselected?.skipToRoot) {
+        navigation.popToTop();
+      } else {
+        navigation.goBack();
+      }
     } catch {
       setServerError(t('common.error'));
     }
@@ -85,48 +130,50 @@ export default function AddInventoryItemScreen({ navigation }: Props) {
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
-      <TextInput
-        mode="outlined"
-        label={t('inventory.add.searchProduct')}
-        value={selectedProductId ? selectedProductName : productSearch}
-        onChangeText={(text) => {
-          if (selectedProductId) {
-            setSelectedProductId('');
-            setSelectedProductName('');
-          }
-          setProductSearch(text);
-        }}
-        right={
-          selectedProductId ? (
-            <TextInput.Icon
-              icon="close-circle"
-              onPress={() => {
-                setSelectedProductId('');
-                setSelectedProductName('');
-                setProductSearch('');
-              }}
-            />
-          ) : undefined
-        }
-        error={!!errors['product']}
-      />
-      {errors['product'] && <HelperText type="error">{errors['product']}</HelperText>}
-
-      {!selectedProductId && products && products.length > 0 && (
-        <View style={[styles.suggestions, { backgroundColor: colors.surface, borderColor: colors.outline }]}>
-          {products.slice(0, 5).map((p) => (
-            <Button
-              key={p.id}
-              mode="text"
-              onPress={() => selectProduct(p.id, p.name, p.unit)}
-              style={styles.suggestion}
-              contentStyle={styles.suggestionContent}
-            >
-              {`${p.name}${p.brand ? ` · ${p.brand}` : ''}`}
-            </Button>
-          ))}
+      {isProductLocked ? (
+        <View style={[styles.lockedProduct, { backgroundColor: colors.surfaceVariant, borderRadius: 4 }]}>
+          <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant }}>
+            {selectedProductName}
+          </Text>
         </View>
+      ) : (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ProductSearch')}
+          accessibilityRole="button"
+          accessibilityLabel={t('inventory.add.searchProduct')}
+        >
+          <View
+            style={[
+              styles.productPicker,
+              {
+                borderColor: errors['product'] ? colors.error : colors.outline,
+                borderRadius: 4,
+              },
+            ]}
+            pointerEvents="none"
+          >
+            <View style={styles.productPickerInner}>
+              <Text
+                variant="bodySmall"
+                style={[
+                  styles.productPickerLabel,
+                  { color: errors['product'] ? colors.error : colors.onSurfaceVariant },
+                ]}
+              >
+                {t('inventory.add.searchProduct')}
+              </Text>
+              <Text
+                variant="bodyLarge"
+                style={{ color: selectedProductName ? colors.onSurface : colors.onSurfaceVariant }}
+              >
+                {selectedProductName || t('inventory.add.tapToSelect')}
+              </Text>
+            </View>
+            <Icon source="magnify" size={20} color={colors.onSurfaceVariant} />
+          </View>
+        </TouchableOpacity>
       )}
+      {errors['product'] ? <HelperText type="error">{errors['product']}</HelperText> : null}
 
       <TextInput
         mode="outlined"
@@ -152,9 +199,13 @@ export default function AddInventoryItemScreen({ navigation }: Props) {
         mode="outlined"
         label={t('inventory.add.expiryDate')}
         value={expiryDate}
-        onChangeText={setExpiryDate}
-        placeholder="YYYY-MM-DD"
+        onChangeText={(text) => {
+          const digits = text.replace(/\D/g, '');
+          setExpiryDate(formatDateInput(digits, isBrazil));
+        }}
+        placeholder={datePlaceholder}
         keyboardType="numeric"
+        maxLength={10}
         error={!!errors['expiryDate']}
       />
       {errors['expiryDate'] && <HelperText type="error">{errors['expiryDate']}</HelperText>}
@@ -193,9 +244,17 @@ export default function AddInventoryItemScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   content: { padding: 16, gap: 8 },
-  suggestions: { borderWidth: 1, borderRadius: 4 },
-  suggestion: { justifyContent: 'flex-start' },
-  suggestionContent: { justifyContent: 'flex-start' },
+  lockedProduct: { padding: 16 },
+  productPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    minHeight: 56,
+  },
+  productPickerInner: { flex: 1, gap: 2 },
+  productPickerLabel: { fontSize: 12 },
   buttonRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
   button: { flex: 1 },
 });

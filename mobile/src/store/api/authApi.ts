@@ -30,6 +30,10 @@ export interface HouseholdDto {
   country: string;
 }
 
+export interface HouseholdAuthResponse extends AuthResponse {
+  household: HouseholdDto;
+}
+
 export interface MemberDto {
   userId: string;
   displayName: string;
@@ -131,11 +135,11 @@ export const authApi = createApi({
     resetPassword: builder.mutation<void, ResetPasswordRequest>({
       query: (body) => ({ url: '/api/auth/reset-password', method: 'POST', body }),
     }),
-    createHousehold: builder.mutation<HouseholdDto, CreateHouseholdRequest>({
+    createHousehold: builder.mutation<HouseholdAuthResponse, CreateHouseholdRequest>({
       query: (body) => ({ url: '/api/households', method: 'POST', body }),
       invalidatesTags: ['Household'],
     }),
-    joinHousehold: builder.mutation<HouseholdDto, JoinHouseholdRequest>({
+    joinHousehold: builder.mutation<HouseholdAuthResponse, JoinHouseholdRequest>({
       query: (body) => ({ url: '/api/households/join', method: 'POST', body }),
       invalidatesTags: ['Household'],
     }),
@@ -168,6 +172,9 @@ export const authApi = createApi({
       }),
       invalidatesTags: ['Household'],
     }),
+    removeDeviceToken: builder.mutation<void, void>({
+      query: () => ({ url: '/api/notifications/token', method: 'DELETE' }),
+    }),
   }),
 });
 
@@ -185,4 +192,5 @@ export const {
   useRemoveMemberMutation,
   useChangeMemberRoleMutation,
   useRegenerateInviteCodeMutation,
+  useRemoveDeviceTokenMutation,
 } = authApi;

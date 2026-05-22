@@ -6,4 +6,5 @@ namespace Stoq.Inventory.Application.InventoryItems.Queries.ListInventoryItems;
 
 public sealed record ListInventoryItemsQuery(
     Guid HouseholdId,
-    string? NameFilter) : IRequest<Result<IReadOnlyList<InventoryItemDto>>>;
+    string? NameFilter,
+    Guid? ProductIdFilter = null) : IRequest<Result<IReadOnlyList<InventoryItemDto>>>;

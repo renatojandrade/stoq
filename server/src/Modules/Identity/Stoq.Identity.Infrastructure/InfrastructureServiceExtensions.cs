@@ -1,9 +1,7 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using MassTransit;
 using MediatR;
-using Stoq.Shared.Contracts.Database;
-using Stoq.Identity.Infrastructure.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Resend;
 using Stoq.Identity.Application.Ports;
+using Stoq.Identity.Infrastructure.Consumers;
+using Stoq.Identity.Infrastructure.Database;
 using Stoq.Identity.Infrastructure.Entities;
 using Stoq.Identity.Infrastructure.Persistence;
 using Stoq.Identity.Infrastructure.Persistence.Interceptors;
 using Stoq.Identity.Infrastructure.Services;
+using Stoq.Shared.Contracts.Database;
 
 namespace Stoq.Identity.Infrastructure;
 
@@ -23,7 +24,8 @@ public static class InfrastructureServiceExtensions
 {
     public static IServiceCollection AddIdentityInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        Action<IBusRegistrationConfigurator>? configureAdditionalConsumers = null)
     {
         // Register infrastructure-layer MediatR handlers (e.g. domain event handlers).
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
@@ -35,11 +37,19 @@ public static class InfrastructureServiceExtensions
 
         services.AddAspNetIdentity();
         services.AddIdentityAuthentication(configuration);
-        services.AddIdentityMassTransit(configuration);
+        services.AddIdentityMassTransit(configuration, configureAdditionalConsumers);
         services.AddPortImplementations();
-        services.AddHttpClient<ISocialAuthService, SocialAuthServiceImpl>();
+        services.AddHttpClient<ISocialAuthService, SocialAuthService>();
+        services.AddHttpClient<IExpoPushService, ExpoPushService>();
 
         return services;
+    }
+
+    public static void AddIdentityConsumers(IBusRegistrationConfigurator configurator)
+    {
+        configurator.AddConsumer<ItemExpiringAlertIntegrationEventConsumer>();
+        configurator.AddConsumer<LowStockDigestIntegrationEventConsumer>();
+        configurator.AddConsumer<ShoppingListUpdatedIntegrationEventConsumer>();
     }
 
     public static IServiceCollection AddIdentityDbContext(
@@ -108,7 +118,8 @@ public static class InfrastructureServiceExtensions
 
     private static IServiceCollection AddIdentityMassTransit(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        Action<IBusRegistrationConfigurator>? configureAdditionalConsumers)
     {
         services.AddMassTransit(x =>
         {
@@ -117,6 +128,8 @@ public static class InfrastructureServiceExtensions
                 o.UsePostgres();
                 o.UseBusOutbox();
             });
+
+            configureAdditionalConsumers?.Invoke(x);
 
             x.UsingRabbitMq((ctx, cfg) =>
             {
@@ -135,10 +148,11 @@ public static class InfrastructureServiceExtensions
 
     private static IServiceCollection AddPortImplementations(this IServiceCollection services)
     {
-        services.AddScoped<IIdentityService, IdentityServiceImpl>();
-        services.AddScoped<IIdentityRepository, IdentityRepositoryImpl>();
-        services.AddScoped<ITokenService, TokenServiceImpl>();
-        services.AddScoped<IEmailService, EmailServiceImpl>();
+        services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IIdentityRepository, IdentityRepository>();
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IDevicePushTokenRepository, DevicePushTokenRepository>();
 
         return services;
     }

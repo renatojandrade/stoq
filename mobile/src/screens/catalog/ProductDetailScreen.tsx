@@ -17,7 +17,7 @@ import { useGetProductQuery, useDeleteProductMutation } from '../../store/api/ca
 type Props = NativeStackScreenProps<CatalogStackParamList, 'ProductDetail'>;
 
 export default function ProductDetailScreen({ route, navigation }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const { productId } = route.params;
 
@@ -45,6 +45,9 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
     );
   }
 
+  const categoryName = i18n.language.startsWith('pt') ? product.categoryNamePt : product.categoryNameEn;
+  const unitName = i18n.language.startsWith('pt') ? product.unitNamePt : product.unitNameEn;
+
   return (
     <ScrollView
       style={{ backgroundColor: colors.background }}
@@ -53,13 +56,13 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       <Card style={styles.card}>
         <Card.Title
           title={product.name}
-          subtitle={product.brand ?? undefined}
+          subtitle={product.brandName ?? undefined}
           titleVariant="headlineSmall"
         />
         <Divider />
         <Card.Content style={styles.cardContent}>
-          <Row label={t('catalog.form.category')} value={product.category} />
-          <Row label={t('catalog.form.unit')} value={t(`catalog.units.${product.unit}`)} />
+          <Row label={t('catalog.form.category')} value={categoryName} />
+          <Row label={t('catalog.form.unit')} value={unitName} />
           <Row label={t('catalog.form.minQuantity')} value={product.minQuantity.toString()} />
           {product.barcode && (
             <Row label={t('catalog.form.barcode')} value={product.barcode} />
@@ -71,30 +74,46 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
       </Card>
 
       <View style={styles.chips}>
-        <Chip icon="tag-outline">{product.category}</Chip>
-        <Chip icon="scale">{t(`catalog.units.${product.unit}`)}</Chip>
+        <Chip icon="tag-outline">{categoryName}</Chip>
+        <Chip icon="scale">{unitName}</Chip>
       </View>
 
-      <View style={styles.buttonRow}>
-        <Button
-          mode="outlined"
-          icon="pencil"
-          onPress={() => navigation.navigate('ProductForm', { product })}
-          style={styles.button}
-        >
-          {t('catalog.detail.edit')}
-        </Button>
-        <Button
-          mode="outlined"
-          icon="trash-can-outline"
-          textColor={colors.error}
-          onPress={handleDelete}
-          loading={isDeleting}
-          style={styles.button}
-        >
-          {t('catalog.detail.delete')}
-        </Button>
-      </View>
+      <Button
+        mode="contained"
+        icon="plus-box-outline"
+        onPress={() =>
+          navigation.getParent()?.navigate('InventoryTab', {
+            screen: 'AddInventoryItem',
+            params: { preselectedProductId: product.id, preselectedProductName: product.name, preselectedUnit: product.unitCode, skipToRoot: true },
+          })
+        }
+        style={styles.addToStockButton}
+      >
+        {t('catalog.detail.addToStock')}
+      </Button>
+
+      {!product.isReference && (
+        <View style={styles.buttonRow}>
+          <Button
+            mode="outlined"
+            icon="pencil"
+            onPress={() => navigation.navigate('ProductForm', { product })}
+            style={styles.button}
+          >
+            {t('catalog.detail.edit')}
+          </Button>
+          <Button
+            mode="outlined"
+            icon="trash-can-outline"
+            textColor={colors.error}
+            onPress={handleDelete}
+            loading={isDeleting}
+            style={styles.button}
+          >
+            {t('catalog.detail.delete')}
+          </Button>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -118,6 +137,7 @@ const styles = StyleSheet.create({
   cardContent: { gap: 12, paddingTop: 12 },
   cover: { marginTop: 12 },
   chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  addToStockButton: { marginBottom: 4 },
   buttonRow: { flexDirection: 'row', gap: 12 },
   button: { flex: 1 },
   row: { gap: 2 },

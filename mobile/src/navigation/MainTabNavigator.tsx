@@ -8,6 +8,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import InventoryNavigator from './InventoryNavigator';
 import CatalogNavigator from './CatalogNavigator';
 import ProfileNavigator from './ProfileNavigator';
+import ShoppingNavigator from './ShoppingNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -68,6 +69,20 @@ export default function MainTabNavigator() {
         }}
       />
       <Tab.Screen
+        name="ShoppingTab"
+        component={ShoppingNavigator}
+        options={{
+          title: t('shopping.list.title'),
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons
+              name={focused ? 'cart' : 'cart-outline'}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="ScanTab"
         component={ScanPlaceholder}
         options={{
@@ -78,6 +93,11 @@ export default function MainTabNavigator() {
       <Tab.Screen
         name="CatalogTab"
         component={CatalogNavigator}
+        listeners={({ navigation }) => ({
+          tabPress: () => {
+            navigation.navigate('CatalogTab', { screen: 'ProductList' });
+          },
+        })}
         options={{
           title: t('catalog.list.title'),
           tabBarIcon: ({ color, focused }) => (

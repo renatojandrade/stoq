@@ -8,4 +8,7 @@ public sealed record ListProductsQuery(
     Guid HouseholdId,
     string? Country,
     string? Name,
-    string? Category) : IRequest<Result<IReadOnlyList<ProductDto>>>;
+    Guid? CategoryId,
+    bool? IsReference = null,
+    int Page = 1,
+    int PageSize = 20) : IRequest<Result<IReadOnlyList<ProductDto>>>;

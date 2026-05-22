@@ -10,6 +10,8 @@
     <ProjectReference Include="..\src\Modules\Catalog\Stoq.Catalog.Infrastructure\Stoq.Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\src\Modules\Inventory\Stoq.Inventory.Application\Stoq.Inventory.Application.csproj" />
     <ProjectReference Include="..\src\Modules\Inventory\Stoq.Inventory.Infrastructure\Stoq.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\Modules\Shopping\Stoq.Shopping.Application\Stoq.Shopping.Application.csproj" />
+    <ProjectReference Include="..\src\Modules\Shopping\Stoq.Shopping.Infrastructure\Stoq.Shopping.Infrastructure.csproj" />
     <ProjectReference Include="..\src\Shared\Stoq.Shared.Kernel\Stoq.Shared.Kernel.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -17,5 +19,13 @@
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Data\catalog-seed.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

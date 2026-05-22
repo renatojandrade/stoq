@@ -6,7 +6,18 @@
       "Bash(python3 -c ':*)",
       "Bash(dotnet restore:*)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet package:*)"
+      "Bash(dotnet package:*)",
+      "Bash(xargs grep *)",
+      "Bash(sort find *)",
+      "Bash(grep -v \"^$\")",
+      "Bash(dotnet list *)",
+      "WebFetch(domain:www.nfce.fazenda.sp.gov.br)",
+      "Bash(dotnet playwright *)",
+      "PowerShell(& \"c:\\\\Users\\\\renat\\\\source\\\\repos\\\\stoq\\\\server\\\\src\\\\Modules\\\\Inventory\\\\Stoq.Inventory.Infrastructure\\\\bin\\\\Debug\\\\net10.0\\\\playwright.ps1\" install chromium 2>&1)",
+      "Bash(xargs ls *)",
+      "Read(//c/Users/renat/AppData/Local/Temp/claude/c--Users-renat-source-repos-stoq/567f2bc2-7df1-4ce1-be14-1a39e2079c8d/tasks/**)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\renat\\\\source\\\\repos\\\\stoq\\\\server\\\\src\\\\Shared\\\\Stoq.Shared.Kernel\\\\Domain\" -Recurse -File)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }

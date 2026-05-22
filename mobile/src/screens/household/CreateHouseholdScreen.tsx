@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { HouseholdStackParamList } from '../../navigation/HouseholdSetupNavigator';
 import { useCreateHouseholdMutation, type HouseholdDto } from '../../store/api/authApi';
-import { setHousehold } from '../../store/authSlice';
+import { setCredentials } from '../../store/authSlice';
 
 type Props = NativeStackScreenProps<HouseholdStackParamList, 'CreateHousehold'>;
 
@@ -26,8 +26,9 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
     if (!name.trim()) { setError(t('household.create.nameRequired')); return; }
 
     try {
-      const household = await createHousehold({ name: name.trim(), country }).unwrap();
-      setCreated(household);
+      const result = await createHousehold({ name: name.trim(), country }).unwrap();
+      dispatch(setCredentials(result));
+      setCreated(result.household);
     } catch (err: unknown) {
       const message = (err as { data?: { detail?: string } })?.data?.detail;
       setError(message ?? t('auth.errors.unknown'));
@@ -42,9 +43,9 @@ export default function CreateHouseholdScreen({ navigation }: Props) {
   }
 
   function handleContinue() {
-    if (created) {
-      dispatch(setHousehold({ id: created.id, country: created.country }));
-    }
+    // Token was already updated via setCredentials in handleCreate.
+    // The root navigator will redirect automatically on householdId change.
+    navigation.getParent()?.goBack();
   }
 
   if (created) {

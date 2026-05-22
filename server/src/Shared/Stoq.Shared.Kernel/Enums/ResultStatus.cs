@@ -6,4 +6,5 @@ internal enum ResultStatus
     Failure,
     Forbidden,
     NotFound,
+    TooManyRequests,
 }

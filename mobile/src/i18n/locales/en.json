@@ -129,8 +129,11 @@
   "catalog": {
     "list": {
       "title": "Product catalog",
+      "tabLabel": "Catalog",
       "searchPlaceholder": "Search products…",
       "searchPrompt": "Search for a product by name to browse the catalog.",
+      "emptyTitle": "No products found",
+      "emptySubtitle": "Try a different name or add one manually.",
       "empty": "No products found. Try a different name or add one manually.",
       "addProduct": "Add manually",
       "scanBarcode": "Scan barcode",
@@ -268,6 +271,7 @@
   "shopping": {
     "list": {
       "title": "Shopping List",
+      "tabLabel": "List",
       "emptyTitle": "Your shopping list is empty",
       "emptySubtitle": "Add items to buy at the store.",
       "addFirstItem": "Add first item",
@@ -301,16 +305,26 @@
       "nfeNotSupported": "NF-e direct XML access is not supported for this state. Try the photo mode instead.",
       "confirmTitle": "Confirm items",
       "confirmSubtitle": "Review and adjust the items before adding them to your inventory.",
+      "headerSubtitle": "review before adding to inventory",
+      "itemsRecognized_one": "{{count}} item recognized",
+      "itemsRecognized_other": "{{count}} items recognized",
+      "recognized": "Recognized",
+      "newProduct": "New product",
+      "addExpiry": "Add expiry date (optional)",
       "alreadyConfirmed": "These items have already been added to your inventory.",
       "confirmEmpty": "No items were recognised. Try again or add items manually.",
-      "expiryDate": "Expiry date (optional)",
+      "expiryDate": "Expiry date",
       "expiryPlaceholder": "YYYY-MM-DD",
       "addToInventory": "Add to inventory",
+      "addToInventoryCount_one": "Add {{count}} item to inventory",
+      "addToInventoryCount_other": "Add {{count}} items to inventory",
       "successMessage": "Items added to your inventory.",
       "removeItem": "Remove item"
     },
     "scanList": {
       "title": "Scan History",
+      "emptyTitle": "No scans yet",
+      "emptySubtitle": "Scan a receipt to add items to your inventory.",
       "empty": "No scans yet. Tap the button below to scan a receipt.",
       "scanButton": "Scan Receipt",
       "tapToConfirm": "Review & confirm",

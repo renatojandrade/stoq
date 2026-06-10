@@ -1,0 +1,26 @@
+<!-- @dsCard group="Spacing" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; }
+  .row-s { display:flex; align-items:center; gap:14px; margin-bottom:9px; }
+  .bar { height:18px; background:var(--primary); border-radius:3px; }
+  .tok { width:52px; font:var(--body-small); color:var(--on-surface-variant); }
+  .px { font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="row-s"><span class="tok">space-1</span><span class="bar" style="width:4px"></span><span class="px">4px</span></div>
+  <div class="row-s"><span class="tok">space-2</span><span class="bar" style="width:8px"></span><span class="px">8px</span></div>
+  <div class="row-s"><span class="tok">space-3</span><span class="bar" style="width:12px"></span><span class="px">12px</span></div>
+  <div class="row-s"><span class="tok">space-4</span><span class="bar" style="width:16px"></span><span class="px">16px · screen edge padding</span></div>
+  <div class="row-s"><span class="tok">space-6</span><span class="bar" style="width:24px"></span><span class="px">24px</span></div>
+  <div class="row-s"><span class="tok">space-8</span><span class="bar" style="width:32px"></span><span class="px">32px</span></div>
+  <div style="margin-top:8px; font:var(--body-small); color:var(--on-surface-variant)">Strict 4-pt grid.</div>
+</body>
+</html>

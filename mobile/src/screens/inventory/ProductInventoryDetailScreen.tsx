@@ -43,7 +43,7 @@ export default function ProductInventoryDetailScreen({ route, navigation }: Prop
   const isBrazil = householdCountry === 'BR';
 
   const { data: batches, isLoading, isError, refetch } = useListInventoryQuery(
-    { productId },
+    productId ? { productId } : { name: productName },
     { refetchOnFocus: true },
   );
 
@@ -54,6 +54,10 @@ export default function ProductInventoryDetailScreen({ route, navigation }: Prop
   const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   async function handleAddOne(item: InventoryItemDto) {
+    if (!item.productId) {
+      return;
+    }
+
     await addItem({ productId: item.productId, quantity: 1, unit: item.unit, expiryDate: item.expiryDate });
   }
 
@@ -194,7 +198,7 @@ export default function ProductInventoryDetailScreen({ route, navigation }: Prop
         color={colors.onPrimaryContainer}
         onPress={() =>
           navigation.navigate('AddInventoryItem', {
-            preselectedProductId: productId,
+            preselectedProductId: productId ?? undefined,
             preselectedProductName: productName,
             preselectedUnit: unit,
           })

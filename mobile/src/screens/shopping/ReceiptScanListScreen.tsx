@@ -9,6 +9,8 @@ import {
   TouchableRipple,
   useTheme,
 } from 'react-native-paper';
+import SkeletonList from '../../components/SkeletonList';
+import EmptyState from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { ShoppingStackParamList } from '../../navigation/ShoppingNavigator';
@@ -118,24 +120,23 @@ export default function ReceiptScanListScreen({ navigation }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {isLoading ? (
-        <View style={styles.center}>
-          <ActivityIndicator />
-        </View>
+        <SkeletonList showThumb={false} />
       ) : isError ? (
-        <View style={styles.center}>
-          <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
-            {t('common.loadError')}
-          </Text>
-          <Button mode="text" onPress={refetch} style={{ marginTop: 8 }}>
-            {t('common.retry')}
-          </Button>
-        </View>
+        <EmptyState
+          icon="alert-circle-outline"
+          title={t('common.loadError')}
+          action={
+            <Button mode="text" onPress={refetch} icon="refresh">
+              {t('common.retry')}
+            </Button>
+          }
+        />
       ) : !corrections || corrections.length === 0 ? (
-        <View style={styles.center}>
-          <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
-            {t('shopping.scanList.empty')}
-          </Text>
-        </View>
+        <EmptyState
+          icon="receipt-text-outline"
+          title={t('shopping.scanList.emptyTitle')}
+          subtitle={t('shopping.scanList.emptySubtitle')}
+        />
       ) : (
         <FlatList
           data={corrections}

@@ -1,12 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
-  ActivityIndicator,
   Button,
   Chip,
   FAB,
   Icon,
-  List,
   Searchbar,
   Surface,
   Text,
@@ -17,6 +15,9 @@ import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { InventoryStackParamList } from '../../navigation/InventoryNavigator';
+import ProductThumb from '../../components/ProductThumb';
+import SkeletonList from '../../components/SkeletonList';
+import EmptyState from '../../components/EmptyState';
 import {
   useGetExpiringItemsQuery,
   useListInventoryQuery,
@@ -28,7 +29,7 @@ type Props = NativeStackScreenProps<InventoryStackParamList, 'InventoryDashboard
 const MIN_SEARCH_LENGTH = 4;
 
 interface ProductGroup {
-  productId: string;
+  productId: string | null;
   productName: string;
   productBrand: string | null;
   productImageUrl: string | null;
@@ -43,12 +44,15 @@ function groupByProduct(items: InventoryItemDto[]): ProductGroup[] {
   const map = new Map<string, ProductGroup>();
 
   for (const item of items) {
-    const existing = map.get(item.productId);
+    // Items without a catalog match are keyed by normalized name so that
+    // the same product bought across multiple receipts still merges into one row.
+    const key = item.productId ?? item.productName.toLowerCase().trim();
+    const existing = map.get(key);
     if (existing) {
       existing.batches.push(item);
       existing.totalQuantity += item.quantity;
     } else {
-      map.set(item.productId, {
+      map.set(key, {
         productId: item.productId,
         productName: item.productName,
         productBrand: item.productBrand,
@@ -97,23 +101,18 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
   const isFetchError =
     isError && typeof error === 'object' && error !== null && 'status' in error && error.status === 'FETCH_ERROR';
 
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
-
   if (isError && !isExpectedEmpty) {
     return (
-      <View style={styles.center}>
-        <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
-          {isFetchError ? t('common.networkError') : t('common.error')}
-        </Text>
-        <Button mode="text" onPress={refetch} icon="refresh">
-          {t('common.retry')}
-        </Button>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <EmptyState
+          icon="alert-circle-outline"
+          title={isFetchError ? t('common.networkError') : t('common.loadError')}
+          action={
+            <Button mode="text" onPress={refetch} icon="refresh">
+              {t('common.retry')}
+            </Button>
+          }
+        />
       </View>
     );
   }
@@ -166,31 +165,28 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
         />
       )}
 
-      {isEmpty ? (
-        <View style={styles.center}>
-          <List.Icon icon="fridge-outline" color={colors.onSurfaceVariant} />
-          <Text variant="titleMedium" style={{ color: colors.onSurface }}>
-            {t('inventory.list.emptyTitle')}
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.emptySubtitle, { color: colors.onSurfaceVariant }]}
-          >
-            {t('inventory.list.emptySubtitle')}
-          </Text>
-          <Button
-            mode="contained"
-            icon="plus"
-            onPress={() => navigation.navigate('AddInventoryItem')}
-            style={styles.emptyButton}
-          >
-            {t('inventory.list.addFirstItem')}
-          </Button>
-        </View>
+      {isLoading ? (
+        <SkeletonList />
+      ) : isEmpty ? (
+        <EmptyState
+          icon="fridge-outline"
+          title={t('inventory.list.emptyTitle')}
+          subtitle={t('inventory.list.emptySubtitle')}
+          action={
+            <Button
+              mode="contained"
+              icon="plus"
+              onPress={() => navigation.navigate('AddInventoryItem')}
+              style={styles.emptyButton}
+            >
+              {t('inventory.list.addFirstItem')}
+            </Button>
+          }
+        />
       ) : (
         <FlatList
           data={groups}
-          keyExtractor={(group) => group.productId}
+          keyExtractor={(group) => group.productId ?? group.productName}
           renderItem={({ item: group }) => {
             const unitLabel = t(`catalog.units.${group.unit}`, { defaultValue: group.unit });
             return (
@@ -208,9 +204,7 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
                 rippleColor={colors.surfaceVariant}
               >
                 <View style={styles.row}>
-                  <View style={[styles.iconWrap, { backgroundColor: colors.surfaceVariant }]}>
-                    <Icon source="fridge-outline" size={22} color={colors.onSurfaceVariant} />
-                  </View>
+                  <ProductThumb name={group.productName} imageUrl={group.productImageUrl} />
                   <View style={styles.rowContent}>
                     <Text
                       variant="bodyLarge"
@@ -220,6 +214,7 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
                       {group.productName}
                     </Text>
                     <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+                      {group.productBrand ? `${group.productBrand}  ·  ` : ''}
                       {`${group.totalQuantity} ${unitLabel}`}
                       {group.batches.length > 1
                         ? `  ·  ${t('inventory.list.batchCount', { count: group.batches.length })}`
@@ -259,7 +254,7 @@ export default function InventoryDashboardScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 0 },
   expiryBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -275,18 +270,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    gap: 12,
-  },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 14,
   },
   rowContent: { flex: 1, gap: 3 },
   lowStockChip: { alignSelf: 'flex-start', marginTop: 2 },
   fab: { position: 'absolute', right: 16, bottom: 16 },
-  emptySubtitle: { textAlign: 'center' },
-  emptyButton: { marginTop: 8 },
+  emptyButton: { width: '100%' },
 });

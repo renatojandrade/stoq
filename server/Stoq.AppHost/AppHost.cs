@@ -15,7 +15,11 @@ IResourceBuilder<ParameterResource> rabbitmqPassword = builder.AddParameter("rab
 IResourceBuilder<PostgresServerResource> postgres = builder.AddPostgres("postgres", password: postgresPassword)
     .WithDataVolume("stoq-postgres-data")
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint("tcp", e => { e.Port = 5432; e.IsProxied = false; });
+    .WithEndpoint("tcp", e =>
+    {
+        e.Port = 5432;
+        e.IsProxied = false;
+    });
 
 IResourceBuilder<PostgresDatabaseResource> dbIdentity = postgres.AddDatabase("stoq-identity");
 IResourceBuilder<PostgresDatabaseResource> dbCatalog = postgres.AddDatabase("stoq-catalog");
@@ -29,8 +33,16 @@ IResourceBuilder<RabbitMQServerResource> rabbitmq = builder.AddRabbitMQ("rabbitm
     .WithDataVolume("stoq-rabbitmq-data")
     .WithManagementPlugin()
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithEndpoint("tcp", e => { e.Port = 5672; e.IsProxied = false; })
-    .WithEndpoint("management", e => { e.Port = 15672; e.IsProxied = false; });
+    .WithEndpoint("tcp", e =>
+    {
+        e.Port = 5672;
+        e.IsProxied = false;
+    })
+    .WithEndpoint("management", e =>
+    {
+        e.Port = 15672;
+        e.IsProxied = false;
+    });
 
 // ─── Application services ─────────────────────────────────────────────────────
 IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.Stoq_ApiService>("apiservice")
@@ -49,5 +61,7 @@ builder.AddProject<Projects.Stoq_Web>("webfrontend")
     .WithHttpHealthCheck("/health")
     .WithReference(apiService)
     .WaitFor(apiService);
+
+builder.AddDockerComposeEnvironment("env");
 
 await builder.Build().RunAsync();

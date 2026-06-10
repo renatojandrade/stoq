@@ -15,7 +15,7 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
     private InventoryItem(
         Guid id,
         Guid householdId,
-        Guid productId,
+        Guid? productId,
         string productName,
         string? productBrand,
         string? productImageUrl,
@@ -42,7 +42,7 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
 
     public Guid HouseholdId { get; private set; }
 
-    public Guid ProductId { get; private set; }
+    public Guid? ProductId { get; private set; }
 
     public string ProductName { get; private set; } = string.Empty;
 
@@ -72,7 +72,7 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
 
     public static InventoryItem Create(
         Guid householdId,
-        Guid productId,
+        Guid? productId,
         string productName,
         string? productBrand,
         string? productImageUrl,
@@ -83,7 +83,6 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
         string? notes)
     {
         Guard.AgainstEmptyGuid(householdId, nameof(householdId));
-        Guard.AgainstEmptyGuid(productId, nameof(productId));
         Guard.AgainstNullOrWhiteSpace(productName, nameof(productName));
         Guard.AgainstNullOrWhiteSpace(unit, nameof(unit));
 
@@ -140,6 +139,12 @@ public sealed class InventoryItem : AggregateRoot<Guid>, IAuditableEntity
         }
 
         Quantity += amount;
+    }
+
+    public void LinkToProduct(Guid productId)
+    {
+        Guard.AgainstEmptyGuid(productId, nameof(productId));
+        ProductId = productId;
     }
 
     public void UpdateDetails(string? notes, DateOnly? expiryDate)

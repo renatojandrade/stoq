@@ -1,0 +1,37 @@
+<!-- @dsCard group="Brand" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { padding:0; display:flex; }
+  .panel { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; }
+  .light { background:#fff; }
+  .mint  { background:#ECF8F1; }
+  .dark  { background:#2D6A4F; }
+  .lab { font:var(--body-small); color:var(--on-surface-variant); }
+  .dark .lab { color:#CDE8D9; }
+  .row { display:flex; align-items:center; gap:10px; }
+  .sizes { display:flex; align-items:center; gap:12px; }
+</style>
+</head>
+<body>
+  <div class="panel light">
+    <img src="../assets/stoq-logo.svg" alt="Stoq" style="height:46px">
+    <div class="sizes">
+      <img src="../assets/stoq-icon.svg" style="width:22px;height:22px">
+      <img src="../assets/stoq-icon.svg" style="width:32px;height:32px">
+      <img src="../assets/stoq-icon.svg" style="width:48px;height:48px">
+    </div>
+    <span class="lab">Primary lockup + app icon at 22 / 32 / 48px</span>
+  </div>
+  <div class="panel dark">
+    <img src="../assets/stoq-logo-white.svg" alt="Stoq" style="height:46px">
+    <img src="../assets/stoq-mark.svg" style="height:40px; filter:brightness(0) invert(1)">
+    <span class="lab">Reversed</span>
+  </div>
+</body>
+</html>

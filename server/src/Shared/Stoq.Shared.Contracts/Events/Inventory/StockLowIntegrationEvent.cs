@@ -5,7 +5,7 @@ public sealed record StockLowIntegrationEvent : BaseIntegrationEvent
     public StockLowIntegrationEvent(
         Guid householdId,
         Guid inventoryItemId,
-        Guid productId,
+        Guid? productId,
         string productName,
         decimal currentQuantity,
         decimal minQuantity,
@@ -24,7 +24,7 @@ public sealed record StockLowIntegrationEvent : BaseIntegrationEvent
 
     public Guid HouseholdId { get; init; }
     public Guid InventoryItemId { get; init; }
-    public Guid ProductId { get; init; }
+    public Guid? ProductId { get; init; }
     public string ProductName { get; init; }
     public decimal CurrentQuantity { get; init; }
     public decimal MinQuantity { get; init; }

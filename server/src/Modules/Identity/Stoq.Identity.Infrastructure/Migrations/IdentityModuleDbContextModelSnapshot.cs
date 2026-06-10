@@ -314,7 +314,7 @@ namespace Stoq.Identity.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DevicePushTokens", (string)null);
+                    b.ToTable("DevicePushTokens", "identity");
                 });
 
             modelBuilder.Entity("Stoq.Identity.Domain.Entities.HouseholdMember", b =>

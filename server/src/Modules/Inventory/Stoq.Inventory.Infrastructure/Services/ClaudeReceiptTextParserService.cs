@@ -79,7 +79,7 @@ public sealed partial class ClaudeReceiptTextParserService(
         var requestBody = new
         {
             model = "claude-haiku-4-5-20251001",
-            max_tokens = 1024,
+            max_tokens = 4096,
             system = _systemPrompt,
             messages = new[]
             {
@@ -129,46 +129,128 @@ public sealed partial class ClaudeReceiptTextParserService(
 
         try
         {
-            ClaudeReceiptResult? result = JsonSerializer.Deserialize<ClaudeReceiptResult>(json, _jsonOptions);
-            if (result is null)
+            return Deserialize(json);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogWarning(ex, "Failed to parse Claude text receipt response as JSON, attempting recovery. Raw: {Text}", text);
+
+            var recovered = TryRepairTruncatedJson(text);
+            if (recovered is null)
             {
                 return new ParseReceiptResultDto(Guid.Empty, null, null, []);
             }
 
-            IReadOnlyList<ParsedReceiptItemDto> items = (result.Items ?? [])
-                .Where(i => !string.IsNullOrWhiteSpace(i.Name))
-                .Select(i => new ParsedReceiptItemDto(
-                    i.Name!,
-                    i.Quantity > 0 ? i.Quantity : 1,
-                    i.Unit ?? "Units",
-                    i.Barcode))
-                .ToList();
-
-            var retailerName = string.IsNullOrWhiteSpace(result.RetailerName) ? null : result.RetailerName.Trim();
-
-            RetailerInfoDto? retailerInfo = null;
-            if (result.RetailerCnpj is not null
-                || result.RetailerTradeName is not null
-                || result.RetailerCity is not null
-                || result.RetailerState is not null)
+            try
             {
-                retailerInfo = new RetailerInfoDto(
-                    Cnpj: NormaliseDigits(result.RetailerCnpj),
-                    LegalName: retailerName,
-                    TradeName: string.IsNullOrWhiteSpace(result.RetailerTradeName) ? null : result.RetailerTradeName.Trim(),
-                    Street: string.IsNullOrWhiteSpace(result.RetailerStreet) ? null : result.RetailerStreet.Trim(),
-                    City: string.IsNullOrWhiteSpace(result.RetailerCity) ? null : result.RetailerCity.Trim(),
-                    State: string.IsNullOrWhiteSpace(result.RetailerState) ? null : result.RetailerState.Trim().ToUpperInvariant(),
-                    ZipCode: NormaliseDigits(result.RetailerZipCode));
-            }
+                var result = Deserialize(recovered);
+                logger.LogInformation(
+                    "Recovered {Count} items from truncated Claude response.",
+                    result.Items.Count);
 
-            return new ParseReceiptResultDto(Guid.Empty, retailerName, retailerInfo, items);
+                return result;
+            }
+            catch (JsonException ex2)
+            {
+                logger.LogWarning(ex2, "JSON recovery also failed.");
+                return new ParseReceiptResultDto(Guid.Empty, null, null, []);
+            }
         }
-        catch (JsonException ex)
+    }
+
+    private ParseReceiptResultDto Deserialize(string json)
+    {
+        ClaudeReceiptResult? result = JsonSerializer.Deserialize<ClaudeReceiptResult>(json, _jsonOptions);
+        if (result is null)
         {
-            logger.LogWarning(ex, "Failed to parse Claude text receipt response as JSON. Raw: {Text}", text);
             return new ParseReceiptResultDto(Guid.Empty, null, null, []);
         }
+
+        IReadOnlyList<ParsedReceiptItemDto> items = (result.Items ?? [])
+            .Where(i => !string.IsNullOrWhiteSpace(i.Name))
+            .Select(i => new ParsedReceiptItemDto(
+                i.Name!,
+                i.Quantity > 0 ? i.Quantity : 1,
+                i.Unit ?? "Units",
+                i.Barcode))
+            .ToList();
+
+        var retailerName = string.IsNullOrWhiteSpace(result.RetailerName) ? null : result.RetailerName.Trim();
+
+        RetailerInfoDto? retailerInfo = null;
+        if (result.RetailerCnpj is not null
+            || result.RetailerTradeName is not null
+            || result.RetailerCity is not null
+            || result.RetailerState is not null)
+        {
+            retailerInfo = new RetailerInfoDto(
+                Cnpj: NormaliseDigits(result.RetailerCnpj),
+                LegalName: retailerName,
+                TradeName: string.IsNullOrWhiteSpace(result.RetailerTradeName) ? null : result.RetailerTradeName.Trim(),
+                Street: string.IsNullOrWhiteSpace(result.RetailerStreet) ? null : result.RetailerStreet.Trim(),
+                City: string.IsNullOrWhiteSpace(result.RetailerCity) ? null : result.RetailerCity.Trim(),
+                State: string.IsNullOrWhiteSpace(result.RetailerState) ? null : result.RetailerState.Trim().ToUpperInvariant(),
+                ZipCode: NormaliseDigits(result.RetailerZipCode));
+        }
+
+        return new ParseReceiptResultDto(Guid.Empty, retailerName, retailerInfo, items);
+    }
+
+    // When Claude hits max_tokens the response is cut off mid-item. This method
+    // finds the last complete item (ends with "},") and closes the array/object,
+    // so callers receive all fully-parsed items instead of zero.
+    private static string? TryRepairTruncatedJson(string raw)
+    {
+        var text = raw.Trim();
+
+        // Strip markdown code fence
+        if (text.StartsWith("```", StringComparison.Ordinal))
+        {
+            var newline = text.IndexOf('\n');
+            text = newline >= 0 ? text[(newline + 1)..] : text[3..];
+        }
+
+        if (text.EndsWith("```", StringComparison.Ordinal))
+        {
+            text = text[..^3].TrimEnd();
+        }
+
+        // Locate the items array opening bracket
+        var itemsPos = text.IndexOf("\"items\"", StringComparison.Ordinal);
+        if (itemsPos < 0)
+        {
+            return null;
+        }
+
+        var arrayOpen = text.IndexOf('[', itemsPos);
+        if (arrayOpen < 0)
+        {
+            return null;
+        }
+
+        // Walk backwards from the end looking for the last '}' that is
+        // immediately followed (ignoring whitespace) by ','. That marks the
+        // closing brace of the last complete item before the truncated one.
+        for (var i = text.Length - 1; i > arrayOpen; i--)
+        {
+            if (text[i] != '}')
+            {
+                continue;
+            }
+
+            var j = i + 1;
+            while (j < text.Length && char.IsWhiteSpace(text[j]))
+            {
+                j++;
+            }
+
+            if (j < text.Length && text[j] == ',')
+            {
+                return text[..(i + 1)] + "\n  ]\n}";
+            }
+        }
+
+        return null;
     }
 
     private static string? NormaliseDigits(string? value)

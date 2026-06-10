@@ -3,7 +3,7 @@ namespace Stoq.Inventory.Application.Common.DTOs;
 public sealed record InventoryItemDto(
     Guid Id,
     Guid HouseholdId,
-    Guid ProductId,
+    Guid? ProductId,
     string ProductName,
     string? ProductBrand,
     string? ProductImageUrl,

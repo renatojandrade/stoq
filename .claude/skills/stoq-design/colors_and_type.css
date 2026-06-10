@@ -1,0 +1,130 @@
+/* ============================================================
+   STOQ — Design Tokens
+   React Native Paper / Material Design 3 (green brand)
+   Type: Roboto · 4-pt spacing grid
+   ------------------------------------------------------------
+   Tokens marked  (real)        match the shipping app exactly.
+   Tokens marked  (MD3 default) are the unchanged baseline.
+   Tokens marked  (improved)    replace a stray purple MD3
+                                default with a green-tinted value.
+   ============================================================ */
+
+:root {
+  /* ---------- BRAND GREEN (real) ---------- */
+  --primary:            #2D6A4F;  /* deep forest green — buttons, active tab, FAB icon target */
+  --on-primary:         #FFFFFF;
+  --primary-container:  #B7E4C7;  /* light green — banners, chips, FAB surface */
+  --on-primary-container:#0D3321; /* (improved) was MD3 purple #21005D */
+  --secondary:          #52B788;  /* medium mint — secondary accents, status */
+  --on-secondary:       #FFFFFF;
+  --secondary-container:#D6F0E1;  /* (improved) was MD3 purple #E8DEF8 — auto-added chip */
+  --on-secondary-container:#0F3D29;
+
+  /* Extended green scale (derived, for richer cards / data viz) */
+  --green-900: #14352370;  /* note: alpha kept out below; see solids */
+  --green-900s:#143523;
+  --green-800: #1B4D34;
+  --green-700: #2D6A4F;     /* = primary */
+  --green-600: #3C8862;
+  --green-500: #52B788;     /* = secondary */
+  --green-400: #74C79E;
+  --green-300: #95D6B6;
+  --green-200: #B7E4C7;     /* = primary-container */
+  --green-100: #D6F0E1;
+  --green-50:  #ECF8F1;
+
+  /* ---------- NEUTRALS (improved — green-tinted, replacing purple MD3) ---------- */
+  --background:     #FFFFFF;  /* (real) page background */
+  --surface:        #F8F9FA;  /* (real) cards, tab bar, action bars */
+  --surface-2:      #ECF1ED;  /* raised surface tint */
+  --surface-variant:#DDE5DF;  /* (improved) icon-chip bg; was MD3 #E7E0EC */
+  --on-surface:     #1A1C1B;  /* (improved) primary text; was MD3 #1C1B1F */
+  --on-surface-variant:#404944; /* (improved) secondary text; was MD3 #49454F */
+  --outline:        #707972;  /* (improved) borders/icons; was MD3 #79747E */
+  --outline-variant:#C3C9C4;  /* (improved) hairline dividers; was MD3 #CAC4D0 */
+
+  /* ---------- SEMANTIC ---------- */
+  --error:           #BA1A1A;  /* (real) */
+  --on-error:        #FFFFFF;
+  --error-container: #FFDAD6;  /* (MD3 default) low-stock chip, alert banner */
+  --on-error-container:#410002;
+  --warning:         #B26A00;  /* (improved) expiry ≤3d; replaces MD3 tertiary mauve #7D5260 */
+  --warning-container:#FFDFB0;
+  --on-warning-container:#3A2200;
+  --success:         #2D6A4F;  /* reuse primary green for success */
+  --success-container:#B7E4C7;
+
+  /* ---------- TYPE (Roboto · MD3 scale) ---------- */
+  --font-sans: 'Roboto', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --font-display: 'Manrope', 'Roboto', sans-serif;  /* logotype only — "Stoq" wordmark, ExtraBold 800 */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-bold:    700;
+
+  /* MD3 type roles: size / line-height / weight / tracking */
+  --display-large:   400 57px/64px var(--font-sans);
+  --headline-medium: 400 28px/36px var(--font-sans);  /* auth titles */
+  --headline-small:  400 24px/32px var(--font-sans);  /* inventory summary qty */
+  --title-large:     500 22px/28px var(--font-sans);  /* profile name */
+  --title-medium:    500 16px/24px var(--font-sans);  /* empty-state titles */
+  --title-small:     500 14px/20px var(--font-sans);  /* section eyebrows */
+  --body-large:      400 16px/24px var(--font-sans);  /* list primary text */
+  --body-medium:     400 14px/20px var(--font-sans);  /* descriptions */
+  --body-small:      400 12px/16px var(--font-sans);  /* meta, captions */
+  --label-large:     500 14px/20px var(--font-sans);  /* buttons */
+  --label-small:     500 11px/16px var(--font-sans);  /* chips, status, tab labels */
+  --eyebrow-tracking: 0.5px;
+
+  /* ---------- SPACING (4-pt grid) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;   /* default screen edge padding */
+  --space-6: 24px;
+  --space-8: 32px;
+  --screen-padding: 16px;
+
+  /* ---------- RADII ---------- */
+  --radius-input:  4px;
+  --radius-card:   12px;
+  --radius-fab:    16px;
+  --radius-chip:   999px;   /* pill */
+  --radius-circle: 9999px;  /* icon chips, scan button, avatars */
+
+  /* ---------- ELEVATION (MD3) ---------- */
+  --elevation-1: 0 1px 2px rgba(0,0,0,0.18);
+  --elevation-2: 0 1px 3px rgba(0,0,0,0.20), 0 2px 6px rgba(0,0,0,0.10);
+  --elevation-3: 0 2px 4px rgba(0,0,0,0.25);   /* scan button, action bars (elevation:4) */
+  --elevation-fab: 0 3px 6px rgba(0,0,0,0.22);
+
+  /* ---------- LAYOUT CONSTANTS ---------- */
+  --tab-bar-height: 60px;
+  --scan-button-size: 56px;
+  --icon-chip-size: 40px;
+  --fab-size: 56px;
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT DEFAULTS (for HTML specimens / kit)
+   ============================================================ */
+body {
+  font-family: var(--font-sans);
+  color: var(--on-surface);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1 { font: var(--headline-medium); margin: 0; letter-spacing: 0; }
+h2 { font: var(--title-large);     margin: 0; }
+h3 { font: var(--title-medium);    margin: 0; }
+.eyebrow {
+  font: var(--title-small);
+  text-transform: uppercase;
+  letter-spacing: var(--eyebrow-tracking);
+  color: var(--on-surface-variant);
+}
+p  { font: var(--body-medium); margin: 0; color: var(--on-surface); }
+small { font: var(--body-small); color: var(--on-surface-variant); }
+.label { font: var(--label-large); }
+.meta  { font: var(--body-small); color: var(--on-surface-variant); }

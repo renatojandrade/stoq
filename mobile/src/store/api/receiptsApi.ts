@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
+import { inventoryApi } from './inventoryApi';
 
 const BASE_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:5000';
 
@@ -124,6 +125,10 @@ export const receiptsApi = createApi({
         arg.correctionId
           ? [{ type: 'ParseCorrection', id: arg.correctionId }]
           : [],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        await queryFulfilled;
+        dispatch(inventoryApi.util.invalidateTags([{ type: 'InventoryItem', id: 'LIST' }]));
+      },
     }),
   }),
 });

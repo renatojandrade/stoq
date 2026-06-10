@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stoq — UI Kit</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; }
+  body { font-family:'Roboto',sans-serif; background:#E7ECE8;
+    display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; gap:40px; }
+  .stage { display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .phone { width:390px; height:800px; background:#000; border-radius:46px; padding:11px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.3), 0 0 0 2px #1a1a1a; flex:none; }
+  .screen { width:100%; height:100%; background:#fff; border-radius:36px; overflow:hidden;
+    display:flex; flex-direction:column; position:relative; }
+  .notch { position:absolute; top:11px; left:50%; transform:translateX(-50%); width:120px; height:30px;
+    background:#000; border-radius:16px; z-index:50; }
+  .caption { font:500 13px Roboto; color:#5C665F; letter-spacing:.3px; }
+  .scrim { position:absolute; inset:0; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="theme.js"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="screens.jsx"></script>
+  <script type="text/babel" src="ReceiptConfirm.jsx"></script>
+  <script type="text/babel" src="screens-extra.jsx"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+    const C = window.STOQ.c;
+
+    // Screens with their own bottom tab bar (main tabs)
+    const TAB_SCREENS = ['inventory','shopping','catalog','profile'];
+    const TITLES = {
+      inventory:'Estoque', shopping:'Lista de compras', catalog:'Catálogo de produtos',
+      profile:'Perfil', expiry:'Alertas de Validade', detail:'',
+      scanlist:'Histórico de escaneamentos', confirm:'Confirmar itens',
+      scancamera:'Escanear Cupom', addform:'Adicionar ao estoque',
+    };
+
+    function App() {
+      const [authed, setAuthed] = useState(false);
+      const [loading, setLoading] = useState(false); // skeleton loading state demo
+      const [tab, setTab] = useState('inventory');     // active main tab
+      const [stack, setStack] = useState([]);           // pushed sub-screens [{name, arg}]
+      const [snackMsg, setSnackMsg] = useState(null);
+
+      function enterApp() {
+        setAuthed(true);
+        setLoading(true);
+        setTimeout(() => setLoading(false), 1200);
+      }
+
+      function snack(msg) {
+        setSnackMsg(msg || 'Adicionado à lista de compras');
+        setTimeout(()=>setSnackMsg(null), 2600);
+      }
+
+      function nav(name, arg) {
+        if (name === 'inventory' || TAB_SCREENS.includes(name)) {
+          if (TAB_SCREENS.includes(name)) { setTab(name); setStack([]); return; }
+        }
+        if (name === 'inventory') { setTab('inventory'); setStack([]); return; }
+        setStack(s => [...s, { name, arg }]);
+      }
+      function back() { setStack(s => s.slice(0, -1)); }
+
+      if (!authed) {
+        return <Frame caption="Login → toque em Entrar">
+          <StatusBar />
+          <LoginScreen nav={enterApp} />
+        </Frame>;
+      }
+
+      if (loading) {
+        return <Frame caption="Estado de carregamento (skeleton)">
+          <StatusBar />
+          <AppHeader title="Estoque" />
+          <LoadingScreen />
+          <TabBar active="inventory" onSelect={()=>{}} onScan={()=>{}} />
+        </Frame>;
+      }
+
+      const top = stack[stack.length - 1];
+      const current = top ? top.name : tab;
+      const showTabBar = !top; // sub-screens hide tab bar
+      let body;
+      if (top) {
+        if (top.name === 'expiry') body = <ExpiryScreen />;
+        else if (top.name === 'detail') body = <DetailScreen product={top.arg} snack={snack} nav={nav} />;
+        else if (top.name === 'scanlist') body = <ScanListScreen nav={nav} />;
+        else if (top.name === 'confirm') body = <ReceiptConfirmScreen scan={top.arg} nav={nav} snack={snack} />;
+        else if (top.name === 'scancamera') body = <ScanCameraScreen nav={nav} />;
+        else if (top.name === 'addform') body = <AddItemFormScreen nav={nav} snack={snack} />;
+      } else {
+        if (tab === 'inventory') body = <InventoryScreen nav={nav} />;
+        else if (tab === 'shopping') body = <ShoppingScreen nav={nav} />;
+        else if (tab === 'catalog') body = <CatalogScreen nav={nav} />;
+        else if (tab === 'profile') body = <ProfileScreen />;
+      }
+
+      const captions = {
+        inventory:'Estoque · toque no banner ou num item',
+        shopping:'Lista · marque itens, abra o + para escanear',
+        catalog:'Catálogo · filtre Todos / Gerais / Minha casa',
+        profile:'Perfil',
+        expiry:'Alertas de validade',
+        detail:'Detalhe do produto · lotes',
+        scanlist:'Cupons escaneados · toque em "Pronto para confirmar"',
+        confirm:'Confirmar itens (redesenhado)',
+        scancamera:'Câmera · toque no obturador para capturar',
+        addform:'Formulário de adição ao estoque',
+      };
+
+      return (
+        <Frame caption={captions[current]}>
+          <StatusBar />
+          <AppHeader
+            title={top && top.name==='detail' ? (top.arg ? top.arg.name : 'Produto') : TITLES[current]}
+            onBack={top ? back : undefined}
+            right={current==='catalog' && !top ? <IconButton name="filter-variant" size={22} /> : null}
+          />
+          {body}
+          {showTabBar && <TabBar active={tab} onSelect={(t)=>{ setTab(t); setStack([]); }} onScan={()=>nav('scancamera')} />}
+          <Snackbar visible={!!snackMsg} text={snackMsg} action="OK" />
+        </Frame>
+      );
+    }
+
+    function Frame({ children, caption }) {
+      return (
+        <div className="stage">
+          <div className="phone"><div className="screen"><div className="notch" />{children}</div></div>
+          {caption && <div className="caption">{caption}</div>}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

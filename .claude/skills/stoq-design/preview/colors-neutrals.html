@@ -1,0 +1,29 @@
+<!-- @dsCard group="Colors" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; }
+  .scale { display: grid; grid-template-columns: repeat(8, 1fr); border-radius: 10px; overflow: hidden; border: 1px solid var(--outline-variant); }
+  .step { height: 70px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; font: var(--label-small); }
+  .cap { margin-top:12px; font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="scale">
+    <div class="step" style="background:#1A1C1B;color:#fff">on-surface</div>
+    <div class="step" style="background:#404944;color:#fff">on-surf-var</div>
+    <div class="step" style="background:#707972;color:#fff">outline</div>
+    <div class="step" style="background:#C3C9C4;color:#1A1C1B">outline-var</div>
+    <div class="step" style="background:#DDE5DF;color:#1A1C1B">surf-variant</div>
+    <div class="step" style="background:#ECF1ED;color:#1A1C1B">surface-2</div>
+    <div class="step" style="background:#F8F9FA;color:#1A1C1B">surface</div>
+    <div class="step" style="background:#FFFFFF;color:#1A1C1B;border-left:1px solid var(--outline-variant)">background</div>
+  </div>
+  <div class="cap">Green-tinted neutral scale (improved). Replaces MD3's purple-cast defaults (#E7E0EC / #49454F / #79747E) for a cohesive feel.</div>
+</body>
+</html>

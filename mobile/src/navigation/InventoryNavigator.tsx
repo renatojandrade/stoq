@@ -14,7 +14,7 @@ export type InventoryStackParamList = {
   InventoryDashboard: undefined;
   ExpiryAlerts: undefined;
   ProductInventoryDetail: {
-    productId: string;
+    productId: string | null;
     productName: string;
     productBrand: string | null;
     productImageUrl: string | null;

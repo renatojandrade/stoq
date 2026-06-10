@@ -22,7 +22,7 @@ internal sealed class BatchAddInventoryItemsCommandHandler(
 
         foreach (BatchInventoryItem item in request.Items)
         {
-            var productId = item.MatchedProductId ?? Guid.NewGuid();
+            Guid? productId = item.MatchedProductId;
 
             var inventoryItem = InventoryItem.Create(
                 request.HouseholdId,

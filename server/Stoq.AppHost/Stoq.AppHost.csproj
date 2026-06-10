@@ -10,6 +10,7 @@
     <!-- Aspire hosting extensions for infrastructure resources -->
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+    <PackageReference Include="Aspire.Hosting.Docker" />
   </ItemGroup>
 
   <ItemGroup>

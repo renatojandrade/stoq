@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Primitives;
 using Stoq.ApiService.Database;
 using Stoq.ApiService.Hubs;
 using Stoq.ApiService.Services;
@@ -36,7 +37,7 @@ builder.Services.AddIdentityInfrastructure(
     {
         Stoq.Identity.Infrastructure.InfrastructureServiceExtensions.AddIdentityConsumers(configurator);
         Stoq.Shopping.Infrastructure.InfrastructureServiceExtensions.AddShoppingConsumers(configurator);
-        int prefetchCount = builder.Configuration.GetValue<int?>("ReceiptParsing:GlobalPrefetchCount") ?? 10;
+        var prefetchCount = builder.Configuration.GetValue<int?>("ReceiptParsing:GlobalPrefetchCount") ?? 10;
         Stoq.Inventory.Infrastructure.InfrastructureServiceExtensions.AddInventoryConsumers(configurator, prefetchCount);
         Stoq.Catalog.Infrastructure.InfrastructureServiceExtensions.AddCatalogConsumers(configurator);
     });
@@ -88,11 +89,12 @@ builder.Services.AddShoppingDbContext(shoppingConnectionString);
 // ─── SignalR ──────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IReceiptNotificationService, CompositeReceiptNotificationService>();
+builder.Services.AddScoped<IHouseholdSyncService, HouseholdSyncService>();
 
 // Allow JWT via query string for SignalR WebSocket connections.
 builder.Services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
 {
-    var original = options.Events?.OnMessageReceived;
+    Func<MessageReceivedContext, Task>? original = options.Events?.OnMessageReceived;
     options.Events ??= new JwtBearerEvents();
     options.Events.OnMessageReceived = async context =>
     {
@@ -101,7 +103,7 @@ builder.Services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.Authenticatio
             await original(context);
         }
 
-        var token = context.Request.Query["access_token"];
+        StringValues token = context.Request.Query["access_token"];
         if (!string.IsNullOrEmpty(token) &&
             context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
         {
@@ -138,6 +140,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ReceiptHub>("/hubs/receipts");
+app.MapHub<HouseholdHub>("/hubs/household");
 app.MapDefaultEndpoints();
 
 // ─── Apply EF Core migrations on startup (development only) ──────────────────

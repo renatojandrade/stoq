@@ -1,0 +1,37 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 22px 24px; display:flex; flex-direction:column; gap:14px; }
+  .chips { display:flex; gap:10px; flex-wrap:wrap; }
+  .chip { display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border-radius:999px; font:var(--label-small); }
+  .banner { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:10px; font:var(--label-large); }
+  .banner .mdi { font-size:20px; }
+  .grow { flex:1; }
+</style>
+</head>
+<body>
+  <div class="banner" style="background:var(--error-container); color:#410002;">
+    <span class="mdi mdi-calendar-alert"></span>
+    <span class="grow">3 itens próximos ao vencimento</span>
+    <span class="mdi mdi-chevron-right"></span>
+  </div>
+  <div class="banner" style="background:var(--surface-variant); color:var(--on-surface-variant);">
+    <span class="mdi mdi-calendar-check"></span>
+    <span class="grow">Nenhum produto vencendo nos próximos 7 dias.</span>
+    <span class="mdi mdi-chevron-right"></span>
+  </div>
+  <div class="chips">
+    <span class="chip" style="background:var(--error-container); color:#410002;">Estoque baixo</span>
+    <span class="chip" style="background:var(--secondary-container); color:var(--on-secondary-container);">Adicionado auto.</span>
+    <span class="chip" style="background:transparent; border:1px solid var(--warning); color:var(--warning);">Vence em 2 dias</span>
+    <span class="chip" style="background:transparent; border:1px solid var(--outline); color:var(--on-surface-variant);">5 dias restantes</span>
+  </div>
+</body>
+</html>

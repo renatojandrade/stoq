@@ -1,0 +1,50 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 8px 0; background:#fff; }
+  .row { display:flex; align-items:center; gap:12px; padding:12px 16px; }
+  .chipico { width:40px; height:40px; border-radius:9999px; background:var(--surface-variant); display:flex; align-items:center; justify-content:center; flex:none; }
+  .chipico .mdi { font-size:22px; color:var(--on-surface-variant); }
+  .content { flex:1; display:flex; flex-direction:column; gap:3px; }
+  .title { font:var(--body-large); color:var(--on-surface); }
+  .meta { font:var(--body-small); color:var(--on-surface-variant); }
+  .lowchip { align-self:flex-start; margin-top:2px; height:22px; padding:0 9px; border-radius:999px; background:var(--error-container); color:#410002; font:var(--label-small); display:inline-flex; align-items:center; }
+  .divider { height:1px; background:var(--outline-variant); margin-left:16px; }
+  .mdi-chev { color:var(--on-surface-variant); font-size:20px; }
+  .cbx { width:22px; height:22px; border-radius:4px; border:2px solid var(--primary); flex:none; display:flex; align-items:center; justify-content:center; }
+  .cbx.on { background:var(--primary); }
+  .cbx.on .mdi { color:#fff; font-size:16px; }
+  .strike { text-decoration:line-through; opacity:.5; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="chipico"><span class="mdi mdi-fridge-outline"></span></div>
+    <div class="content">
+      <span class="title">Leite integral</span>
+      <span class="meta">2 Litros&nbsp;&nbsp;·&nbsp;&nbsp;2 lotes</span>
+      <span class="lowchip">Estoque baixo</span>
+    </div>
+    <span class="mdi mdi-chevron-right mdi-chev"></span>
+  </div>
+  <div class="divider"></div>
+  <div class="row">
+    <div class="cbx on"><span class="mdi mdi-check"></span></div>
+    <div class="content"><span class="title strike">Café em pó 500g</span><span class="meta">1 Pacote</span></div>
+    <span class="mdi mdi-trash-can-outline mdi-chev"></span>
+  </div>
+  <div class="divider"></div>
+  <div class="row">
+    <div class="cbx"></div>
+    <div class="content"><span class="title">Ovos</span><span class="meta">12 Unidades</span></div>
+    <span class="mdi mdi-trash-can-outline mdi-chev"></span>
+  </div>
+</body>
+</html>

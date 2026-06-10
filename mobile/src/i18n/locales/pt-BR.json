@@ -129,8 +129,11 @@
   "catalog": {
     "list": {
       "title": "Catálogo de produtos",
+      "tabLabel": "Catálogo",
       "searchPlaceholder": "Buscar produtos…",
       "searchPrompt": "Busque um produto pelo nome para explorar o catálogo.",
+      "emptyTitle": "Nenhum produto encontrado",
+      "emptySubtitle": "Tente outro nome ou adicione manualmente.",
       "empty": "Nenhum produto encontrado. Tente outro nome ou adicione manualmente.",
       "addProduct": "Adicionar manualmente",
       "scanBarcode": "Escanear código de barras",
@@ -268,6 +271,7 @@
   "shopping": {
     "list": {
       "title": "Lista de compras",
+      "tabLabel": "Lista",
       "emptyTitle": "Sua lista de compras está vazia",
       "emptySubtitle": "Adicione itens para comprar no mercado.",
       "addFirstItem": "Adicionar primeiro item",
@@ -301,16 +305,26 @@
       "nfeNotSupported": "O acesso direto ao XML da NF-e não é suportado neste estado. Tente o modo foto.",
       "confirmTitle": "Confirmar itens",
       "confirmSubtitle": "Revise e ajuste os itens antes de adicioná-los ao estoque.",
+      "headerSubtitle": "revise antes de adicionar ao estoque",
+      "itemsRecognized_one": "{{count}} item reconhecido",
+      "itemsRecognized_other": "{{count}} itens reconhecidos",
+      "recognized": "Reconhecido",
+      "newProduct": "Novo produto",
+      "addExpiry": "Adicionar validade (opcional)",
       "alreadyConfirmed": "Estes itens já foram adicionados ao seu estoque.",
       "confirmEmpty": "Nenhum item foi reconhecido. Tente novamente ou adicione manualmente.",
-      "expiryDate": "Data de validade (opcional)",
+      "expiryDate": "Validade",
       "expiryPlaceholder": "AAAA-MM-DD",
       "addToInventory": "Adicionar ao estoque",
+      "addToInventoryCount_one": "Adicionar {{count}} item ao estoque",
+      "addToInventoryCount_other": "Adicionar {{count}} itens ao estoque",
       "successMessage": "Itens adicionados ao seu estoque.",
       "removeItem": "Remover item"
     },
     "scanList": {
       "title": "Histórico de escaneamentos",
+      "emptyTitle": "Nenhum escaneamento ainda",
+      "emptySubtitle": "Escaneie um cupom para adicionar itens ao seu estoque.",
       "empty": "Nenhum escaneamento ainda. Toque no botão abaixo para escanear um cupom.",
       "scanButton": "Escanear cupom",
       "tapToConfirm": "Revisar e confirmar",

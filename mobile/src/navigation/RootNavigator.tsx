@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,11 @@ import { authApi } from '../store/api/authApi';
 import { receiptsApi } from '../store/api/receiptsApi';
 import { usePushNotifications } from '../hooks/usePushNotifications';
 import { useSignalR } from '../hooks/useSignalR';
+import { useHouseholdSync } from '../hooks/useHouseholdSync';
 import AuthNavigator from './AuthNavigator';
 import HouseholdSetupNavigator from './HouseholdSetupNavigator';
 import MainTabNavigator from './MainTabNavigator';
+import OfflineBanner from '../components/OfflineBanner';
 
 const navigationRef = createNavigationContainerRef();
 
@@ -24,6 +26,7 @@ export default function RootNavigator() {
   const [isBootstrapping, setIsBootstrapping] = useState(true);
 
   const connection = useSignalR();
+  useHouseholdSync();
 
   // Global handlers for async NF-e scan results — survive screen navigation.
   // Invalidate the corrections list cache so ReceiptScanList updates automatically.
@@ -59,7 +62,8 @@ export default function RootNavigator() {
     } else if (screen === 'ShoppingList') {
       navigationRef.navigate('ShoppingTab' as never);
     } else if (screen === 'ScanList') {
-      navigationRef.navigate('ShoppingTab' as never, { screen: 'ScanList' } as never);
+      // @ts-expect-error React Navigation's navigate overloads don't allow two `as never` args.
+      navigationRef.navigate('ShoppingTab', { screen: 'ScanList' });
     }
   }, []);
 
@@ -104,12 +108,21 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
-      {!isAuthenticated
-        ? <AuthNavigator />
-        : householdId
-          ? <MainTabNavigator />
-          : <HouseholdSetupNavigator />}
-    </NavigationContainer>
+    <View style={styles.root}>
+      <OfflineBanner />
+      <NavigationContainer ref={navigationRef}>
+        {!isAuthenticated
+          ? <AuthNavigator />
+          : householdId
+            ? <MainTabNavigator />
+            : <HouseholdSetupNavigator />}
+      </NavigationContainer>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

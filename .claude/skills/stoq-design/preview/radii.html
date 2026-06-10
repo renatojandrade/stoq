@@ -1,0 +1,24 @@
+<!-- @dsCard group="Spacing" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; display:flex; gap:26px; align-items:center; flex-wrap:wrap; }
+  .demo { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .box { width:74px; height:74px; background:var(--primary-container); border:1px solid var(--primary); }
+  .lab { font:var(--body-small); color:var(--on-surface-variant); text-align:center; }
+  .lab b { display:block; color:var(--on-surface); font-weight:500; }
+</style>
+</head>
+<body>
+  <div class="demo"><div class="box" style="border-radius:4px"></div><div class="lab"><b>4px</b>input</div></div>
+  <div class="demo"><div class="box" style="border-radius:12px"></div><div class="lab"><b>12px</b>card</div></div>
+  <div class="demo"><div class="box" style="border-radius:16px"></div><div class="lab"><b>16px</b>FAB</div></div>
+  <div class="demo"><div class="box" style="border-radius:9999px"></div><div class="lab"><b>full</b>icon chip · avatar · scan</div></div>
+  <div class="demo"><div class="box" style="border-radius:999px; height:30px; width:90px;"></div><div class="lab"><b>pill</b>chip</div></div>
+</body>
+</html>

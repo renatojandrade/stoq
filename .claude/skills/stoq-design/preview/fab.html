@@ -1,0 +1,24 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; display:flex; gap:40px; align-items:center; flex-wrap:wrap; }
+  .demo { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .fab { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:var(--elevation-fab); }
+  .fab .mdi { font-size:24px; }
+  .fab-ext { width:auto; padding:0 20px; gap:8px; height:56px; font:var(--label-large); }
+  .lab { font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="demo"><div class="fab" style="background:var(--primary-container); color:var(--on-primary-container);"><span class="mdi mdi-plus"></span></div><div class="lab">FAB · primaryContainer</div></div>
+  <div class="demo"><div class="fab fab-ext" style="background:var(--primary-container); color:var(--on-primary-container);"><span class="mdi mdi-plus"></span>Adicionar lote</div><div class="lab">Extended FAB</div></div>
+  <div class="demo"><div class="fab" style="background:var(--primary); color:#fff; border-radius:9999px; margin-top:0;"><span class="mdi mdi-barcode-scan"></span></div><div class="lab">Scan button</div></div>
+</body>
+</html>

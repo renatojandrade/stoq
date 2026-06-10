@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 22px 24px; }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .sw { border-radius: 12px; overflow: hidden; border: 1px solid var(--outline-variant); }
+  .sw .chip { height: 64px; display:flex; align-items:flex-end; padding: 8px; }
+  .sw .meta { padding: 7px 9px 9px; }
+  .sw .name { font: var(--label-large); }
+  .sw .hex { font: var(--body-small); color: var(--on-surface-variant); text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#2D6A4F"><span style="color:#fff;font:var(--label-small)">onPrimary</span></div><div class="meta"><div class="name">Primary</div><div class="hex">#2D6A4F</div></div></div>
+    <div class="sw"><div class="chip" style="background:#B7E4C7"><span style="color:#0D3321;font:var(--label-small)">on…</span></div><div class="meta"><div class="name">Primary Container</div><div class="hex">#B7E4C7</div></div></div>
+    <div class="sw"><div class="chip" style="background:#52B788"><span style="color:#fff;font:var(--label-small)">onSecondary</span></div><div class="meta"><div class="name">Secondary</div><div class="hex">#52B788</div></div></div>
+    <div class="sw"><div class="chip" style="background:#D6F0E1"><span style="color:#0F3D29;font:var(--label-small)">on…</span></div><div class="meta"><div class="name">Secondary Cont.</div><div class="hex">#D6F0E1</div></div></div>
+  </div>
+</body>
+</html>

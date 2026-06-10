@@ -52,6 +52,19 @@ export const shoppingApi = createApi({
     }),
     checkOffItem: builder.mutation<ShoppingListItemDto, string>({
       query: (id) => ({ url: `/api/shopping/${id}/check`, method: 'POST' }),
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patch = dispatch(
+          shoppingApi.util.updateQueryData('listShopping', undefined, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) { item.isChecked = true; }
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patch.undo();
+        }
+      },
       invalidatesTags: (_result, _err, id) => [
         { type: 'ShoppingItem', id },
         { type: 'ShoppingItem', id: 'LIST' },
@@ -59,6 +72,19 @@ export const shoppingApi = createApi({
     }),
     uncheckItem: builder.mutation<ShoppingListItemDto, string>({
       query: (id) => ({ url: `/api/shopping/${id}/uncheck`, method: 'POST' }),
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patch = dispatch(
+          shoppingApi.util.updateQueryData('listShopping', undefined, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) { item.isChecked = false; }
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patch.undo();
+        }
+      },
       invalidatesTags: (_result, _err, id) => [
         { type: 'ShoppingItem', id },
         { type: 'ShoppingItem', id: 'LIST' },

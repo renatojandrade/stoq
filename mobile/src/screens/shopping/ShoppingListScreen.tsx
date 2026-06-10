@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
-  ActivityIndicator,
   Button,
   Checkbox,
   Chip,
   Divider,
   FAB,
-  List,
   Text,
   TouchableRipple,
   IconButton,
   useTheme,
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { ShoppingStackParamList } from '../../navigation/ShoppingNavigator';
+import ProductThumb from '../../components/ProductThumb';
+import SkeletonList from '../../components/SkeletonList';
+import EmptyState from '../../components/EmptyState';
 import {
   useListShoppingQuery,
   useCheckOffItemMutation,
@@ -36,6 +38,12 @@ export default function ShoppingListScreen({ navigation }: Props) {
     refetchOnFocus: true,
   });
 
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
   const [checkOff] = useCheckOffItemMutation();
   const [uncheck] = useUncheckItemMutation();
   const [removeItem] = useRemoveShoppingItemMutation();
@@ -45,22 +53,21 @@ export default function ShoppingListScreen({ navigation }: Props) {
     isError && typeof error === 'object' && error !== null && 'status' in error && error.status === 'FETCH_ERROR';
 
   if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <SkeletonList />;
   }
 
   if (isError) {
     return (
-      <View style={styles.center}>
-        <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
-          {isFetchError ? t('common.networkError') : t('common.error')}
-        </Text>
-        <Button mode="text" onPress={refetch} icon="refresh">
-          {t('common.retry')}
-        </Button>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <EmptyState
+          icon="alert-circle-outline"
+          title={isFetchError ? t('common.networkError') : t('common.loadError')}
+          action={
+            <Button mode="text" onPress={refetch} icon="refresh">
+              {t('common.retry')}
+            </Button>
+          }
+        />
       </View>
     );
   }
@@ -95,6 +102,7 @@ export default function ShoppingListScreen({ navigation }: Props) {
             status={item.isChecked ? 'checked' : 'unchecked'}
             onPress={() => handleToggle(item)}
           />
+          <ProductThumb name={item.productName} imageUrl={null} size={40} />
           <View style={styles.rowContent}>
             <Text
               variant="bodyLarge"
@@ -136,34 +144,31 @@ export default function ShoppingListScreen({ navigation }: Props) {
   if (isEmpty) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.center}>
-          <List.Icon icon="cart-outline" color={colors.onSurfaceVariant} />
-          <Text variant="titleMedium" style={{ color: colors.onSurface }}>
-            {t('shopping.list.emptyTitle')}
-          </Text>
-          <Text
-            variant="bodyMedium"
-            style={[styles.emptySubtitle, { color: colors.onSurfaceVariant }]}
-          >
-            {t('shopping.list.emptySubtitle')}
-          </Text>
-          <Button
-            mode="contained"
-            icon="plus"
-            onPress={() => navigation.navigate('AddShoppingItem')}
-            style={styles.emptyButton}
-          >
-            {t('shopping.list.addFirstItem')}
-          </Button>
-          <Button
-            mode="outlined"
-            icon="receipt-text-outline"
-            onPress={() => navigation.navigate('ReceiptScanList')}
-            style={styles.emptyButton}
-          >
-            {t('shopping.list.scanReceipt')}
-          </Button>
-        </View>
+        <EmptyState
+          icon="cart-outline"
+          title={t('shopping.list.emptyTitle')}
+          subtitle={t('shopping.list.emptySubtitle')}
+          action={
+            <>
+              <Button
+                mode="contained"
+                icon="plus"
+                onPress={() => navigation.navigate('AddShoppingItem')}
+                style={styles.emptyButton}
+              >
+                {t('shopping.list.addFirstItem')}
+              </Button>
+              <Button
+                mode="outlined"
+                icon="receipt-text-outline"
+                onPress={() => navigation.navigate('ReceiptScanList')}
+                style={styles.emptyButton}
+              >
+                {t('shopping.list.scanReceipt')}
+              </Button>
+            </>
+          }
+        />
       </View>
     );
   }
@@ -225,19 +230,20 @@ export default function ShoppingListScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 0 },
   clearButton: { alignSelf: 'flex-end', marginRight: 8, marginTop: 4 },
   list: { paddingBottom: 96 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingLeft: 14,
     paddingRight: 8,
-    paddingVertical: 8,
+    paddingVertical: 10,
+    gap: 12,
   },
   rowContent: { flex: 1, gap: 3, paddingVertical: 4 },
   autoChip: { alignSelf: 'flex-start', marginTop: 2 },
   strikethrough: { textDecorationLine: 'line-through', opacity: 0.5 },
-  emptySubtitle: { textAlign: 'center' },
-  emptyButton: { marginTop: 8, width: '100%' },
+  emptyButton: { width: '100%' },
   fabGroup: { position: 'absolute', right: 0, bottom: 0 },
 });

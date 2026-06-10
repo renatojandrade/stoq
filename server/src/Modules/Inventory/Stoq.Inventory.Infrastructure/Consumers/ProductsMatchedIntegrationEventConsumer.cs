@@ -1,6 +1,7 @@
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using Stoq.Inventory.Application.Ports;
+using Stoq.Inventory.Domain.Aggregates;
 using Stoq.Inventory.Domain.Entities;
 using Stoq.Inventory.Domain.Enums;
 using Stoq.Shared.Contracts.Events.Catalog;
@@ -9,6 +10,7 @@ namespace Stoq.Inventory.Infrastructure.Consumers;
 
 public sealed class ProductsMatchedIntegrationEventConsumer(
     IParseCorrectionsRepository repository,
+    IInventoryRepository inventoryRepository,
     ILogger<ProductsMatchedIntegrationEventConsumer> logger)
     : IConsumer<ProductsMatchedIntegrationEvent>
 {
@@ -42,11 +44,19 @@ public sealed class ProductsMatchedIntegrationEventConsumer(
                 continue;
             }
 
-            var newStatus = result.IsMatched
+            MatchStatus newStatus = result.IsMatched
                 ? MatchStatus.MatchedReference
                 : MatchStatus.FlaggedUnmatched;
 
             item.UpdateMatchStatus(newStatus, result.MatchedReferenceProductId);
+
+            if (result.IsMatched && result.MatchedReferenceProductId.HasValue)
+            {
+                InventoryItem? inventoryItem = await inventoryRepository
+                    .GetByIdAsync(result.InventoryItemId, context.CancellationToken);
+
+                inventoryItem?.LinkToProduct(result.MatchedReferenceProductId.Value);
+            }
         }
 
         await repository.SaveChangesAsync(context.CancellationToken);

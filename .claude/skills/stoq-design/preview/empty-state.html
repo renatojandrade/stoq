@@ -1,0 +1,25 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; }
+  .ico { font-size:46px; color:var(--on-surface-variant); opacity:.55; }
+  .t { font:var(--title-medium); color:var(--on-surface); }
+  .s { font:var(--body-medium); color:var(--on-surface-variant); max-width:300px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 20px; border-radius:20px; background:var(--primary); color:#fff; font:var(--label-large); margin-top:4px; }
+  .btn .mdi { font-size:18px; }
+</style>
+</head>
+<body>
+  <span class="mdi mdi-fridge-outline ico"></span>
+  <div class="t">Seu estoque está vazio</div>
+  <div class="s">Comece adicionando os produtos que você tem em casa.</div>
+  <span class="btn"><span class="mdi mdi-plus"></span>Adicionar primeiro item</span>
+</body>
+</html>

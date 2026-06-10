@@ -1,0 +1,33 @@
+<!-- @dsCard group="Colors" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; }
+  .scale { display: grid; grid-template-columns: repeat(11, 1fr); border-radius: 10px; overflow: hidden; border: 1px solid var(--outline-variant); }
+  .step { height: 72px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px; font: var(--label-small); }
+  .lbls { display:grid; grid-template-columns: repeat(11, 1fr); margin-top:6px; }
+  .lbls span { text-align:center; font: var(--body-small); color: var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="scale">
+    <div class="step" style="background:#143523;color:#fff">900</div>
+    <div class="step" style="background:#1B4D34;color:#fff">800</div>
+    <div class="step" style="background:#2D6A4F;color:#fff">700</div>
+    <div class="step" style="background:#3C8862;color:#fff">600</div>
+    <div class="step" style="background:#52B788;color:#fff">500</div>
+    <div class="step" style="background:#74C79E;color:#143523">400</div>
+    <div class="step" style="background:#95D6B6;color:#143523">300</div>
+    <div class="step" style="background:#B7E4C7;color:#143523">200</div>
+    <div class="step" style="background:#D6F0E1;color:#143523">100</div>
+    <div class="step" style="background:#ECF8F1;color:#143523">50</div>
+    <div class="step" style="background:#FFFFFF;color:#143523;border-left:1px solid var(--outline-variant)">0</div>
+  </div>
+  <div style="margin-top:14px; font:var(--body-small); color:var(--on-surface-variant)">Green brand scale — 700 = Primary, 500 = Secondary, 200 = Primary Container. Use mid-tones for data viz & richer cards.</div>
+</body>
+</html>

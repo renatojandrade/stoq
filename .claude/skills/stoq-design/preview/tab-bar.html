@@ -1,0 +1,33 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 28px 0 18px; background:#fff; }
+  .tabbar { position:relative; display:flex; background:var(--surface); border-top:1px solid var(--outline-variant); height:60px; padding:0 4px; }
+  .tab { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+  .tab .mdi { font-size:24px; color:var(--on-surface-variant); }
+  .tab .lab { font:var(--label-small); color:var(--on-surface-variant); }
+  .tab.active .mdi, .tab.active .lab { color:var(--primary); }
+  .scanwrap { flex:1; display:flex; align-items:center; justify-content:center; }
+  .scan { width:56px; height:56px; border-radius:9999px; background:var(--primary); display:flex; align-items:center; justify-content:center; margin-top:-14px; box-shadow:var(--elevation-3); }
+  .scan .mdi { font-size:26px; color:#fff; }
+  .cap { padding: 14px 24px 0; font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="tabbar">
+    <div class="tab active"><span class="mdi mdi-fridge"></span><span class="lab">Estoque</span></div>
+    <div class="tab"><span class="mdi mdi-cart-outline"></span><span class="lab">Lista</span></div>
+    <div class="scanwrap"><div class="scan"><span class="mdi mdi-barcode-scan"></span></div></div>
+    <div class="tab"><span class="mdi mdi-package-variant-closed"></span><span class="lab">Catálogo</span></div>
+    <div class="tab"><span class="mdi mdi-account-circle-outline"></span><span class="lab">Perfil</span></div>
+  </div>
+  <div class="cap">Active tab uses the filled icon + primary green. Center scan button overhangs by 14px. Short labels prevent clipping.</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!-- @dsCard group="Colors" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 22px 24px; }
+  .pairs { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; }
+  .pair { border-radius:12px; overflow:hidden; border:1px solid var(--outline-variant); }
+  .pair .main { height:54px; display:flex; align-items:center; padding:0 12px; font:var(--label-large); }
+  .pair .cont { height:36px; display:flex; align-items:center; padding:0 12px; font:var(--body-small); }
+  .pair .nm { padding:7px 10px; font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="pairs">
+    <div class="pair"><div class="main" style="background:#BA1A1A;color:#fff">Error</div><div class="cont" style="background:#FFDAD6;color:#410002">errorContainer · estoque baixo</div><div class="nm">#BA1A1A / #FFDAD6</div></div>
+    <div class="pair"><div class="main" style="background:#B26A00;color:#fff">Warning</div><div class="cont" style="background:#FFDFB0;color:#3A2200">vence em ≤3 dias</div><div class="nm">#B26A00 / #FFDFB0 (improved)</div></div>
+    <div class="pair"><div class="main" style="background:#2D6A4F;color:#fff">Success</div><div class="cont" style="background:#B7E4C7;color:#0D3321">confirmado</div><div class="nm">#2D6A4F / #B7E4C7</div></div>
+  </div>
+</body>
+</html>

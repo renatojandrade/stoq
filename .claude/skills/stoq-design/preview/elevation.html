@@ -1,0 +1,23 @@
+<!-- @dsCard group="Spacing" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 28px 24px; display:flex; gap:28px; align-items:center; flex-wrap:wrap; background:#FFFFFF; }
+  .demo { display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .box { width:96px; height:64px; background:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font:var(--body-small); color:var(--on-surface-variant); }
+  .lab { font:var(--body-small); color:var(--on-surface-variant); text-align:center; }
+  .lab b { display:block; color:var(--on-surface); font-weight:500; }
+</style>
+</head>
+<body>
+  <div class="demo"><div class="box" style="box-shadow:var(--elevation-1)">e1</div><div class="lab"><b>Level 1</b>chips</div></div>
+  <div class="demo"><div class="box" style="box-shadow:var(--elevation-2)">e2</div><div class="lab"><b>Level 2</b>cards</div></div>
+  <div class="demo"><div class="box" style="box-shadow:var(--elevation-3)">e3</div><div class="lab"><b>Level 3</b>action bars · scan</div></div>
+  <div class="demo"><div class="box" style="box-shadow:var(--elevation-fab); background:var(--primary-container)">fab</div><div class="lab"><b>FAB</b>floating</div></div>
+</body>
+</html>

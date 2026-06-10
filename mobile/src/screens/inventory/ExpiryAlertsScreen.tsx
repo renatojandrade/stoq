@@ -5,7 +5,6 @@ import {
   Button,
   Chip,
   Divider,
-  List,
   Snackbar,
   Text,
   useTheme,
@@ -13,6 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useGetExpiringItemsQuery, useTriggerExpiryScanMutation } from '../../store/api/inventoryApi';
 import type { InventoryItemDto } from '../../store/api/inventoryApi';
+import ProductThumb from '../../components/ProductThumb';
 
 const DAYS_AHEAD = 7;
 
@@ -67,20 +67,26 @@ export default function ExpiryAlertsScreen() {
             : t('inventory.expiry.daysLeft', { count: days });
 
       return (
-        <List.Item
-          title={item.productName}
-          description={`${item.quantity} ${item.unit}${item.productBrand ? ` · ${item.productBrand}` : ''}`}
-          right={() => (
-            <Chip
-              compact
-              style={[styles.chip, { borderColor: chipColor }]}
-              textStyle={{ color: chipColor }}
-              mode="outlined"
-            >
-              {expiryLabel}
-            </Chip>
-          )}
-        />
+        <View style={styles.row}>
+          <ProductThumb name={item.productName} imageUrl={null} size={42} />
+          <View style={styles.rowContent}>
+            <Text variant="bodyLarge" style={{ color: colors.onSurface }}>
+              {item.productName}
+            </Text>
+            <Text variant="bodySmall" style={{ color: colors.onSurfaceVariant }}>
+              {`${item.quantity} ${item.unit}`}
+              {item.productBrand ? ` · ${item.productBrand}` : ''}
+            </Text>
+          </View>
+          <Chip
+            compact
+            style={[styles.chip, { borderColor: chipColor }]}
+            textStyle={{ color: chipColor }}
+            mode="outlined"
+          >
+            {expiryLabel}
+          </Chip>
+        </View>
       );
     },
     [colors, t],
@@ -168,6 +174,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 14,
+  },
+  rowContent: {
+    flex: 1,
+    gap: 2,
   },
   chip: {
     alignSelf: 'center',

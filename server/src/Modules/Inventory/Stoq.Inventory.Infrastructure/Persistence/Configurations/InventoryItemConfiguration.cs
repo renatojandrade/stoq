@@ -19,7 +19,7 @@ internal sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Inve
         builder.Ignore(i => i.IsStockLow);
 
         builder.Property(i => i.HouseholdId).IsRequired();
-        builder.Property(i => i.ProductId).IsRequired();
+        builder.Property(i => i.ProductId);
         builder.Property(i => i.ProductName).IsRequired().HasMaxLength(200);
         builder.Property(i => i.ProductBrand).HasMaxLength(200);
         builder.Property(i => i.ProductImageUrl).HasMaxLength(2000);

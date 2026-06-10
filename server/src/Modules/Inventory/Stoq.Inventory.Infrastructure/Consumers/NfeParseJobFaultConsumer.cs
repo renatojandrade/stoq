@@ -1,4 +1,4 @@
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.Extensions.Logging;
 using Stoq.Inventory.Application.Ports;
 using Stoq.Inventory.Domain.Entities;
@@ -14,8 +14,8 @@ public sealed class NfeParseJobFaultConsumer(
 {
     public async Task Consume(ConsumeContext<Fault<NfeParseJobRequestedEvent>> context)
     {
-        var original = context.Message.Message;
-        string reason = context.Message.Exceptions.FirstOrDefault()?.Message ?? "Unknown error";
+        NfeParseJobRequestedEvent original = context.Message.Message;
+        var reason = context.Message.Exceptions.FirstOrDefault()?.Message ?? "Unknown error";
 
         logger.LogError(
             "NF-e parse job failed for correction {CorrectionId}: {Reason}",

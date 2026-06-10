@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stoq.ApiService.DTOs;
+using Stoq.ApiService.Services;
 using Stoq.Identity.Application.Common.DTOs;
 using Stoq.Identity.Application.Households.Commands.ChangeMemberRole;
 using Stoq.Identity.Application.Households.Commands.CreateHousehold;
@@ -20,7 +21,8 @@ namespace Stoq.ApiService.Controllers;
 [Authorize]
 public sealed class HouseholdsController(
     IMediator mediator,
-    ICurrentUserService currentUserService)
+    ICurrentUserService currentUserService,
+    IHouseholdSyncService householdSyncService)
     : ControllerBase
 {
     /// <summary>Creates a new household with the caller as Admin.</summary>
@@ -72,6 +74,10 @@ public sealed class HouseholdsController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastMemberJoinedAsync(
+                result.Value.Household.Id,
+                result.Value.User.DisplayName,
+                ct);
             return Ok(result.Value);
         }
 

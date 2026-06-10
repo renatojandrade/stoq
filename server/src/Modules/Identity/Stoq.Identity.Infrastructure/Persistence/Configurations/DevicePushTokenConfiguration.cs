@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Stoq.Identity.Domain.Entities;
+using Stoq.Identity.Infrastructure.Persistence;
 
 namespace Stoq.Identity.Infrastructure.Persistence.Configurations;
 
@@ -8,7 +9,7 @@ internal sealed class DevicePushTokenConfiguration : IEntityTypeConfiguration<De
 {
     public void Configure(EntityTypeBuilder<DevicePushToken> builder)
     {
-        builder.ToTable("DevicePushTokens");
+        builder.ToTable("DevicePushTokens", IdentityModuleDbContext.Schema);
 
         builder.HasKey(t => t.Id);
 

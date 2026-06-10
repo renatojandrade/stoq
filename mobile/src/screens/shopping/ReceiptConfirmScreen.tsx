@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import {
   ActivityIndicator,
   Button,
-  Divider,
+  Chip,
   HelperText,
+  Icon,
   IconButton,
   Snackbar,
   Text,
   TextInput,
+  TouchableRipple,
   useTheme,
 } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
@@ -23,12 +25,27 @@ import {
 
 type Props = NativeStackScreenProps<ShoppingStackParamList, 'ReceiptConfirm'>;
 
+// ── Background color for the list area (surface2 from the design system) ─────
+const SURFACE2 = '#ECF1ED';
+
+// ── Title-case helper (mirrors ui_kits/mobile/ReceiptConfirm.jsx titleCase) ──
+// Receipt items arrive in ALL-CAPS from the OCR/NF-e parser; this makes them
+// readable without discarding the user's own edits (applied only on init).
+function toTitleCase(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/\b\w/g, (m) => m.toUpperCase())
+    .replace(/\d+[lL]\b/g, (m) => m.toUpperCase());   // keep "1L", "2L" uppercase
+}
+
+// ── Data types ────────────────────────────────────────────────────────────────
 interface EditableItem {
   id: string;
   productName: string;
   quantity: string;
   unit: string;
   expiryDate: string;
+  showExpiry: boolean;
   correctionItemId?: string;
   matchedProductId?: string | null;
   barcode?: string | null;
@@ -42,10 +59,11 @@ function toEditable(
 ): EditableItem {
   return {
     id: `${index}`,
-    productName: item.productName,
+    productName: toTitleCase(item.productName),
     quantity: String(item.quantity),
     unit: t(`catalog.units.${item.unit}`, { defaultValue: item.unit }),
     expiryDate: '',
+    showExpiry: false,
     correctionItemId: item.correctionItemId,
     matchedProductId: item.matchedProductId,
     barcode: item.barcode,
@@ -54,10 +72,61 @@ function toEditable(
 }
 
 function isValidExpiryDate(value: string): boolean {
-  if (!value) return true;
+  if (!value) {
+    return true;
+  }
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+// ── CField ─────────────────────────────────────────────────────────────────────
+// Compact flat field styled to match ui_kits/mobile/ReceiptConfirm.jsx CField:
+//   surface2 background · 8px radius · 2px outlineVariant underline · dense.
+interface CFieldProps {
+  label: string;
+  value: string;
+  onChangeText?: (v: string) => void;
+  keyboardType?: 'default' | 'decimal-pad' | 'numeric';
+  error?: boolean;
+  editable?: boolean;
+  style?: object;
+}
+
+function CField({ label, value, onChangeText, keyboardType, error, editable = true, style }: CFieldProps) {
+  const { colors } = useTheme();
+  return (
+    <View style={[cfStyles.wrap, style]}>
+      <TextInput
+        mode="flat"
+        label={label}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboardType}
+        error={error}
+        editable={editable}
+        dense
+        style={cfStyles.input}
+        underlineColor={colors.outlineVariant}
+        activeUnderlineColor={colors.outlineVariant}
+        underlineStyle={cfStyles.underline}
+      />
+    </View>
+  );
+}
+
+const cfStyles = StyleSheet.create({
+  wrap: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  input: {
+    backgroundColor: SURFACE2,
+  },
+  underline: {
+    height: 2,
+  },
+});
+
+// ── Screen ────────────────────────────────────────────────────────────────────
 export default function ReceiptConfirmScreen({ navigation, route }: Props) {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -111,7 +180,9 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
         retailerSku: i.retailerSku ?? null,
       }));
 
-    if (validItems.length === 0) return;
+    if (validItems.length === 0) {
+      return;
+    }
 
     try {
       await batchAdd({ items: validItems, correctionId: correctionId ?? null }).unwrap();
@@ -121,6 +192,7 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
     }
   }
 
+  // ── Loading / empty guards ─────────────────────────────────────────────────
   if (isDetailLoading) {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
@@ -153,38 +225,65 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
         isValidExpiryDate(i.expiryDate),
     );
 
+  // ── Main render ───────────────────────────────────────────────────────────
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {sourceRetailerName ? (
-        <Text variant="titleSmall" style={[styles.retailerName, { color: colors.primary }]}>
-          {sourceRetailerName}
-        </Text>
-      ) : null}
-      <Text variant="bodySmall" style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
-        {alreadyConfirmed
-          ? t('shopping.receipt.alreadyConfirmed')
-          : t('shopping.receipt.confirmSubtitle')}
-      </Text>
+    <View style={[styles.container, { backgroundColor: SURFACE2 }]}>
 
+      {/* ── Summary header (primary green) ─────────────────────────────────── */}
+      <View style={[styles.header, { backgroundColor: colors.primary }]}>
+        {sourceRetailerName ? (
+          <View style={styles.headerRow}>
+            <Icon source="store-outline" size={20} color={colors.onPrimary} />
+            <Text variant="titleSmall" style={[styles.headerRetailer, { color: colors.onPrimary }]}>
+              {sourceRetailerName}
+            </Text>
+          </View>
+        ) : null}
+        <Text variant="bodySmall" style={[styles.headerSub, { color: colors.primaryContainer }]}>
+          {alreadyConfirmed
+            ? t('shopping.receipt.alreadyConfirmed')
+            : `${t('shopping.receipt.itemsRecognized', { count: items.length })} · ${t('shopping.receipt.headerSubtitle')}`}
+        </Text>
+      </View>
+
+      {/* ── Item cards ─────────────────────────────────────────────────────── */}
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <Divider />}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => {
           const expiryInvalid = item.expiryDate !== '' && !isValidExpiryDate(item.expiryDate);
+          const isMatched = !!item.matchedProductId;
+
           return (
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <TextInput
-                  mode="outlined"
-                  label={t('shopping.add.productName')}
-                  value={item.productName}
-                  onChangeText={(v) => updateItem(item.id, { productName: v })}
-                  style={styles.nameInput}
-                  dense
-                  editable={!alreadyConfirmed}
-                />
+            <View style={[styles.card, { backgroundColor: colors.background }, cardShadow]}>
+
+              {/* Status chip + remove ───────────────────────────────────── */}
+              <View style={styles.cardTop}>
+                {isMatched ? (
+                  <Chip
+                    compact
+                    icon={({ size }) => (
+                      <Icon source="check-circle" size={size} color={colors.onSecondaryContainer} />
+                    )}
+                    style={{ backgroundColor: colors.secondaryContainer }}
+                    textStyle={{ color: colors.onSecondaryContainer, fontSize: 11 }}
+                  >
+                    {t('shopping.receipt.recognized')}
+                  </Chip>
+                ) : (
+                  <Chip
+                    compact
+                    icon={({ size }) => (
+                      <Icon source="help-circle-outline" size={size} color={colors.onTertiaryContainer} />
+                    )}
+                    style={{ backgroundColor: colors.tertiaryContainer }}
+                    textStyle={{ color: colors.onTertiaryContainer, fontSize: 11 }}
+                  >
+                    {t('shopping.receipt.newProduct')}
+                  </Chip>
+                )}
+                <View style={styles.spacer} />
                 {!alreadyConfirmed && (
                   <IconButton
                     icon="close"
@@ -196,54 +295,74 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
                 )}
               </View>
 
-              <View style={styles.row}>
-                <TextInput
-                  mode="outlined"
+              {/* Product name ───────────────────────────────────────────── */}
+              <CField
+                label={t('shopping.add.productName')}
+                value={item.productName}
+                onChangeText={(v) => updateItem(item.id, { productName: v })}
+                editable={!alreadyConfirmed}
+              />
+
+              {/* Quantity (narrow) + unit (flex) ────────────────────────── */}
+              <View style={styles.qtyRow}>
+                <CField
                   label={t('shopping.add.quantity')}
                   value={item.quantity}
                   onChangeText={(v) => updateItem(item.id, { quantity: v })}
                   keyboardType="decimal-pad"
-                  style={styles.quantityInput}
-                  dense
                   editable={!alreadyConfirmed}
+                  style={styles.qtyField}
                 />
-                <TextInput
-                  mode="outlined"
+                <CField
                   label={t('shopping.add.unit')}
                   value={item.unit}
                   onChangeText={(v) => updateItem(item.id, { unit: v })}
-                  style={styles.unitInput}
-                  dense
                   editable={!alreadyConfirmed}
+                  style={styles.unitField}
                 />
               </View>
 
+              {/* Optional expiry ────────────────────────────────────────── */}
               {!alreadyConfirmed && (
-                <>
-                  <TextInput
-                    mode="outlined"
-                    label={t('shopping.receipt.expiryDate')}
-                    placeholder={t('shopping.receipt.expiryPlaceholder')}
-                    value={item.expiryDate}
-                    onChangeText={(v) => updateItem(item.id, { expiryDate: v })}
-                    keyboardType="numeric"
-                    style={styles.expiryInput}
-                    dense
-                    error={expiryInvalid}
-                  />
-                  {expiryInvalid && (
-                    <HelperText type="error">
-                      {t('inventory.validation.expiryDateInvalid')}
-                    </HelperText>
-                  )}
-                </>
+                item.showExpiry ? (
+                  <>
+                    <CField
+                      label={t('shopping.receipt.expiryDate')}
+                      value={item.expiryDate}
+                      onChangeText={(v) => updateItem(item.id, { expiryDate: v })}
+                      keyboardType="numeric"
+                      error={expiryInvalid}
+                      editable
+                    />
+                    {expiryInvalid && (
+                      <HelperText type="error" style={styles.helperText}>
+                        {t('inventory.validation.expiryDateInvalid')}
+                      </HelperText>
+                    )}
+                  </>
+                ) : (
+                  <TouchableRipple
+                    onPress={() => updateItem(item.id, { showExpiry: true })}
+                    style={styles.expiryTrigger}
+                    rippleColor={colors.surfaceVariant}
+                    accessibilityRole="button"
+                  >
+                    <View style={styles.expiryTriggerInner}>
+                      <Icon source="calendar-plus" size={18} color={colors.primary} />
+                      <Text variant="labelMedium" style={{ color: colors.primary }}>
+                        {t('shopping.receipt.addExpiry')}
+                      </Text>
+                    </View>
+                  </TouchableRipple>
+                )
               )}
             </View>
           );
         }}
       />
 
-      <View style={[styles.footer, { backgroundColor: colors.surface }]}>
+      {/* ── Sticky footer ──────────────────────────────────────────────────── */}
+      <View style={[styles.footer, { backgroundColor: colors.background }, footerShadow]}>
         {isLoading ? (
           <ActivityIndicator />
         ) : (
@@ -254,7 +373,7 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
             icon="check"
             style={styles.submitButton}
           >
-            {t('shopping.receipt.addToInventory')}
+            {t('shopping.receipt.addToInventoryCount', { count: items.length })}
           </Button>
         )}
       </View>
@@ -271,27 +390,47 @@ export default function ReceiptConfirmScreen({ navigation, route }: Props) {
   );
 }
 
+// ── Platform shadows ──────────────────────────────────────────────────────────
+const cardShadow = Platform.select({
+  ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.10, shadowRadius: 3 },
+  android: { elevation: 2 },
+  default: {},
+});
+
+const footerShadow = Platform.select({
+  ios: { shadowColor: '#000', shadowOffset: { width: 0, height: -1 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  android: { elevation: 4 },
+  default: {},
+});
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
-  retailerName: { marginHorizontal: 16, marginTop: 16, marginBottom: 2 },
-  subtitle: { marginHorizontal: 16, marginBottom: 8 },
-  list: { paddingHorizontal: 16, paddingBottom: 100 },
-  card: { paddingVertical: 12, gap: 8 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  nameInput: { flex: 1 },
-  row: { flexDirection: 'row', gap: 8 },
-  quantityInput: { flex: 1 },
-  unitInput: { flex: 1 },
-  expiryInput: {},
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    paddingBottom: 32,
-    elevation: 4,
-  },
+
+  // Header
+  header: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 18 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  headerRetailer: { flex: 1 },
+  headerSub: { marginTop: 6 },
+
+  // Card list
+  list: { padding: 16, paddingTop: 14, paddingBottom: 108, gap: 12 },
+  card: { borderRadius: 14, paddingTop: 14, paddingHorizontal: 14, paddingBottom: 12, gap: 10 },
+
+  // Card internals
+  cardTop: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  spacer: { flex: 1 },
+  qtyRow: { flexDirection: 'row', gap: 10 },
+  qtyField: { width: 96 },
+  unitField: { flex: 1 },
+
+  // Expiry affordance
+  expiryTrigger: { borderRadius: 4, marginTop: 2 },
+  expiryTriggerInner: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 4 },
+  helperText: { marginTop: -4 },
+
+  // Footer
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, paddingBottom: 32 },
   submitButton: { width: '100%' },
 });

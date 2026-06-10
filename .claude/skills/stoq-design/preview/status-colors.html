@@ -1,0 +1,34 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 22px 24px; display:grid; grid-template-columns:1fr 1fr; gap:22px 32px; }
+  .blk-t { font:var(--title-small); text-transform:uppercase; letter-spacing:var(--eyebrow-tracking); color:var(--on-surface-variant); margin-bottom:10px; }
+  .line { display:flex; align-items:center; gap:8px; margin-bottom:7px; font:var(--label-small); }
+  .sw { width:12px; height:12px; border-radius:3px; flex:none; }
+  .sp { display:inline-flex; align-items:center; gap:5px; }
+  .sp .mdi { font-size:14px; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="blk-t">Validade (urgência)</div>
+    <div class="line"><span class="sw" style="background:var(--error)"></span>≤ 1 dia — Vencido / Vence hoje</div>
+    <div class="line"><span class="sw" style="background:var(--warning)"></span>≤ 3 dias — amarelo (alerta)</div>
+    <div class="line"><span class="sw" style="background:var(--outline)"></span>&gt; 3 dias — neutro</div>
+  </div>
+  <div>
+    <div class="blk-t">Escaneamento de cupom</div>
+    <div class="line"><span class="sp" style="color:var(--primary)"><span class="mdi mdi-progress-clock"></span>Processando</span></div>
+    <div class="line"><span class="sp" style="color:var(--secondary)"><span class="mdi mdi-check-circle-outline"></span>Pronto para confirmar</span></div>
+    <div class="line"><span class="sp" style="color:var(--on-surface-variant)"><span class="mdi mdi-check-all"></span>Confirmado</span></div>
+    <div class="line"><span class="sp" style="color:var(--error)"><span class="mdi mdi-alert-circle-outline"></span>Falhou</span></div>
+  </div>
+</body>
+</html>

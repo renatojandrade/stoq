@@ -1,8 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import {
-  ActivityIndicator,
+  Button,
   FAB,
+  Icon,
   IconButton,
   List,
   Menu,
@@ -15,6 +16,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { CatalogStackParamList } from '../../navigation/CatalogNavigator';
 import { useListProductsQuery, useDeleteProductMutation } from '../../store/api/catalogApi';
 import type { ProductDto, ListProductsParams } from '../../store/api/catalogApi';
+import SkeletonList from '../../components/SkeletonList';
+import EmptyState from '../../components/EmptyState';
 
 type Props = NativeStackScreenProps<CatalogStackParamList, 'ProductList'>;
 
@@ -101,27 +104,39 @@ export default function ProductListScreen({ navigation }: Props) {
 
       {showSearchPrompt ? (
         <View style={styles.center}>
+          <Icon source="magnify" size={28} color={colors.onSurfaceVariant} />
           <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
             {t('catalog.list.searchPrompt')}
           </Text>
         </View>
       ) : isLoading || isFetching ? (
-        <View style={styles.center}>
-          <ActivityIndicator />
-        </View>
+        <SkeletonList />
       ) : isError ? (
-        <View style={styles.center}>
-          <Text variant="bodyMedium" style={{ color: colors.onSurfaceVariant }}>
-            {t('common.error')}
-          </Text>
-          <IconButton icon="refresh" onPress={refetch} />
-        </View>
+        <EmptyState
+          icon="alert-circle-outline"
+          title={t('common.loadError')}
+          action={
+            <Button mode="text" onPress={refetch} icon="refresh">
+              {t('common.retry')}
+            </Button>
+          }
+        />
       ) : products?.length === 0 ? (
-        <View style={styles.center}>
-          <Text variant="bodyLarge" style={{ color: colors.onSurfaceVariant, textAlign: 'center' }}>
-            {t('catalog.list.empty')}
-          </Text>
-        </View>
+        <EmptyState
+          icon="package-variant-closed"
+          title={t('catalog.list.emptyTitle')}
+          subtitle={t('catalog.list.emptySubtitle')}
+          action={
+            <Button
+              mode="contained"
+              icon="pencil-plus-outline"
+              onPress={() => navigation.navigate('ProductForm', {})}
+              style={styles.emptyButton}
+            >
+              {t('catalog.list.addProduct')}
+            </Button>
+          }
+        />
       ) : (
         <FlatList
           data={products}
@@ -183,9 +198,10 @@ export default function ProductListScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
   searchbar: { margin: 16, marginBottom: 8 },
   list: { paddingBottom: 96 },
   actions: { flexDirection: 'row', alignItems: 'center' },
   fabGroup: { position: 'absolute', right: 0, bottom: 0 },
+  emptyButton: { width: '100%' },
 });

@@ -1,0 +1,36 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; display:flex; flex-direction:column; gap:16px; }
+  .btns { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .btn { display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 20px; border-radius:20px;
+         font:var(--label-large); border:none; cursor:default; }
+  .btn .mdi { font-size:18px; }
+  .contained { background:var(--primary); color:#fff; }
+  .tonal { background:var(--primary-container); color:var(--on-primary-container); }
+  .outlined { background:transparent; color:var(--primary); border:1px solid var(--outline-variant); }
+  .text { background:transparent; color:var(--primary); padding:0 12px; }
+  .disabled { background:#E3E5E4; color:#A0A8A3; }
+  .cap { font:var(--body-small); color:var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="btns">
+    <button class="btn contained"><span class="mdi mdi-check"></span>Adicionar ao estoque</button>
+    <button class="btn tonal"><span class="mdi mdi-calendar-alert"></span>Verificar a vencer</button>
+  </div>
+  <div class="btns">
+    <button class="btn outlined"><span class="mdi mdi-cart-plus"></span>Adicionar à lista</button>
+    <button class="btn text">Esqueceu a senha?</button>
+    <button class="btn disabled"><span class="mdi mdi-check"></span>Confirmar itens</button>
+  </div>
+  <div class="cap">contained · contained-tonal · outlined · text · disabled — all sentence-case imperative.</div>
+</body>
+</html>

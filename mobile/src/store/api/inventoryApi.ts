@@ -6,7 +6,7 @@ const BASE_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:5000';
 export interface InventoryItemDto {
   id: string;
   householdId: string;
-  productId: string;
+  productId: string | null;
   productName: string;
   productBrand: string | null;
   productImageUrl: string | null;
@@ -85,6 +85,19 @@ export const inventoryApi = createApi({
         method: 'POST',
         body,
       }),
+      async onQueryStarted({ id, amount }, { dispatch, queryFulfilled }) {
+        const patch = dispatch(
+          inventoryApi.util.updateQueryData('listInventory', undefined, (draft) => {
+            const item = draft.find((i) => i.id === id);
+            if (item) { item.quantity = Math.max(0, item.quantity - amount); }
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patch.undo();
+        }
+      },
       invalidatesTags: (_result, _err, { id }) => [
         { type: 'InventoryItem', id },
         { type: 'InventoryItem', id: 'LIST' },

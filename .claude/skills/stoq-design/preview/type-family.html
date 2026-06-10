@@ -1,0 +1,29 @@
+<!-- @dsCard group="Type" -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="_card.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { padding: 24px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; }
+  .item .k { font: var(--body-small); color: var(--on-surface-variant); margin-bottom: 2px; }
+  .fam { font: var(--title-large); color: var(--primary); }
+  .eyebrow-demo { font: var(--title-small); text-transform: uppercase; letter-spacing: var(--eyebrow-tracking); color: var(--on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="row gap-3" style="margin-bottom:18px; align-items:baseline;">
+    <span class="fam">Roboto</span>
+    <span style="font:var(--body-small); color:var(--on-surface-variant)">MD3 default · Regular 400 / Medium 500 / Bold 700</span>
+  </div>
+  <div class="grid">
+    <div class="item"><div class="k">Numbers — tabular feel</div><div style="font:var(--headline-small)">0123456789</div></div>
+    <div class="item"><div class="k">Section eyebrow (titleSmall, uppercased)</div><div class="eyebrow-demo">Lotes</div></div>
+    <div class="item"><div class="k">Weights</div><div style="font:var(--body-large)"><span style="font-weight:400">Regular</span> · <span style="font-weight:500">Medium</span> · <span style="font-weight:700">Bold</span></div></div>
+    <div class="item"><div class="k">Special char</div><div style="font:var(--body-large)">Ellipsis only: Carregando…</div></div>
+  </div>
+</body>
+</html>

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stoq.ApiService.DTOs;
+using Stoq.ApiService.Services;
 using Stoq.Catalog.Application.Common.DTOs;
 using Stoq.Catalog.Application.Products.Queries.GetProduct;
 using Stoq.Inventory.Application.Common.DTOs;
@@ -23,7 +24,8 @@ namespace Stoq.ApiService.Controllers;
 public sealed class InventoryController(
     IMediator mediator,
     ICurrentUserService currentUserService,
-    IExpiryCheckService expiryCheckService)
+    IExpiryCheckService expiryCheckService,
+    IHouseholdSyncService householdSyncService)
     : ControllerBase
 {
     /// <summary>Lists all inventory items for the caller's household, with an optional name filter.</summary>
@@ -125,6 +127,7 @@ public sealed class InventoryController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastInventoryUpdatedAsync(householdId.Value, ct);
             return CreatedAtAction(nameof(List), result.Value);
         }
 
@@ -152,6 +155,7 @@ public sealed class InventoryController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastInventoryUpdatedAsync(householdId.Value, ct);
             return Ok(result.Value);
         }
 
@@ -182,6 +186,7 @@ public sealed class InventoryController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastInventoryUpdatedAsync(householdId.Value, ct);
             return NoContent();
         }
 
@@ -233,6 +238,7 @@ public sealed class InventoryController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastInventoryUpdatedAsync(householdId.Value, ct);
             return CreatedAtAction(nameof(List), result.Value);
         }
 

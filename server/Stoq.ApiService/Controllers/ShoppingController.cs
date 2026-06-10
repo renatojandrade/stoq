@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stoq.ApiService.DTOs;
+using Stoq.ApiService.Services;
 using Stoq.Shared.Kernel.Common;
 using Stoq.Shared.Kernel.Services;
 using Stoq.Shopping.Application.Common.DTOs;
@@ -20,7 +21,8 @@ namespace Stoq.ApiService.Controllers;
 [Authorize]
 public sealed class ShoppingController(
     IMediator mediator,
-    ICurrentUserService currentUserService)
+    ICurrentUserService currentUserService,
+    IHouseholdSyncService householdSyncService)
     : ControllerBase
 {
     /// <summary>Lists all shopping list items for the caller's household.</summary>
@@ -81,6 +83,7 @@ public sealed class ShoppingController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastShoppingListUpdatedAsync(householdId.Value, ct);
             return CreatedAtAction(nameof(List), result.Value);
         }
 
@@ -106,6 +109,7 @@ public sealed class ShoppingController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastShoppingListUpdatedAsync(householdId.Value, ct);
             return Ok(result.Value);
         }
 
@@ -136,6 +140,7 @@ public sealed class ShoppingController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastShoppingListUpdatedAsync(householdId.Value, ct);
             return Ok(result.Value);
         }
 
@@ -166,6 +171,7 @@ public sealed class ShoppingController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastShoppingListUpdatedAsync(householdId.Value, ct);
             return NoContent();
         }
 
@@ -195,6 +201,7 @@ public sealed class ShoppingController(
 
         if (result.IsSuccess)
         {
+            await householdSyncService.BroadcastShoppingListUpdatedAsync(householdId.Value, ct);
             return NoContent();
         }
 
